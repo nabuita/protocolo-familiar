@@ -1921,9 +1921,82 @@
     font-size: 13px;
 }
 
+.asset-insurance-matrix-form {
+    display: grid;
+    gap: 12px;
+    padding: 14px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: #fff;
+}
+
+.asset-insurance-matrix-title {
+    display: flex;
+    gap: 12px;
+    align-items: baseline;
+    justify-content: space-between;
+}
+
+.asset-insurance-matrix-title strong {
+    color: var(--primary);
+    font-size: 15px;
+    font-weight: 900;
+}
+
+.asset-insurance-matrix-title span {
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 700;
+    text-align: right;
+}
+
+.asset-insurance-matrix-fields {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.asset-insurance-matrix-fields label {
+    display: grid;
+    gap: 6px;
+    color: #2e3d34;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.asset-insurance-matrix-fields label.wide {
+    grid-column: span 2;
+}
+
+.asset-insurance-matrix-fields input,
+.asset-insurance-matrix-fields select {
+    width: 100%;
+    min-height: 42px;
+    border: 1px solid #b9cdbf;
+    border-radius: 8px;
+    padding: 9px 10px;
+    background: #fff;
+    color: #102119;
+    font: inherit;
+}
+
+.asset-insurance-matrix-fields input:focus,
+.asset-insurance-matrix-fields select:focus {
+    outline: 2px solid rgba(0, 96, 73, 0.18);
+    border-color: var(--primary);
+}
+
 @media (max-width: 900px) {
     .asset-insurance-matrix-methods {
         grid-template-columns: 1fr;
+    }
+
+    .asset-insurance-matrix-fields {
+        grid-template-columns: 1fr;
+    }
+
+    .asset-insurance-matrix-fields label.wide {
+        grid-column: auto;
     }
 }
 

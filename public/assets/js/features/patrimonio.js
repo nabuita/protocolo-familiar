@@ -3524,6 +3524,38 @@ const updatePolicyAllocationRows = (form) => {
     form.querySelectorAll('[data-asset-insurance-policy-row]').forEach(updatePolicyAllocationRow);
 };
 
+const syncMatrixPolicyProxy = (form, target) => {
+    const row = target.closest('[data-asset-matrix-row]');
+    const field = target.dataset.matrixPolicyField;
+    if (!(row instanceof HTMLElement) || !field) {
+        return;
+    }
+    const index = Number(row.dataset.assetMatrixRow);
+    const card = assetInsurancePolicyCards(form)[index];
+    const source = card?.querySelector(`[name$="[${field}]"]`);
+    if (source instanceof HTMLInputElement || source instanceof HTMLSelectElement) {
+        source.value = target.value;
+    }
+    if (['prima_neta', 'gastos_expedicion', 'iva'].includes(field)) {
+        const total = ['prima_neta', 'gastos_expedicion', 'iva']
+            .reduce((sum, key) => sum + assetNumber(card?.querySelector(`[name$="[${key}]"]`)?.value), 0);
+        const totalSource = card?.querySelector('[name$="[prima_total]"]');
+        const totalProxy = row.querySelector('[data-matrix-policy-field="prima_total"]');
+        if (totalSource instanceof HTMLInputElement) {
+            totalSource.value = total > 0 ? String(Math.round(total)) : '';
+        }
+        if (totalProxy instanceof HTMLInputElement) {
+            totalProxy.value = total > 0 ? assetMoneyPlain(total) : '';
+        }
+    }
+    updatePolicyAllocationRow(card);
+    const assignedSource = card?.querySelector('[name$="[prima_asignada]"]');
+    const assignedProxy = row.querySelector('[data-matrix-policy-field="prima_asignada"]');
+    if (assignedSource instanceof HTMLInputElement && assignedProxy instanceof HTMLInputElement) {
+        assignedProxy.value = assignedSource.value ? (assetMoneyPlain(assignedSource.value) || assignedSource.value) : '';
+    }
+};
+
 const syncAllInsuranceQuoteMatrices = (form) => {
     const cards = [...form.querySelectorAll('[data-asset-insurance-policy-row]')];
     cards.forEach((card, index) => {
@@ -3568,6 +3600,13 @@ const insuranceOfferComparisonMatrixHtml = (form, policies = []) => {
         return `
             <div class="asset-insurance-quote-empty">
                 Primero selecciona coberturas y diligencia valores asegurados. Despues aqui aparecera una sola matriz para comparar a todos los oferentes.
+            </div>
+        `;
+    }
+    if (!policies.length) {
+        return `
+            <div class="asset-insurance-quote-empty">
+                Agrega una oferta solo cuando tengas una aseguradora o intermediario para cotizar. La poliza matriz no cuenta como oferta.
             </div>
         `;
     }
@@ -3853,47 +3892,60 @@ const printInsuranceQuoteRequest = (form, policy) => {
 
 const insurancePolicyRowsFromForm = (form) => assetFormRows(form, '[data-asset-insurance-policy-row]', assetInsurancePolicyFields);
 
+const assetInsurancePolicyCards = (form) => [...form.querySelectorAll('[data-asset-insurance-policy-row]')];
+
+const insurancePolicyRowsWithIndexFromForm = (form) => assetInsurancePolicyCards(form)
+    .map((card, index) => ({
+        index,
+        row: assetInsurancePolicyFields.reduce((carry, field) => {
+            carry[field] = card.querySelector(`[name$="[${field}]"]`)?.value ?? '';
+            return carry;
+        }, {}),
+    }));
+
 const renderAssetInsuranceMatrixSummary = (form) => {
     const target = form.querySelector('[data-asset-insurance-matrix-summary]');
     if (!(target instanceof HTMLElement)) {
         return;
     }
-    const rows = insurancePolicyRowsFromForm(form)
-        .filter((row) => row.alcance_poliza === 'Matriz/global' || row.metodo_distribucion === 'Coeficiente' || row.metodo_distribucion === 'Por unidades' || row.grupo_poliza);
+    const rows = insurancePolicyRowsWithIndexFromForm(form)
+        .filter(({ row }) => row.alcance_poliza === 'Matriz/global' || row.metodo_distribucion === 'Coeficiente' || row.metodo_distribucion === 'Por unidades' || row.grupo_poliza);
     const assetName = form.elements.nombre_descripcion?.value || 'este activo';
     target.innerHTML = `
         <div class="asset-insurance-matrix-guide">
-            <strong>Cuando una sola poliza cubre varias unidades</strong>
-            <p>Registra la poliza una sola vez. Luego asigna a ${assetEscape(assetName)} solo la parte que le corresponde por coeficiente, numero de unidades o criterio manual documentado.</p>
+            <strong>Poliza matriz de ${assetEscape(assetName)}</strong>
+            <p>Registra la caratula una sola vez. Aqui solo importan los valores de la poliza y como se reparte el costo entre las unidades.</p>
             <div class="asset-insurance-matrix-methods">
                 <span><b>Coeficiente PH</b> Prima asignada = prima total x coeficiente %.</span>
                 <span><b>Por unidades</b> Prima asignada = prima total / unidades cubiertas.</span>
                 <span><b>Manual</b> El analista define el valor y documenta el criterio.</span>
             </div>
         </div>
-        <div class="asset-insurance-matrix-table" role="table" aria-label="Polizas matriz o globales">
-            <div class="asset-insurance-matrix-head" role="row">
-                <span>Poliza / grupo</span>
-                <span>Ramos</span>
-                <span>Prima total</span>
-                <span>Metodo</span>
-                <span>Coef. / unidades</span>
-                <span>Prima asignada</span>
-                <span>Vigencia</span>
-            </div>
-            ${rows.map((row) => `
-                <div role="row">
-                    <strong>${assetEscape([row.numero_poliza, row.grupo_poliza].filter(Boolean).join(' / ') || 'Poliza matriz por completar')}</strong>
-                    <span>${assetEscape(row.ramo || 'Ramos por definir')}</span>
-                    <span>${assetEscape(assetMoney(assetNumber(row.prima_total)) || 'Por definir')}</span>
-                    <span>${assetEscape(row.metodo_distribucion || 'Por definir')}</span>
-                    <span>${assetEscape(row.metodo_distribucion === 'Coeficiente' ? `${row.coeficiente_participacion || '0'}%` : (row.numero_unidades_cubiertas ? `${row.numero_unidades_cubiertas} unidades` : ''))}</span>
-                    <strong>${assetEscape(assetMoney(assetNumber(row.prima_asignada)) || 'Por calcular')}</strong>
-                    <span>${assetEscape([assetDate(row.fecha_inicio), assetDate(row.fecha_fin)].filter(Boolean).join(' - ') || 'Sin fechas')}</span>
+        ${rows.map(({ row, index }, displayIndex) => `
+            <div class="asset-insurance-matrix-form" data-asset-matrix-row="${index}">
+                <div class="asset-insurance-matrix-title">
+                    <strong>Poliza matriz ${displayIndex + 1}</strong>
+                    <span>${assetEscape(row.grupo_poliza || assetName)}</span>
                 </div>
-            `).join('') || '<p class="muted">Aun no hay polizas matriz registradas para este activo. Usa el boton superior para crear una.</p>'}
-        </div>
-        <p class="muted">La poliza matriz no se duplica por cada inmueble: queda una sola poliza y cada activo conserva su costo proporcional para patrimonio, rentabilidad e historial.</p>
+                <div class="asset-insurance-matrix-fields">
+                    <label>Numero poliza<input data-matrix-policy-field="numero_poliza" value="${assetEscape(row.numero_poliza || '')}" placeholder="Numero de poliza"></label>
+                    <label>Aseguradora<input data-matrix-policy-field="aseguradora" value="${assetEscape(row.aseguradora || '')}" placeholder="Aseguradora"></label>
+                    <label>Prima neta<input data-matrix-policy-field="prima_neta" data-money-format inputmode="decimal" value="${assetEscape(assetMoneyPlain(row.prima_neta) || row.prima_neta || '')}" placeholder="$0"></label>
+                    <label>Gastos expedicion<input data-matrix-policy-field="gastos_expedicion" data-money-format inputmode="decimal" value="${assetEscape(assetMoneyPlain(row.gastos_expedicion) || row.gastos_expedicion || '')}" placeholder="$0"></label>
+                    <label>IVA<input data-matrix-policy-field="iva" data-money-format inputmode="decimal" value="${assetEscape(assetMoneyPlain(row.iva) || row.iva || '')}" placeholder="$0"></label>
+                    <label>Prima total<input data-matrix-policy-field="prima_total" data-money-format inputmode="decimal" value="${assetEscape(assetMoneyPlain(row.prima_total) || row.prima_total || '')}" placeholder="$0"></label>
+                    <label>Metodo distribucion<select data-matrix-policy-field="metodo_distribucion" data-policy-allocation-field><option value="Coeficiente" ${row.metodo_distribucion === 'Coeficiente' ? 'selected' : ''}>Coeficiente PH</option><option value="Por unidades" ${row.metodo_distribucion === 'Por unidades' ? 'selected' : ''}>Por unidades</option><option value="Manual" ${row.metodo_distribucion === 'Manual' ? 'selected' : ''}>Manual documentado</option></select></label>
+                    <label>Coeficiente %<input data-matrix-policy-field="coeficiente_participacion" data-policy-allocation-field inputmode="decimal" value="${assetEscape(row.coeficiente_participacion || '')}" placeholder="3.5"></label>
+                    <label>Unidades cubiertas<input data-matrix-policy-field="numero_unidades_cubiertas" data-policy-allocation-field inputmode="numeric" value="${assetEscape(row.numero_unidades_cubiertas || '')}" placeholder="5"></label>
+                    <label>Prima asignada<input data-matrix-policy-field="prima_asignada" data-policy-allocation-field data-money-format inputmode="decimal" value="${assetEscape(assetMoneyPlain(row.prima_asignada) || row.prima_asignada || '')}" placeholder="$0"></label>
+                    <label>Inicio vigencia<input data-matrix-policy-field="fecha_inicio" type="date" value="${assetEscape(row.fecha_inicio || '')}"></label>
+                    <label>Fin vigencia<input data-matrix-policy-field="fecha_fin" type="date" value="${assetEscape(row.fecha_fin || '')}"></label>
+                    <label>Renovacion<input data-matrix-policy-field="fecha_renovacion" type="date" value="${assetEscape(row.fecha_renovacion || '')}"></label>
+                    <label class="wide">Observacion distribucion<input data-matrix-policy-field="observaciones_distribucion" value="${assetEscape(row.observaciones_distribucion || '')}" placeholder="Coeficiente, unidades o criterio usado"></label>
+                </div>
+                <p class="muted">Total sugerido = prima neta + gastos de expedicion + IVA. La prima asignada se calcula segun el metodo de distribucion.</p>
+            </div>
+        `).join('') || '<p class="muted">Aun no hay poliza matriz registrada. Usa el boton superior para crearla.</p>'}
     `;
 };
 
@@ -3918,8 +3970,20 @@ const renderAssetInsurancePolicyRows = (form, rows = []) => {
         estado: 'Cotizacion solicitada',
         observaciones: `Oferta minima ${index + 1}. Cotizar todos los ramos y coberturas solicitados con tasas, primas, deducibles, limites y sublimites.`,
     });
+    const seenMatrixRows = new Set();
     const sourceRows = (rows.length > 0 ? [...rows] : [])
-        .filter((row) => !(String(row.observaciones || '').startsWith('Oferta minima') && !row.aseguradora && !row.numero_poliza && !parseInsuranceQuoteMatrix(row.cotizacion_matriz).length));
+        .filter((row) => !(String(row.observaciones || '').startsWith('Oferta minima') && !row.aseguradora && !row.numero_poliza && !parseInsuranceQuoteMatrix(row.cotizacion_matriz).length))
+        .filter((row) => {
+            if (row.alcance_poliza !== 'Matriz/global') {
+                return true;
+            }
+            const key = [row.ano, row.numero_poliza, row.grupo_poliza, row.fecha_inicio, row.fecha_fin, row.prima_total].join('|');
+            if (seenMatrixRows.has(key)) {
+                return false;
+            }
+            seenMatrixRows.add(key);
+            return true;
+        });
     const normalizedRows = sourceRows.map((row, index) => ({
         ...defaultQuote(index),
         ...row,
@@ -3936,6 +4000,7 @@ const renderAssetInsurancePolicyRows = (form, rows = []) => {
         const selectedRamos = new Set(splitInsuranceSelection(row.ramo ?? ''));
         const allowedProducts = new Set(selectedRamos);
         const adopted = row.adoptada === 'Si';
+        const matrixPolicy = row.alcance_poliza === 'Matriz/global';
         const ramoChecklist = [...allowedProducts].map((item) => {
             const catalog = insuranceCatalogForProduct(form, item);
             return `
@@ -3950,7 +4015,7 @@ const renderAssetInsurancePolicyRows = (form, rows = []) => {
         `;
         }).join('');
         return `
-            <details class="asset-insurance-policy-card asset-insurance-offer-card" data-asset-insurance-policy-row open>
+            <details class="asset-insurance-policy-card asset-insurance-offer-card" data-asset-insurance-policy-row ${matrixPolicy ? 'hidden' : 'open'}>
                 <summary>
                     <strong>${adopted ? 'Poliza vigente' : `Oferta ${index + 1}`}</strong>
                     <span>${assetEscape([row.aseguradora, row.numero_poliza, row.prima_total ? assetMoney(row.prima_total) : '', adopted ? 'Adoptada' : ''].filter(Boolean).join(' / ') || 'Completa los datos basicos para cotizar')}</span>
@@ -4023,7 +4088,7 @@ const renderAssetInsurancePolicyRows = (form, rows = []) => {
         `;
         }).join('')}
         </div>
-        ${insuranceOfferComparisonMatrixHtml(form, normalizedRows)}
+        ${insuranceOfferComparisonMatrixHtml(form, normalizedRows.filter((row) => row.alcance_poliza !== 'Matriz/global'))}
     `;
     updatePolicyAllocationRows(form);
     renderInsuranceQuoteAnalysis(form);
@@ -5464,17 +5529,19 @@ if (assetForm instanceof HTMLFormElement) {
         const assetLabel = [assetForm.elements.nombre_descripcion?.value, assetForm.elements.identificador?.value]
             .filter(Boolean)
             .join(' / ');
-        rows.push({
-            ano: String(new Date().getFullYear()),
-            ramo: joinInsuranceSelection(selectedInsuranceProductsFromForm(assetForm)),
-            valor_asegurado_total: insuranceRequestedTotal(assetForm) > 0 ? String(Math.round(insuranceRequestedTotal(assetForm))) : '',
-            alcance_poliza: 'Matriz/global',
-            grupo_poliza: assetLabel || 'Poliza matriz del edificio o grupo de unidades',
-            metodo_distribucion: 'Coeficiente',
-            estado: 'Cotizacion solicitada',
-            observaciones_distribucion: 'Poliza global que cubre varias unidades. Diligenciar coeficiente PH, unidades cubiertas o criterio manual.',
-            observaciones: 'Registrar una sola vez la poliza matriz y asignar a este activo solo la prima proporcional.',
-        });
+        if (!rows.some((row) => row.alcance_poliza === 'Matriz/global')) {
+            rows.push({
+                ano: String(new Date().getFullYear()),
+                ramo: joinInsuranceSelection(selectedInsuranceProductsFromForm(assetForm)),
+                valor_asegurado_total: insuranceRequestedTotal(assetForm) > 0 ? String(Math.round(insuranceRequestedTotal(assetForm))) : '',
+                alcance_poliza: 'Matriz/global',
+                grupo_poliza: assetLabel || 'Poliza matriz del edificio o grupo de unidades',
+                metodo_distribucion: 'Coeficiente',
+                estado: 'Vigente',
+                observaciones_distribucion: 'Poliza global que cubre varias unidades. Diligenciar coeficiente PH, unidades cubiertas o criterio manual.',
+                observaciones: 'Registrar una sola vez la poliza matriz y asignar a este activo solo la prima proporcional.',
+            });
+        }
         assetForm.dataset.assetInsuranceTab = 'matriz';
         updateAssetInsuranceSections(assetForm, assetForm.elements.tipo_activo?.value || '');
         renderAssetInsurancePolicyRows(assetForm, rows);
@@ -5482,6 +5549,27 @@ if (assetForm instanceof HTMLFormElement) {
         renderAssetInsuranceHistory(assetForm);
         saveAssetDraft(assetForm);
     }));
+
+    assetForm.querySelector('[data-asset-insurance-matrix-summary]')?.addEventListener('input', (event) => {
+        const target = event.target;
+        if (target instanceof HTMLInputElement && target.matches('[data-matrix-policy-field]')) {
+            syncMatrixPolicyProxy(assetForm, target);
+            renderAssetCurrentPolicy(assetForm);
+            renderAssetInsuranceHistory(assetForm);
+            saveAssetDraft(assetForm);
+        }
+    });
+
+    assetForm.querySelector('[data-asset-insurance-matrix-summary]')?.addEventListener('change', (event) => {
+        const target = event.target;
+        if ((target instanceof HTMLInputElement || target instanceof HTMLSelectElement) && target.matches('[data-matrix-policy-field]')) {
+            syncMatrixPolicyProxy(assetForm, target);
+            renderAssetInsuranceMatrixSummary(assetForm);
+            renderAssetCurrentPolicy(assetForm);
+            renderAssetInsuranceHistory(assetForm);
+            saveAssetDraft(assetForm);
+        }
+    });
 
     assetForm.querySelector('[data-add-asset-insurance-previous]')?.addEventListener('click', () => {
         const rows = historyRowsForType(assetForm, '[data-asset-insurance-policy-row]', assetInsurancePolicyFields);
