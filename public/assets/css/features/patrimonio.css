@@ -1272,6 +1272,8 @@
 
 .asset-insurance-item-list-head {
     display: grid;
+    grid-template-columns: minmax(220px, 1fr) minmax(320px, 2fr) auto;
+    align-items: center;
     gap: 3px;
     padding: 10px 12px;
     border: 1px solid var(--line);
@@ -1290,6 +1292,116 @@
     font-weight: 750;
 }
 
+.asset-insurance-item-list-head output {
+    color: var(--primary);
+    font-size: 16px;
+    font-weight: 900;
+    white-space: nowrap;
+}
+
+.asset-insurance-item-totals {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.asset-insurance-item-totals span {
+    display: inline-flex;
+    gap: 8px;
+    align-items: center;
+    padding: 6px 10px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: #edf6f1;
+    color: var(--primary);
+    font-size: 12px;
+    font-weight: 850;
+}
+
+.asset-insurance-items-table {
+    display: grid;
+    overflow-x: auto;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: #fff;
+}
+
+.asset-insurance-items-head,
+.asset-insurance-item-row {
+    display: grid;
+    grid-template-columns:
+        minmax(150px, .9fr)
+        minmax(230px, 1.3fr)
+        minmax(70px, .45fr)
+        minmax(80px, .45fr)
+        minmax(130px, .75fr)
+        minmax(135px, .75fr)
+        minmax(120px, .7fr)
+        minmax(135px, .75fr)
+        minmax(135px, .75fr)
+        minmax(210px, 1.2fr)
+        minmax(135px, .75fr)
+        minmax(105px, .6fr)
+        minmax(170px, 1fr)
+        44px;
+    min-width: 1880px;
+}
+
+.asset-insurance-items-head {
+    background: #f8fbf9;
+    color: var(--primary);
+    font-size: 11px;
+    font-weight: 900;
+}
+
+.asset-insurance-items-head span,
+.asset-insurance-item-row label,
+.asset-insurance-item-row .asset-remove-insurance {
+    padding: 8px;
+    border-bottom: 1px solid var(--line);
+}
+
+.asset-insurance-item-row:last-child label,
+.asset-insurance-item-row:last-child .asset-remove-insurance {
+    border-bottom: 0;
+}
+
+.asset-insurance-item-row {
+    gap: 0;
+    align-items: stretch;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: #fff;
+}
+
+.asset-insurance-item-row label {
+    display: grid;
+    gap: 4px;
+    align-content: start;
+}
+
+.asset-insurance-item-row label > span {
+    display: none;
+}
+
+.asset-insurance-item-row input,
+.asset-insurance-item-row select {
+    width: 100%;
+    min-height: 34px;
+    padding: 7px 8px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: #fff;
+    color: var(--text);
+    font: inherit;
+    font-size: 12px;
+}
+
+.asset-insurance-item-row input + input {
+    margin-top: 4px;
+}
+
 @media (max-width: 900px) {
     .asset-coverage-matrix-row {
         grid-template-columns: 24px minmax(180px, 1fr);
@@ -1297,6 +1409,10 @@
 
     .asset-coverage-matrix-row span:not(.asset-coverage-matrix-name) {
         grid-column: 2;
+    }
+
+    .asset-insurance-item-list-head {
+        grid-template-columns: 1fr;
     }
 }
 
