@@ -1,6 +1,6 @@
 {
     "source":  "Catalogo_Macro_Ramos_Seguros_Colombia_2026.xlsx",
-    "generated_at":  "2026-08-04T08:12:35",
+    "generated_at":  "2026-08-04T12:24:00",
     "country":  "Colombia",
     "catalog":  [
                     {
@@ -3359,5 +3359,63 @@
                           "Descripción práctica":  "Cobertura habitual del ramo BEPS; su alcance exacto depende del clausulado y límites contratados.",
                           "Fuente":  "https://www.fasecolda.com/ramos/"
                       }
-                  ]
+                  ],
+    "sources":  [
+                    {
+                        "Entidad / fuente":  "Superintendencia Financiera de Colombia",
+                        "Documento o página":  "Circular Básica Jurídica – Parte II, Título IV, Capítulo II",
+                        "Uso en el archivo":  "Nombres y códigos oficiales de los 38 ramos, incluido Decenal.",
+                        "Consulta":  "04/08/2026",
+                        "URL":  "https://www.superfinanciera.gov.co/loader.php?idFile=1070652\u0026lFuncion=descargar\u0026lServicio=Tools2\u0026lTipo=descargas"
+                    },
+                    {
+                        "Entidad / fuente":  "Superintendencia Financiera de Colombia",
+                        "Documento o página":  "Industria aseguradora",
+                        "Uso en el archivo":  "Referencia institucional y publicación de información por ramos.",
+                        "Consulta":  "04/08/2026",
+                        "URL":  "https://www.superfinanciera.gov.co/publicaciones/61137/informes-y-cifrascifrasindustria-aseguradora-61137/"
+                    },
+                    {
+                        "Entidad / fuente":  "Fasecolda",
+                        "Documento o página":  "Portal de ramos",
+                        "Uso en el archivo":  "Descripción sectorial y orientación general sobre productos y coberturas.",
+                        "Consulta":  "04/08/2026",
+                        "URL":  "https://www.fasecolda.com/ramos/"
+                    },
+                    {
+                        "Entidad / fuente":  "Fasecolda",
+                        "Documento o página":  "Cobertura por víctima – SOAT",
+                        "Uso en el archivo":  "Validación de las cuatro coberturas legales del SOAT.",
+                        "Consulta":  "04/08/2026",
+                        "URL":  "https://www.fasecolda.com/ramos/soat/tarifas-comerciales/cobertura-por-victima/"
+                    },
+                    {
+                        "Entidad / fuente":  "Fasecolda",
+                        "Documento o página":  "Seguro de crédito",
+                        "Uso en el archivo":  "Objeto del seguro de crédito comercial y de exportación.",
+                        "Consulta":  "04/08/2026",
+                        "URL":  "https://www.fasecolda.com/ramos/seguro-de-credito/el-seguro/"
+                    },
+                    {
+                        "Entidad / fuente":  "Fasecolda",
+                        "Documento o página":  "Régimen de Seguros – autorización de ramos",
+                        "Uso en el archivo":  "Reglas de autorización y tratamiento de amparos por ramo.",
+                        "Consulta":  "04/08/2026",
+                        "URL":  "https://publicaciones.fasecolda.com/regimen-de-seguros/chapter/p3-c5/"
+                    },
+                    {
+                        "Entidad / fuente":  "Advertencia técnica",
+                        "Documento o página":  "",
+                        "Uso en el archivo":  "",
+                        "Consulta":  "",
+                        "URL":  ""
+                    },
+                    {
+                        "Entidad / fuente":  "Este archivo es un catálogo de referencia y no reemplaza el clausulado de una póliza ni una asesoría jurídica, actuarial o técnica. Un mismo producto puede combinar amparos de varios ramos; cada cobertura debe contabilizarse y administrarse bajo el ramo que corresponda. La existencia de una cobertura en esta matriz no implica que todas las aseguradoras la ofrezcan, ni que opere sin exclusiones, límites, sublímites, periodos de carencia, deducibles o requisitos de asegurabilidad. Antes de contratar o reclamar, deben revisarse la carátula, condiciones generales, condiciones particulares, anexos y notas técnicas aplicables.",
+                        "Documento o página":  "",
+                        "Uso en el archivo":  "",
+                        "Consulta":  "",
+                        "URL":  ""
+                    }
+                ]
 }

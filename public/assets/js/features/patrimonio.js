@@ -308,6 +308,13 @@ const insuranceCatalogValue = (row, ...keys) => {
 const insuranceCatalogRamo = (row) => insuranceCatalogValue(row, 'Ramo oficial', 'Ramo');
 const insuranceCatalogMacro = (row) => insuranceCatalogValue(row, 'Macro-ramo');
 
+const normalizeInsuranceText = (value) => String(value || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim();
+
 const insuranceRamoAliases = {
     'Automovil todo riesgo': 'Automóviles',
     'Responsabilidad civil extracontractual': 'Responsabilidad Civil',
@@ -331,8 +338,13 @@ const insuranceMacrosForForm = (form) => [...new Set(insuranceAcademyData(form).
     .filter(Boolean))];
 
 const insuranceCatalogForProduct = (form, product) => {
-    const normalized = normalizeInsuranceRamo(product);
-    return insuranceAcademyData(form).catalog.find((row) => insuranceCatalogRamo(row) === normalized) || null;
+    const normalized = normalizeInsuranceText(normalizeInsuranceRamo(product));
+    return insuranceAcademyData(form).catalog.find((row) => normalizeInsuranceText(insuranceCatalogRamo(row)) === normalized) || null;
+};
+
+const insuranceAcademyRowsForRamo = (form, product) => {
+    const normalized = normalizeInsuranceText(normalizeInsuranceRamo(product));
+    return insuranceAcademyData(form).coverages.filter((row) => normalizeInsuranceText(row.Ramo) === normalized);
 };
 
 const assetDocumentStateClass = (value) => String(value ?? '').toLowerCase().replace(/\s+/g, '-');
@@ -1318,8 +1330,8 @@ const coverageOptionsForPolicy = (ramo, allCoverages, form = null) => {
     const academyCoverages = form ? insuranceAcademyData(form).coverages : [];
     const coverageNames = selectedProfiles.flatMap((item) => {
         const normalized = normalizeInsuranceRamo(item);
-        const fromAcademy = academyCoverages
-            .filter((row) => row.Ramo === normalized)
+        const fromAcademy = (form ? insuranceAcademyRowsForRamo(form, item) : academyCoverages
+            .filter((row) => normalizeInsuranceText(row.Ramo) === normalizeInsuranceText(normalized)))
             .map((row) => row.Cobertura)
             .filter(Boolean);
         return fromAcademy.length > 0 ? fromAcademy : (insuranceCoverageProfiles[item] || insuranceCoverageProfiles[normalized] || []);
@@ -1410,14 +1422,16 @@ const insuranceCoverageMatrixHtml = (products = [], selected = new Set(), form =
     const academyCoverages = form ? insuranceAcademyData(form).coverages : [];
     const selectedProducts = products.filter((product) => {
         const normalized = normalizeInsuranceRamo(product);
-        return insuranceCoverageProfiles[product]?.length || insuranceCoverageProfiles[normalized]?.length || academyCoverages.some((row) => row.Ramo === normalized);
+        return insuranceCoverageProfiles[product]?.length
+            || insuranceCoverageProfiles[normalized]?.length
+            || academyCoverages.some((row) => normalizeInsuranceText(row.Ramo) === normalizeInsuranceText(normalized));
     });
     if (selectedProducts.length === 0) {
         return '<div class="asset-coverage-matrix-empty">Selecciona primero los seguros a incorporar al activo para ver las coberturas que puede requerir cada ramo.</div>';
     }
     return selectedProducts.map((product, productIndex) => {
         const normalized = normalizeInsuranceRamo(product);
-        const academyRows = academyCoverages.filter((row) => row.Ramo === normalized);
+        const academyRows = form ? insuranceAcademyRowsForRamo(form, product) : academyCoverages.filter((row) => normalizeInsuranceText(row.Ramo) === normalizeInsuranceText(normalized));
         const coverages = [...new Set(academyRows.length > 0 ? academyRows.map((row) => row.Cobertura).filter(Boolean) : (insuranceCoverageProfiles[product] || insuranceCoverageProfiles[normalized] || []))];
         const coverageMeta = (coverage) => academyRows.find((row) => row.Cobertura === coverage) || null;
         return `
