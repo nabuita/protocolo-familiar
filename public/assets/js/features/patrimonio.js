@@ -2438,7 +2438,7 @@ const renderAssetSpecificFields = (form, row = null) => {
         `;
     };
     const renderField = (field) => {
-        if (type === 'Inmueble' && ['tipo_seguro', 'que_se_asegura', 'riesgos_cubiertos'].includes(field.name)) {
+        if (assetSupportsInsurance(type) && ['tipo_seguro', 'que_se_asegura', 'riesgos_cubiertos'].includes(field.name)) {
             return '';
         }
         const value = details[field.name] ?? '';
@@ -2472,10 +2472,12 @@ const renderAssetSpecificFields = (form, row = null) => {
     `).join('');
     const extraTabs = `<button type="button" data-asset-tab="participacion" aria-selected="false">Participacion</button>${type === 'Inmueble' ? '<button type="button" data-asset-tab="historial-anual" aria-selected="false">Historial anual</button>' : ''}`;
     const assetTabs = `${groupEntries.map(([group], index) => `<button type="button" class="${index === 0 ? 'is-active' : ''}" data-asset-tab="${index}" aria-selected="${index === 0 ? 'true' : 'false'}">${assetEscape(group.replace(/^\d+\.\s*/, ''))}</button>`).join('')}${extraTabs}`;
-    const assetPanels = groupEntries.map(([group, groupFields], index) => `
+    const assetPanels = groupEntries.map(([group, groupFields], index) => {
+        const isInsuranceGroup = assetSupportsInsurance(type) && group.includes('Seguros');
+        return `
         <section class="asset-specific-tab-panel ${index === 0 ? 'is-active' : ''}" data-asset-tab-panel="${index}" ${index === 0 ? '' : 'hidden'}>
             <h3>${assetEscape(group)}</h3>
-            ${type === 'Inmueble' && group === '14. Seguros' ? `
+            ${isInsuranceGroup ? `
                 ${renderInsuranceBuilder()}
                 <details class="asset-insurance-policy-basics">
                     <summary><strong>Datos de poliza vigente o cotizacion</strong><span>Abrir solo cuando ya exista aseguradora, poliza o vigencia.</span></summary>
@@ -2483,7 +2485,8 @@ const renderAssetSpecificFields = (form, row = null) => {
                 </details>
             ` : `<div class="asset-specific-fields">${groupFields.map(renderField).join('')}</div>`}
         </section>
-    `).join('');
+    `;
+    }).join('');
     container.innerHTML = isTabbedAsset(type)
         ? `<h2>${assetEscape(schema.label)}</h2>${riskHelp}<div class="asset-specific-tabs" role="tablist">${assetTabs}</div><div class="asset-specific-tab-panels">${assetPanels}</div>`
         : `<h2>${assetEscape(schema.label)}</h2>${intangibleAlert(type, details)}${categoryDefinitionPanel(type, details)}${groups}`;
@@ -4270,12 +4273,20 @@ if (assetForm instanceof HTMLFormElement) {
     };
 
     assetForm.elements.tipo_activo?.addEventListener('change', () => {
+        assetForm.dataset.assetInsuranceTab = 'modelo';
+        assetForm.dataset.assetCoverageActiveProduct = '';
+        assetForm.dataset.assetValueActiveProduct = '';
+        assetForm.dataset.assetCoveragePolicyIndex = '0';
         renderAssetSpecificFields(assetForm);
         renderAssetFiduciaRows(assetForm);
         renderAssetSubunitRows(assetForm);
         renderAssetAnnualHistory(assetForm);
-        renderAssetInsuranceCoverageRows(assetForm);
-        renderAssetInsuranceEquipmentRows(assetForm);
+        renderAssetInsurancePolicyRows(assetForm, []);
+        renderAssetInsuranceCoverageRows(assetForm, []);
+        renderAssetInsuranceEquipmentRows(assetForm, []);
+        renderAssetInsuranceMovementRows(assetForm, []);
+        renderAssetCurrentPolicy(assetForm);
+        renderAssetInsuranceHistory(assetForm);
     });
 
     assetSearch?.addEventListener('input', applyAssetSearch);
