@@ -1237,7 +1237,16 @@ const insuranceCoverageRequestTableHtml = (rows = []) => {
             </div>
         `;
     }
+    const guidanceItems = [...new Map(rows.map((row) => [row.cobertura || '', insuranceValueGuidanceFor(row.cobertura || '')])).values()];
     return `
+        <div class="asset-insurance-value-help">
+            ${guidanceItems.slice(0, 4).map((item) => `
+                <span title="${assetEscape(item.tooltip)}">
+                    <strong>${assetEscape(item.title)}</strong>
+                    ${assetEscape(item.alert)}
+                </span>
+            `).join('')}
+        </div>
         <div class="asset-insurance-request-table" role="table" aria-label="Solicitud de coberturas para cotizar">
             <div class="asset-insurance-request-head" role="row">
                 <span>Cobertura</span>
@@ -1250,10 +1259,11 @@ const insuranceCoverageRequestTableHtml = (rows = []) => {
                 const insuredValue = assetNumber(row.valor_asegurado);
                 const limit = row.limite_evento || row.sublimite || '';
                 const requestedValue = insuredValue > 0 ? assetMoney(insuredValue) : (limit || 'Definir limite solicitado');
+                const guidance = insuranceValueGuidanceFor(row.cobertura || '');
                 return `
                     <div class="asset-insurance-request-row" role="row">
-                        <strong>${assetEscape(row.cobertura || 'Cobertura por definir')}</strong>
-                        <span>${assetEscape(coverageAssetsLabel(row.cobertura || ''))}</span>
+                        <strong>${assetHelpButton(guidance.tooltip)}${assetEscape(row.cobertura || 'Cobertura por definir')}<small>${assetEscape(guidance.title)}</small></strong>
+                        <span>${assetEscape(guidance.assets)}<small>${assetEscape(guidance.basis)}</small></span>
                         <label>
                             <input
                                 inputmode="decimal"
@@ -1268,7 +1278,7 @@ const insuranceCoverageRequestTableHtml = (rows = []) => {
                         <label>
                             <input
                                 value="${assetEscape(row.fuente_valor_asegurado ?? '')}"
-                                placeholder="Acta, criterio familiar, valor solicitado..."
+                                placeholder="${assetEscape(guidance.source)}"
                                 data-insurance-request-field="fuente_valor_asegurado"
                                 data-product="${assetEscape(row.ramo || '')}"
                                 data-coverage="${assetEscape(row.cobertura || '')}"
@@ -1277,7 +1287,7 @@ const insuranceCoverageRequestTableHtml = (rows = []) => {
                         <label>
                             <input
                                 value="${assetEscape(row.observaciones ?? '')}"
-                                placeholder="Solicitar limite evento, sublimites, deducible, indice, tasa y prima."
+                                placeholder="${assetEscape(guidance.alert)}"
                                 data-insurance-request-field="observaciones"
                                 data-product="${assetEscape(row.ramo || '')}"
                                 data-coverage="${assetEscape(row.cobertura || '')}"
@@ -1327,6 +1337,74 @@ const coverageAssetsLabel = (coverage) => {
 const coverageReviewLabel = (coverage) => insuranceCoverageAcademy[coverage]?.review || 'Revisar clausulado, deducible, sublimite y soporte.';
 
 const coverageBasisLabel = (coverage) => insuranceCoverageAcademy[coverage]?.basis || 'Definir valor, limite o sublimite con soporte documental.';
+
+const insuranceValueGuidanceFor = (coverage) => {
+    const text = String(coverage || '').toLowerCase();
+    const academy = insuranceCoverageAcademy[coverage] || {};
+    const assets = academy.assets || coverageValueCategoriesFor(coverage);
+    let title = 'Valor asegurable con soporte';
+    let basis = academy.basis || 'Define el valor, limite o sublimite con soporte documental antes de pedir cotizacion.';
+    let source = 'Soporta con avaluo, factura, cotizacion, inventario, contrato, acta o criterio documentado.';
+    let alert = academy.review || 'Revisa deducibles, sublimites, exclusiones y fuente del valor.';
+
+    if (text.includes('incendio') || text.includes('rayo') || text.includes('explosion') || text.includes('humo') || text.includes('agua') || text.includes('anegacion') || text.includes('inundacion')) {
+        title = 'Dano material a valor de reposicion';
+        basis = 'Usa valor de reposicion: costo de reconstruir o reponer el bien hoy. En inmuebles calcula m2 asegurables por valor de reposicion por m2.';
+        source = 'Fuente: avaluo, presupuesto de construccion, cotizacion, inventario de contenidos o relacion valorizada.';
+        alert = 'Alerta: el terreno no se asegura. Separa construccion, contenidos, equipos, mercancias y mejoras para evitar infra o supraseguro.';
+    }
+    if (text.includes('terremoto') || text.includes('temblor') || text.includes('erupcion')) {
+        title = 'Valor de reposicion para evento catastrofico';
+        basis = 'Toma el mismo valor asegurable de reposicion de construccion y contenidos declarados, sin incluir terreno.';
+        source = 'Fuente: avaluo, areas, valor m2, inventario y certificado de PH si aplica.';
+        alert = 'Alerta: terremoto suele tener deducible especial por evento o por articulo afectado; confirmar sublimites.';
+    }
+    if (text.includes('responsabilidad') || text.includes('rc ') || text.includes('tercero') || text.includes('lesion') || text.includes('muerte') || text.includes('defensa')) {
+        title = 'Limite de responsabilidad';
+        basis = 'No sale de inventario. Define limite por evento y vigencia segun exposicion: visitantes, empleados, contratistas, parqueaderos, contratos y actividad.';
+        source = 'Fuente: acta de criterio, contratos, exigencias de terceros, historico de siniestros, aforo, operacion y apetito de riesgo.';
+        alert = 'Alerta: confirmar si incluye predios/labores/operaciones, patronal, cruzada, parqueaderos, gastos medicos y defensa.';
+    }
+    if (text.includes('maquinaria') || text.includes('rotura') || text.includes('dano interno')) {
+        title = 'Inventario item por item';
+        basis = 'Cada maquina o equipo debe tener descripcion, serial, fecha de adquisicion, valor de compra, valor de reposicion, fuente y fecha de consulta.';
+        source = 'Fuente: factura, cotizacion actual, proveedor, mantenimiento, ficha tecnica o avaluo especializado.';
+        alert = 'Alerta: revisar antiguedad, mantenimiento, demerito, desgaste, garantias y exclusiones de dano interno.';
+    }
+    if (text.includes('electronico') || text.includes('corriente') || text.includes('debil') || text.includes('ups') || text.includes('cctv')) {
+        title = 'Equipo electronico y corriente debil';
+        basis = 'Relaciona UPS, CCTV, redes, telefonia, computadores, controles y equipos electronicos a valor de reposicion.';
+        source = 'Fuente: cotizacion vigente, factura, proveedor, inventario con serial y fecha de consulta.';
+        alert = 'Alerta: confirmar protecciones electricas, portabilidad, software, datos, mantenimiento y dano interno.';
+    }
+    if (text.includes('hurto') || text.includes('sustraccion')) {
+        title = 'Inventario valorizado contra sustraccion';
+        basis = 'Lista bienes asegurados por item: descripcion, cantidad, ubicacion, serial, valor de reposicion y fuente.';
+        source = 'Fuente: inventario fisico, factura, cotizacion, registro fotografico o avaluo para obras/joyas.';
+        alert = 'Alerta: revisar modalidad cubierta, alarma, cerraduras, vigilancia, dinero, joyas y bienes excluidos.';
+    }
+    if (text.includes('lucro') || text.includes('arrendamiento dejado')) {
+        title = 'Perdida financiera o canon';
+        basis = 'Define ingreso, canon, utilidad bruta o gastos permanentes y el periodo de indemnizacion solicitado.';
+        source = 'Fuente: contrato de arrendamiento, estados financieros, canon mensual, participacion e historico de ingresos.';
+        alert = 'Alerta: normalmente exige dano material amparado como evento detonante y puede tener deducible temporal.';
+    }
+    if (text.includes('vehiculo') || text.includes('auto') || text.includes('perdida total') || text.includes('perdida parcial')) {
+        title = 'Valor comercial del vehiculo';
+        basis = 'Usa valor comercial soportado, usualmente guia Fasecolda, factura, avaluo o cotizacion segun clase y estado.';
+        source = 'Fuente: Fasecolda, factura, tarjeta de propiedad, kilometraje, accesorios y cotizacion de mercado.';
+        alert = 'Alerta: declarar uso, conductor, accesorios, prendas, deducible y asistencia.';
+    }
+
+    return {
+        title,
+        basis,
+        source,
+        alert,
+        assets: assets.length > 0 ? assets.join(' / ') : 'No requiere relacion de bienes; define limite o servicio.',
+        tooltip: `${title}. ${basis} ${source} ${alert}`,
+    };
+};
 
 const insuranceCoverageMatrixHtml = (products = [], selected = new Set(), form = null) => {
     const academyCoverages = form ? insuranceAcademyData(form).coverages : [];
@@ -3450,13 +3528,45 @@ const renderAssetInsuranceEquipmentRows = (form, rows = []) => {
         ${selectedInsuranceStripHtml(form)}
         ${insuranceProductTabsHtml(selectedProducts, activeProduct, 'values')}
         ${insuranceCoverageRequestTableHtml(activeCoverageRows)}
-        ${sourceRows.map((row, index) => {
-        return `
-            <div data-asset-insurance-equipment-row hidden>
-                ${insuredItemFields.map((field) => `<input type="hidden" name="seguro_equipos[${index}][${field}]" value="${assetEscape(row[field] ?? '')}">`).join('')}
+        <div class="asset-insurance-item-list">
+            <div class="asset-insurance-item-list-head">
+                <strong>Relacion de bienes o valores base</strong>
+                <span>Usala cuando el valor asegurado salga de construccion, equipos, muebles, mercancias, maquinaria, corriente debil, obras, joyas o dinero.</span>
             </div>
-        `;
-    }).join('')}
+            ${sourceRows.map((row, index) => `
+                <div class="asset-insurance-equipment-row" data-asset-insurance-equipment-row>
+                    <label>Ano<input name="seguro_equipos[${index}][ano]" inputmode="numeric" value="${assetEscape(row.ano ?? '')}" placeholder="2026"></label>
+                    <label>Ramo<input name="seguro_equipos[${index}][ramo]" value="${assetEscape(row.ramo ?? activeProduct ?? '')}" placeholder="Ramo"></label>
+                    <label>Cobertura asociada<input name="seguro_equipos[${index}][cobertura_asociada]" value="${assetEscape(row.cobertura_asociada ?? '')}" placeholder="Incendio, rotura, corriente debil..."></label>
+                    <label>Categoria item<input name="seguro_equipos[${index}][categoria_item]" value="${assetEscape(row.categoria_item ?? '')}" placeholder="Construccion, maquinaria, muebles..."></label>
+                    <label>Item asegurado<input name="seguro_equipos[${index}][item]" value="${assetEscape(row.item ?? '')}" placeholder="Equipo, mueble, mercancia, edificio..."></label>
+                    <label>Descripcion<input name="seguro_equipos[${index}][descripcion]" value="${assetEscape(row.descripcion ?? '')}" placeholder="Marca, modelo, material, area, ubicacion"></label>
+                    <label>Unidad<input name="seguro_equipos[${index}][unidad]" value="${assetEscape(row.unidad ?? '')}" placeholder="und, m2, gl, juego"></label>
+                    <label>Cantidad<input name="seguro_equipos[${index}][cantidad]" data-insured-item-calc inputmode="decimal" value="${assetEscape(row.cantidad ?? '')}" placeholder="1"></label>
+                    <label>Ubicacion<input name="seguro_equipos[${index}][ubicacion]" value="${assetEscape(row.ubicacion ?? '')}" placeholder="Inmueble, piso, zona"></label>
+                    <label>Serial / referencia<input name="seguro_equipos[${index}][serial_referencia]" value="${assetEscape(row.serial_referencia ?? '')}" placeholder="Serial, placa, referencia"></label>
+                    <label>Valor compra<input name="seguro_equipos[${index}][valor_compra]" inputmode="decimal" value="${assetEscape(row.valor_compra ?? '')}" placeholder="$0"></label>
+                    <label>Fecha adquisicion<input name="seguro_equipos[${index}][fecha_adquisicion]" type="date" value="${assetEscape(row.fecha_adquisicion ?? '')}"></label>
+                    <label>Vr reposicion unitario<input name="seguro_equipos[${index}][valor_reposicion_unitario]" data-insured-item-calc inputmode="decimal" value="${assetEscape(row.valor_reposicion_unitario ?? '')}" placeholder="$0"></label>
+                    <label>Vr reposicion total<input name="seguro_equipos[${index}][valor_reposicion]" data-insured-item-total inputmode="decimal" value="${assetEscape(row.valor_reposicion ?? '')}" placeholder="$0"></label>
+                    <label>Fuente consulta<input name="seguro_equipos[${index}][fuente_consulta]" value="${assetEscape(row.fuente_consulta ?? '')}" placeholder="Cotizacion, factura, avaluo, proveedor"></label>
+                    <label>Fecha consulta<input name="seguro_equipos[${index}][fecha_consulta]" type="date" value="${assetEscape(row.fecha_consulta ?? '')}"></label>
+                    <label>Ano adquisicion<input name="seguro_equipos[${index}][ano_adquisicion]" inputmode="numeric" value="${assetEscape(row.ano_adquisicion ?? '')}" placeholder="2020"></label>
+                    <label>Edad anos<input name="seguro_equipos[${index}][edad_anos]" value="${assetEscape(row.edad_anos ?? '')}" placeholder="Auto/manual"></label>
+                    <label>Vida util anos<input name="seguro_equipos[${index}][vida_util_anos]" inputmode="numeric" value="${assetEscape(row.vida_util_anos ?? '')}" placeholder="10"></label>
+                    <label>Regla demerito<input name="seguro_equipos[${index}][regla_demerito]" value="${assetEscape(row.regla_demerito ?? '')}" placeholder="Segun poliza o criterio"></label>
+                    <label>Depreciacion %<input name="seguro_equipos[${index}][depreciacion_porcentaje]" data-insured-item-calc inputmode="decimal" value="${assetEscape(row.depreciacion_porcentaje ?? '')}" placeholder="0%"></label>
+                    <label>Depreciacion valor<input name="seguro_equipos[${index}][depreciacion_valor]" data-insured-item-depreciation inputmode="decimal" value="${assetEscape(row.depreciacion_valor ?? '')}" placeholder="$0"></label>
+                    <label>Vr asegurable sugerido<input name="seguro_equipos[${index}][valor_asegurable_sugerido]" data-insured-item-suggested inputmode="decimal" value="${assetEscape(row.valor_asegurable_sugerido ?? '')}" placeholder="$0"></label>
+                    <label>Incluye terreno<select name="seguro_equipos[${index}][incluye_terreno]">${assetPlaceholderOption(row.incluye_terreno ?? '')}<option value="No" ${(row.incluye_terreno ?? '') === 'No' ? 'selected' : ''}>No</option><option value="Si" ${(row.incluye_terreno ?? '') === 'Si' ? 'selected' : ''}>Si</option></select></label>
+                    <label>Inicio cobertura<input name="seguro_equipos[${index}][fecha_inicio]" type="date" value="${assetEscape(row.fecha_inicio ?? '')}"></label>
+                    <label>Fin cobertura<input name="seguro_equipos[${index}][fecha_fin]" type="date" value="${assetEscape(row.fecha_fin ?? '')}"></label>
+                    <label>Renovacion<input name="seguro_equipos[${index}][fecha_renovacion]" type="date" value="${assetEscape(row.fecha_renovacion ?? '')}"></label>
+                    <label>Observaciones<input name="seguro_equipos[${index}][observaciones]" value="${assetEscape(row.observaciones ?? '')}" placeholder="Sublimite, exclusion, soporte..."></label>
+                    <button type="button" class="asset-remove-insurance" aria-label="Quitar item asegurable" data-remove-asset-insurance-equipment>&times;</button>
+                </div>
+            `).join('') || '<p class="muted">Agrega un item cuando el valor de la cobertura deba salir de inventario o calculo soportado.</p>'}
+        </div>
     `;
     updateInsuredItemRows(container);
     updateInsuranceDerivedSummary(form);
