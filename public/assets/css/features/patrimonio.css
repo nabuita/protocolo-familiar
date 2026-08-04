@@ -1417,6 +1417,34 @@
     white-space: nowrap;
 }
 
+.asset-insurance-quick-items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 8px;
+    border: 1px dashed var(--line);
+    border-radius: 10px;
+    background: #fff;
+}
+
+.asset-insurance-quick-items button {
+    min-height: 36px;
+    padding: 7px 11px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: #f8fbf9;
+    color: var(--primary);
+    font-size: 12px;
+    font-weight: 900;
+    cursor: pointer;
+}
+
+.asset-insurance-quick-items button:hover,
+.asset-insurance-quick-items button:focus-visible {
+    border-color: var(--primary);
+    background: #eaf5ef;
+}
+
 .asset-insurance-item-totals {
     display: flex;
     flex-wrap: wrap;
