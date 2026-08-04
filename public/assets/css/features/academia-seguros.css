@@ -1,0 +1,262 @@
+.insurance-academy-page {
+    display: grid;
+    gap: 16px;
+}
+
+.insurance-academy-hero,
+.insurance-academy-toolbar,
+.insurance-academy-layout {
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--surface);
+    box-shadow: var(--shadow-soft);
+}
+
+.insurance-academy-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 18px;
+    align-items: end;
+    padding: 18px;
+}
+
+.insurance-academy-hero h1 {
+    margin: 2px 0 6px;
+}
+
+.insurance-academy-hero p {
+    max-width: 980px;
+    margin: 0;
+    color: var(--muted);
+}
+
+.insurance-academy-metrics {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(110px, 1fr));
+    gap: 10px;
+}
+
+.insurance-academy-metrics article {
+    display: grid;
+    gap: 2px;
+    min-width: 120px;
+    padding: 12px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: #f7fbf8;
+}
+
+.insurance-academy-metrics strong {
+    color: var(--primary);
+    font-size: 24px;
+}
+
+.insurance-academy-metrics span,
+.insurance-academy-card-head span,
+.insurance-academy-source {
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.insurance-academy-toolbar {
+    display: grid;
+    grid-template-columns: minmax(240px, 1fr) minmax(220px, 320px);
+    gap: 12px;
+    padding: 14px;
+}
+
+.insurance-academy-toolbar label {
+    display: grid;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.insurance-academy-layout {
+    display: grid;
+    grid-template-columns: minmax(280px, 360px) minmax(0, 1fr);
+    min-height: 620px;
+    overflow: hidden;
+}
+
+.insurance-academy-list {
+    display: grid;
+    align-content: start;
+    max-height: 76vh;
+    overflow: auto;
+    border-right: 1px solid var(--line);
+    background: #f8fbf9;
+}
+
+.insurance-academy-list button {
+    display: grid;
+    gap: 6px;
+    min-height: 58px;
+    padding: 12px 14px 13px;
+    border: 0;
+    border-bottom: 1px solid var(--line);
+    border-radius: 0;
+    background: transparent;
+    color: #223027;
+    text-align: left;
+    box-shadow: none;
+    cursor: pointer;
+    white-space: normal;
+}
+
+.insurance-academy-list button.is-active {
+    background: #eaf5ef;
+    color: var(--primary);
+}
+
+.insurance-academy-list em {
+    display: inline-flex;
+    width: fit-content;
+    padding: 2px 7px;
+    border-radius: 999px;
+    background: #edf6f1;
+    color: var(--primary);
+    font-size: 11px;
+    font-style: normal;
+    font-weight: 900;
+    line-height: 1.2;
+}
+
+.insurance-academy-list span {
+    display: block;
+    font-weight: 800;
+    line-height: 1.25;
+    overflow-wrap: anywhere;
+}
+
+.insurance-academy-list small {
+    display: block;
+    color: var(--muted);
+    font-size: 11px;
+    line-height: 1.2;
+}
+
+.insurance-academy-detail {
+    min-width: 0;
+    max-height: 76vh;
+    overflow: auto;
+    padding: 16px;
+}
+
+.insurance-academy-card {
+    display: none;
+}
+
+.insurance-academy-card.is-active {
+    display: grid;
+    gap: 14px;
+}
+
+.insurance-academy-card-head {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 14px;
+    align-items: start;
+}
+
+.insurance-academy-card-head h2 {
+    margin: 2px 0 6px;
+}
+
+.insurance-academy-card-head p {
+    margin: 0;
+    color: var(--muted);
+}
+
+.insurance-academy-card-head strong {
+    padding: 7px 10px;
+    border-radius: 999px;
+    background: #edf6f1;
+    color: var(--primary);
+    font-size: 12px;
+}
+
+.insurance-academy-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.insurance-academy-grid section {
+    display: grid;
+    gap: 6px;
+    padding: 12px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: #fff;
+}
+
+.insurance-academy-grid h3 {
+    margin: 0;
+    color: var(--primary);
+    font-size: 13px;
+}
+
+.insurance-academy-grid p {
+    margin: 0;
+    color: #2d3a31;
+    font-size: 13px;
+    line-height: 1.45;
+}
+
+.insurance-academy-coverage-table {
+    display: grid;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    overflow-x: auto;
+}
+
+.insurance-academy-coverage-table > div {
+    display: grid;
+    grid-template-columns: minmax(130px, .8fr) minmax(190px, 1fr) minmax(320px, 2fr) minmax(88px, .5fr);
+    gap: 10px;
+    align-items: start;
+    min-width: 860px;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--line);
+    background: #fff;
+    font-size: 12px;
+}
+
+.insurance-academy-coverage-table > div:last-child {
+    border-bottom: 0;
+}
+
+.insurance-academy-table-head {
+    background: #f0f6f2 !important;
+    color: var(--primary);
+    font-weight: 900;
+}
+
+.insurance-academy-coverage-table strong {
+    color: var(--primary);
+}
+
+.insurance-academy-source {
+    margin: 0;
+    overflow-wrap: anywhere;
+}
+
+@media (max-width: 980px) {
+    .insurance-academy-hero,
+    .insurance-academy-toolbar,
+    .insurance-academy-layout,
+    .insurance-academy-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .insurance-academy-list,
+    .insurance-academy-detail {
+        max-height: none;
+    }
+
+    .insurance-academy-list {
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+    }
+}
