@@ -3622,7 +3622,10 @@ const insuranceOfferComparisonMatrixHtml = (form, policies = []) => {
 const insuranceQuoteRecommendationHtml = (form) => {
     const targetCoverages = insuranceRequestedCoverages(form);
     const targetCount = targetCoverages.length;
-    const policies = assetFormRows(form, '[data-asset-insurance-policy-row]', assetInsurancePolicyFields);
+    const policies = assetFormRows(form, '[data-asset-insurance-policy-row]', assetInsurancePolicyFields)
+        .filter((policy) => policy.alcance_poliza !== 'Matriz/global')
+        .filter((policy) => policy.estado !== 'Vencida')
+        .filter((policy) => policy.aseguradora || policy.numero_poliza || parseInsuranceQuoteMatrix(policy.cotizacion_matriz).length);
     if (!targetCount || !policies.length) {
         return '';
     }
@@ -3915,10 +3918,8 @@ const renderAssetInsurancePolicyRows = (form, rows = []) => {
         estado: 'Cotizacion solicitada',
         observaciones: `Oferta minima ${index + 1}. Cotizar todos los ramos y coberturas solicitados con tasas, primas, deducibles, limites y sublimites.`,
     });
-    const sourceRows = rows.length > 0 ? [...rows] : [];
-    while (sourceRows.length < 3) {
-        sourceRows.push(defaultQuote(sourceRows.length));
-    }
+    const sourceRows = (rows.length > 0 ? [...rows] : [])
+        .filter((row) => !(String(row.observaciones || '').startsWith('Oferta minima') && !row.aseguradora && !row.numero_poliza && !parseInsuranceQuoteMatrix(row.cotizacion_matriz).length));
     const normalizedRows = sourceRows.map((row, index) => ({
         ...defaultQuote(index),
         ...row,
@@ -5474,7 +5475,7 @@ if (assetForm instanceof HTMLFormElement) {
             observaciones_distribucion: 'Poliza global que cubre varias unidades. Diligenciar coeficiente PH, unidades cubiertas o criterio manual.',
             observaciones: 'Registrar una sola vez la poliza matriz y asignar a este activo solo la prima proporcional.',
         });
-        assetForm.dataset.assetInsuranceTab = 'cotizaciones';
+        assetForm.dataset.assetInsuranceTab = 'matriz';
         updateAssetInsuranceSections(assetForm, assetForm.elements.tipo_activo?.value || '');
         renderAssetInsurancePolicyRows(assetForm, rows);
         renderAssetInsuranceMatrixSummary(assetForm);
@@ -5964,13 +5965,7 @@ if (assetForm instanceof HTMLFormElement) {
 
     modal?.addEventListener('click', (event) => {
         if (event.target === modal) {
-            closeAssetModal();
-        }
-    });
-
-    document.addEventListener('keydown', (event) => {
-        if (event.key === 'Escape' && modal instanceof HTMLElement && !modal.hidden) {
-            closeAssetModal();
+            event.preventDefault();
         }
     });
 
