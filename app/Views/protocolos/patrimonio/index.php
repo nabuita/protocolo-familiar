@@ -279,11 +279,22 @@ foreach (($documentoRows ?? []) as $documento) {
             <nav class="asset-insurance-flow" data-asset-insurance-flow hidden aria-label="Flujo de seguros">
                 <button type="button" data-asset-insurance-tab="coberturas">2. Coberturas requeridas</button>
                 <button type="button" data-asset-insurance-tab="modelo" class="is-active">3. Valores asegurados</button>
-                <button type="button" data-asset-insurance-tab="cotizaciones">4. Cotizaciones</button>
-                <button type="button" data-asset-insurance-tab="vigente">5. Poliza vigente</button>
-                <button type="button" data-asset-insurance-tab="movimientos">6. Cambios</button>
-                <button type="button" data-asset-insurance-tab="historial">7. Historial</button>
+                <button type="button" data-asset-insurance-tab="matriz">4. Poliza global / matriz</button>
+                <button type="button" data-asset-insurance-tab="cotizaciones">5. Cotizaciones</button>
+                <button type="button" data-asset-insurance-tab="vigente">6. Poliza vigente</button>
+                <button type="button" data-asset-insurance-tab="movimientos">7. Cambios</button>
+                <button type="button" data-asset-insurance-tab="historial">8. Historial</button>
             </nav>
+            <section class="asset-insurance" data-asset-insurance-matrix data-asset-insurance-panel="matriz" hidden>
+                <div class="asset-participation-header">
+                    <div>
+                        <h2>4. Poliza global / matriz <span class="asset-document-marker">*Control Documental*</span></h2>
+                        <p>Registra una sola poliza cuando cubre varios inmuebles, unidades o todo un edificio. El sistema conserva la poliza una vez y asigna a este activo solo su costo proporcional.</p>
+                    </div>
+                    <button type="button" data-add-asset-insurance-matrix>Registrar poliza matriz</button>
+                </div>
+                <div class="asset-insurance-matrix-summary" data-asset-insurance-matrix-summary></div>
+            </section>
             <section class="asset-insurance" data-asset-insurance data-asset-insurance-panel="cotizaciones" hidden>
                 <div class="asset-participation-header">
                     <div>

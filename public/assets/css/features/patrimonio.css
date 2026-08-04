@@ -1823,6 +1823,110 @@
     line-height: 1.35;
 }
 
+.asset-insurance-matrix-summary {
+    display: grid;
+    gap: 12px;
+}
+
+.asset-insurance-matrix-guide {
+    display: grid;
+    gap: 8px;
+    padding: 14px;
+    border: 1px solid #c9d9cf;
+    border-radius: 12px;
+    background: #f7fbf8;
+}
+
+.asset-insurance-matrix-guide strong {
+    color: var(--primary);
+    font-size: 14px;
+}
+
+.asset-insurance-matrix-guide p,
+.asset-insurance-matrix-summary > .muted {
+    margin: 0;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.45;
+}
+
+.asset-insurance-matrix-methods {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+}
+
+.asset-insurance-matrix-methods span {
+    padding: 10px;
+    border: 1px solid #d7e3da;
+    border-radius: 10px;
+    background: #fff;
+    color: #536156;
+    font-size: 12px;
+    line-height: 1.35;
+}
+
+.asset-insurance-matrix-methods b {
+    display: block;
+    margin-bottom: 3px;
+    color: var(--primary);
+    font-weight: 900;
+}
+
+.asset-insurance-matrix-table {
+    overflow-x: auto;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: #fff;
+}
+
+.asset-insurance-matrix-table > div {
+    display: grid;
+    grid-template-columns: minmax(190px, 1.2fr) minmax(170px, 1fr) 130px 130px 130px 140px 150px;
+    min-width: 980px;
+    border-bottom: 1px solid var(--line);
+}
+
+.asset-insurance-matrix-table > div:last-child {
+    border-bottom: 0;
+}
+
+.asset-insurance-matrix-table span,
+.asset-insurance-matrix-table strong {
+    min-width: 0;
+    padding: 10px;
+    color: #29382f;
+    font-size: 12px;
+    overflow-wrap: anywhere;
+}
+
+.asset-insurance-matrix-table strong {
+    color: var(--primary);
+    font-weight: 850;
+}
+
+.asset-insurance-matrix-head {
+    background: #f1f7f3;
+}
+
+.asset-insurance-matrix-head span {
+    color: var(--primary);
+    font-weight: 900;
+}
+
+.asset-insurance-matrix-table > p {
+    margin: 0;
+    padding: 14px;
+    color: var(--muted);
+    font-size: 13px;
+}
+
+@media (max-width: 900px) {
+    .asset-insurance-matrix-methods {
+        grid-template-columns: 1fr;
+    }
+}
+
 .asset-subunit-row {
     grid-template-columns: 1fr;
     gap: 14px;
