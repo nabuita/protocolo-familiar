@@ -307,6 +307,7 @@
 .asset-subunits[hidden],
 .asset-annual-history[hidden],
 .asset-insurance[hidden],
+[data-asset-insurance-equipment-row][hidden],
 [data-asset-insurance-coverage][hidden],
 [data-asset-insurance-equipment][hidden],
 [data-asset-insurance-movements][hidden],
@@ -814,7 +815,8 @@
 
 .asset-insurance-request-head span,
 .asset-insurance-request-row span,
-.asset-insurance-request-row strong {
+.asset-insurance-request-row strong,
+.asset-insurance-request-row label {
     padding: 9px 10px;
     border-bottom: 1px solid var(--line);
     font-size: 12px;
@@ -822,7 +824,8 @@
 }
 
 .asset-insurance-request-row:last-child span,
-.asset-insurance-request-row:last-child strong {
+.asset-insurance-request-row:last-child strong,
+.asset-insurance-request-row:last-child label {
     border-bottom: 0;
 }
 
@@ -832,6 +835,21 @@
 
 .asset-insurance-request-row span {
     color: #40544a;
+}
+
+.asset-insurance-request-row label {
+    display: block;
+}
+
+.asset-insurance-request-row input {
+    width: 100%;
+    min-height: 34px;
+    padding: 7px 9px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: #fff;
+    color: var(--text);
+    font: inherit;
 }
 
 @media (max-width: 900px) {

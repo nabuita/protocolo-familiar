@@ -1217,9 +1217,34 @@ const insuranceCoverageRequestTableHtml = (rows = []) => {
                     <div class="asset-insurance-request-row" role="row">
                         <strong>${assetEscape(row.cobertura || 'Cobertura por definir')}</strong>
                         <span>${assetEscape(coverageAssetsLabel(row.cobertura || ''))}</span>
-                        <span>${assetEscape(requestedValue)}</span>
-                        <span>${assetEscape(row.fuente_valor_asegurado || 'Pendiente')}</span>
-                        <span>${assetEscape(row.observaciones || 'Solicitar a la aseguradora limite evento, sublimites, deducible, indice, tasa y prima en la cotizacion.')}</span>
+                        <label>
+                            <input
+                                inputmode="decimal"
+                                value="${assetEscape(row.valor_asegurado ?? '')}"
+                                placeholder="${assetEscape(requestedValue)}"
+                                data-insurance-request-field="valor_asegurado"
+                                data-product="${assetEscape(row.ramo || '')}"
+                                data-coverage="${assetEscape(row.cobertura || '')}"
+                            >
+                        </label>
+                        <label>
+                            <input
+                                value="${assetEscape(row.fuente_valor_asegurado ?? '')}"
+                                placeholder="Acta, criterio familiar, valor solicitado..."
+                                data-insurance-request-field="fuente_valor_asegurado"
+                                data-product="${assetEscape(row.ramo || '')}"
+                                data-coverage="${assetEscape(row.cobertura || '')}"
+                            >
+                        </label>
+                        <label>
+                            <input
+                                value="${assetEscape(row.observaciones ?? '')}"
+                                placeholder="Solicitar limite evento, sublimites, deducible, indice, tasa y prima."
+                                data-insurance-request-field="observaciones"
+                                data-product="${assetEscape(row.ramo || '')}"
+                                data-coverage="${assetEscape(row.cobertura || '')}"
+                            >
+                        </label>
                     </div>
                 `;
             }).join('')}
@@ -1847,6 +1872,25 @@ const refreshCoverageSuggestedValues = (form) => {
             }
         }
     });
+};
+
+const syncInsuranceRequestField = (form, input) => {
+    const field = input.dataset.insuranceRequestField || '';
+    const product = input.dataset.product || '';
+    const coverage = input.dataset.coverage || '';
+    if (!field || !coverage) {
+        return;
+    }
+    const coverageRow = [...form.querySelectorAll('[data-asset-insurance-coverage-row]')]
+        .find((row) => {
+            const rowProduct = row.querySelector('[name$="[ramo]"]')?.value || '';
+            const rowCoverage = row.querySelector('[name$="[cobertura]"]')?.value || '';
+            return rowProduct === product && rowCoverage === coverage;
+        });
+    const target = coverageRow?.querySelector(`[name$="[${field}]"]`);
+    if (target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement || target instanceof HTMLSelectElement) {
+        target.value = input.value;
+    }
 };
 
 const syncCoveragePremiumRow = (row) => {
@@ -2911,11 +2955,6 @@ const renderAssetInsuranceEquipmentRows = (form, rows = []) => {
         ${selectedInsuranceStripHtml(form)}
         ${insuranceProductTabsHtml(selectedProducts, activeProduct, 'values')}
         ${insuranceCoverageRequestTableHtml(activeCoverageRows)}
-        ${needsInsuredItems ? '' : `
-            <div class="asset-insurance-request-empty">
-                Este ramo no requiere relacion de bienes. Define el valor o limite solicitado en la cobertura y deja que la aseguradora responda con limite por evento, sublimites, deducible, indice, tasa y prima.
-            </div>
-        `}
         ${sourceRows.map((row, index) => {
         const isActiveRow = needsInsuredItems && ((row.ramo || '') === activeProduct || (!activeProduct && row.ramo === ''));
         const rowRamoOptions = productOptions.replace(`value="${assetEscape(row.ramo ?? '')}"`, `value="${assetEscape(row.ramo ?? '')}" selected`);
@@ -4116,6 +4155,13 @@ if (assetForm instanceof HTMLFormElement) {
     const insuranceEquipmentRows = assetForm.querySelector('[data-asset-insurance-equipment-rows]');
     insuranceEquipmentRows?.addEventListener('input', (event) => {
         const target = event.target;
+        if (target instanceof HTMLInputElement && target.matches('[data-insurance-request-field]')) {
+            syncInsuranceRequestField(assetForm, target);
+            updateInsuranceDerivedSummary(assetForm);
+            renderAssetInsuranceHistory(assetForm);
+            saveAssetDraft(assetForm);
+            return;
+        }
         if (!(target instanceof Element) || !target.matches('[data-insured-item-calc], [data-insured-item-total]')) {
             return;
         }
