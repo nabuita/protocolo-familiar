@@ -1196,7 +1196,7 @@ const insuranceCoverageRequestTableHtml = (rows = []) => {
     if (rows.length === 0) {
         return `
             <div class="asset-insurance-request-empty">
-                Primero marca las coberturas requeridas. Despues esta tabla mostrara los valores y condiciones que se solicitaran a las aseguradoras.
+                Primero marca las coberturas requeridas. Despues esta tabla mostrara la base que se enviara a cotizar.
             </div>
         `;
     }
@@ -1205,30 +1205,21 @@ const insuranceCoverageRequestTableHtml = (rows = []) => {
             <div class="asset-insurance-request-head" role="row">
                 <span>Cobertura</span>
                 <span>Dato base</span>
-                <span>Valor asegurado</span>
-                <span>Limite evento</span>
-                <span>Sublimite</span>
-                <span>Deducible</span>
-                <span>Indice</span>
-                <span>Tasa</span>
-                <span>Prima</span>
-                <span>Fuente</span>
+                <span>Valor o limite solicitado</span>
+                <span>Fuente del valor</span>
+                <span>Observacion para cotizar</span>
             </div>
             ${rows.map((row) => {
                 const insuredValue = assetNumber(row.valor_asegurado);
-                const premium = assetNumber(row.prima);
+                const limit = row.limite_evento || row.sublimite || '';
+                const requestedValue = insuredValue > 0 ? assetMoney(insuredValue) : (limit || 'Definir limite solicitado');
                 return `
                     <div class="asset-insurance-request-row" role="row">
                         <strong>${assetEscape(row.cobertura || 'Cobertura por definir')}</strong>
                         <span>${assetEscape(coverageAssetsLabel(row.cobertura || ''))}</span>
-                        <span>${insuredValue > 0 ? assetMoney(insuredValue) : 'Por definir'}</span>
-                        <span>${assetEscape(row.limite_evento || 'Por definir')}</span>
-                        <span>${assetEscape(row.sublimite || 'Por definir')}</span>
-                        <span>${assetEscape(row.deducible || 'Por definir')}</span>
-                        <span>${assetEscape(row.indice_variable || row.porcentaje_invar || 'Por definir')}</span>
-                        <span>${assetEscape(row.tasa || 'Por definir')}</span>
-                        <span>${premium > 0 ? assetMoney(premium) : 'Por calcular'}</span>
+                        <span>${assetEscape(requestedValue)}</span>
                         <span>${assetEscape(row.fuente_valor_asegurado || 'Pendiente')}</span>
+                        <span>${assetEscape(row.observaciones || 'Solicitar a la aseguradora limite evento, sublimites, deducible, indice, tasa y prima en la cotizacion.')}</span>
                     </div>
                 `;
             }).join('')}
@@ -2904,6 +2895,8 @@ const renderAssetInsuranceEquipmentRows = (form, rows = []) => {
     const selectedCoverageRows = historyRowsForType(form, '[data-asset-insurance-coverage-row]', assetInsuranceCoverageFields)
         .filter((item) => item.cobertura || item.ramo);
     const activeCoverageRows = selectedCoverageRows.filter((item) => (item.ramo || '') === activeProduct || (!activeProduct && item.ramo === ''));
+    const activeSupportCategories = coverageSupportCategories(activeCoverageRows);
+    const needsInsuredItems = activeSupportCategories.length > 0;
     const productOptions = [...new Set([...(options.ramo_seguro || []), ...selectedProducts])]
         .filter(Boolean)
         .map((item) => `<option value="${assetEscape(item)}">${assetEscape(item)}</option>`)
@@ -2918,8 +2911,13 @@ const renderAssetInsuranceEquipmentRows = (form, rows = []) => {
         ${selectedInsuranceStripHtml(form)}
         ${insuranceProductTabsHtml(selectedProducts, activeProduct, 'values')}
         ${insuranceCoverageRequestTableHtml(activeCoverageRows)}
+        ${needsInsuredItems ? '' : `
+            <div class="asset-insurance-request-empty">
+                Este ramo no requiere relacion de bienes. Define el valor o limite solicitado en la cobertura y deja que la aseguradora responda con limite por evento, sublimites, deducible, indice, tasa y prima.
+            </div>
+        `}
         ${sourceRows.map((row, index) => {
-        const isActiveRow = (row.ramo || '') === activeProduct || (!activeProduct && row.ramo === '');
+        const isActiveRow = needsInsuredItems && ((row.ramo || '') === activeProduct || (!activeProduct && row.ramo === ''));
         const rowRamoOptions = productOptions.replace(`value="${assetEscape(row.ramo ?? '')}"`, `value="${assetEscape(row.ramo ?? '')}" selected`);
         const rowCoverageOptions = coverageOptions.replace(`value="${assetEscape(row.cobertura_asociada ?? '')}"`, `value="${assetEscape(row.cobertura_asociada ?? '')}" selected`);
         return `
