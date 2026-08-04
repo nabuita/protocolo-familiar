@@ -3688,8 +3688,8 @@ const insuranceQuoteRecommendationHtml = (form) => {
     const eligible = evaluated.filter((row) => row.full && row.premium > 0).sort((a, b) => a.premium - b.premium);
     const best = eligible[0] || null;
     const message = best
-        ? `Recomendacion preliminar: ${best.insurer}, porque cotiza todas las coberturas solicitadas y registra la menor prima comparable.`
-        : 'Recomendacion preliminar pendiente: falta una oferta con todas las coberturas marcadas y prima total registrada.';
+        ? `Decision sugerida: ${best.insurer}, porque cotiza todas las coberturas solicitadas y registra la menor prima comparable.`
+        : 'Decision pendiente: registra las respuestas de las aseguradoras y luego toma la poliza que ofrezca mejor cobertura neta.';
     const comparisonRows = policies.flatMap((policy, index) => {
         const insurer = policy.aseguradora || `Oferta ${index + 1}`;
         return parseInsuranceQuoteMatrix(policy.cotizacion_matriz).map((row) => ({
@@ -3700,6 +3700,7 @@ const insuranceQuoteRecommendationHtml = (form) => {
     return `
         <div class="asset-insurance-analysis-card">
             <strong>${assetEscape(message)}</strong>
+            <p>La decision se formaliza con el boton "Tomar esta poliza". Esa opcion alimenta el resumen de poliza vigente, cambios, historial y calendario de renovacion.</p>
             <div>
                 ${evaluated.map((row) => `
                     <span class="${best && best.index === row.index ? 'is-best' : ''}">
@@ -4026,7 +4027,7 @@ const renderAssetInsurancePolicyRows = (form, rows = []) => {
                     <input type="hidden" name="seguro_polizas[${index}][cotizacion_matriz]" value="${assetEscape(row.cotizacion_matriz ?? '')}">
                     <label>Criterio decision<input name="seguro_polizas[${index}][criterio_adopcion]" value="${assetEscape(row.criterio_adopcion ?? '')}" placeholder="Mejor equilibrio cobertura, deducible y prima"></label>
                     <button type="button" data-print-asset-insurance-quote>Generar solicitud PDF</button>
-                    <button type="button" data-adopt-asset-insurance-policy>${adopted ? 'Opcion adoptada' : 'Adoptar cotizacion'}</button>
+                    <button type="button" data-adopt-asset-insurance-policy>${adopted ? 'Opcion seleccionada' : 'Tomar esta poliza'}</button>
                 </div>
                 <div class="asset-insurance-policy-row asset-insurance-quote-contact">
                     <input type="hidden" name="seguro_polizas[${index}][ano]" value="${assetEscape(row.ano ?? '')}">
@@ -4623,17 +4624,24 @@ const renderAssetCurrentPolicy = (form) => {
     const policies = assetFormRows(form, '[data-asset-insurance-policy-row]', ['ano', 'ramo', 'aseguradora', 'numero_poliza', 'fecha_inicio', 'fecha_fin', 'fecha_renovacion', 'prima_total', 'prima_asignada', 'alcance_poliza', 'grupo_poliza', 'metodo_distribucion', 'coeficiente_participacion', 'numero_unidades_cubiertas', 'valor_asegurado_total', 'deducible_general', 'estado', 'adoptada', 'criterio_adopcion']);
     const current = policies.find((row) => row.adoptada === 'Si') || policies.find((row) => row.estado === 'Vigente');
     if (!current) {
-        target.innerHTML = '<p class="muted">Aun no has adoptado una cotizacion como poliza vigente.</p>';
+        target.innerHTML = `
+            <div class="asset-insurance-guide">
+                <strong>Sin poliza vigente seleccionada</strong>
+                <p>Este bloque no se diligencia directamente. Primero registra una oferta en "Cotizaciones y decision", una poliza anterior o una poliza matriz/global; luego presiona "Tomar esta poliza" cuando corresponda.</p>
+            </div>
+        `;
         return;
     }
     const coverages = assetFormRows(form, '[data-asset-insurance-coverage-row]', ['numero_poliza', 'cobertura', 'valor_asegurado', 'prima', 'deducible'])
         .filter((row) => !current.numero_poliza || !row.numero_poliza || row.numero_poliza === current.numero_poliza);
     target.innerHTML = `
         <article class="asset-insurance-year">
-            <strong>${assetEscape(current.ano || 'Vigente')}</strong>
+            <strong>${assetEscape(current.alcance_poliza === 'Matriz/global' ? 'Poliza matriz/global vigente' : 'Poliza vigente')}</strong>
+            <span>Ano: ${assetEscape(current.ano || 'Sin ano')}</span>
             <span>Aseguradora: ${assetEscape(current.aseguradora || 'Por definir')}</span>
             <span>Poliza: ${assetEscape(current.numero_poliza || 'Sin numero')}</span>
             <span>Productos: ${assetEscape(current.ramo || 'Por definir')}</span>
+            <span>Valor asegurado total: ${assetMoney(assetNumber(current.valor_asegurado_total))}</span>
             <span>Prima total: ${assetMoney(assetNumber(current.prima_total))}</span>
             <span>Costo asignado: ${assetMoney(assetNumber(current.prima_asignada || current.prima_total))}</span>
             <span>${assetEscape([current.alcance_poliza, current.grupo_poliza, current.metodo_distribucion].filter(Boolean).join(' / ') || 'Poliza individual')}</span>
@@ -5624,6 +5632,8 @@ if (assetForm instanceof HTMLFormElement) {
                     criterio_adopcion: rowIndex === index ? (row.criterio_adopcion || 'Mejor equilibrio entre cobertura, deducible, sublimites, exclusiones y prima.') : row.criterio_adopcion,
                 }));
                 renderAssetInsurancePolicyRows(assetForm, rows);
+                assetForm.dataset.assetInsuranceTab = 'vigente';
+                updateAssetInsuranceSections(assetForm, assetForm.elements.tipo_activo?.value || '');
                 renderAssetCurrentPolicy(assetForm);
                 renderAssetInsuranceMatrixSummary(assetForm);
                 renderAssetInsuranceHistory(assetForm);

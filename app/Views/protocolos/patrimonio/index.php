@@ -280,9 +280,9 @@ foreach (($documentoRows ?? []) as $documento) {
                 <button type="button" data-asset-insurance-tab="coberturas">2. Coberturas requeridas</button>
                 <button type="button" data-asset-insurance-tab="modelo" class="is-active">3. Valores asegurados</button>
                 <button type="button" data-asset-insurance-tab="matriz">4. Poliza global / matriz</button>
-                <button type="button" data-asset-insurance-tab="cotizaciones">5. Cotizaciones</button>
-                <button type="button" data-asset-insurance-tab="vigente">6. Poliza vigente</button>
-                <button type="button" data-asset-insurance-tab="movimientos">7. Cambios</button>
+                <button type="button" data-asset-insurance-tab="cotizaciones">5. Cotizaciones y decision</button>
+                <button type="button" data-asset-insurance-tab="vigente">6. Resumen poliza vigente</button>
+                <button type="button" data-asset-insurance-tab="movimientos">7. Cambios / endosos</button>
                 <button type="button" data-asset-insurance-tab="historial">8. Historial</button>
             </nav>
             <section class="asset-insurance" data-asset-insurance-matrix data-asset-insurance-panel="matriz" hidden>
@@ -298,8 +298,8 @@ foreach (($documentoRows ?? []) as $documento) {
             <section class="asset-insurance" data-asset-insurance data-asset-insurance-panel="cotizaciones" hidden>
                 <div class="asset-participation-header">
                     <div>
-                        <h2>Cotizaciones comparables <span class="asset-document-marker">*Control Documental*</span></h2>
-                        <p>Registra minimo tres aseguradoras sobre la misma base asegurable. Cada oferta recibe el paquete consolidado de ramos, coberturas, valores asegurados y bienes reportados.</p>
+                        <h2>Cotizaciones y decision <span class="asset-document-marker">*Control Documental*</span></h2>
+                        <p>Registra las aseguradoras que cotizan la misma solicitud. Aqui se decide cual se toma; al seleccionar una opcion, pasa automaticamente al resumen de poliza vigente.</p>
                     </div>
                     <div class="asset-header-actions">
                         <button type="button" data-add-asset-insurance-matrix>Registrar poliza matriz</button>
@@ -313,8 +313,8 @@ foreach (($documentoRows ?? []) as $documento) {
                         <li>Relaciona bienes y construccion a valor de reposicion con fuente y fecha.</li>
                         <li>Marca los amparos que aplican y valida que su valor salga de esa relacion.</li>
                         <li>Define RCE por exposicion: actividad, terceros, empleados, parqueaderos, contratistas y predios.</li>
-                        <li>Pide minimo tres ofertas con las mismas sumas aseguradas para comparar prima, tasa, deducible, sublimites y exclusiones.</li>
-                        <li>Escoge la mejor cobertura neta: no solo la prima mas baja.</li>
+                        <li>Pide minimo tres ofertas con las mismas sumas aseguradas.</li>
+                        <li>Cuando lleguen las respuestas, compara prima, deducibles, sublimites, exclusiones y toma la poliza con mejor cobertura neta.</li>
                     </ol>
                 </div>
                 <div class="asset-insurance-quote-analysis" data-asset-insurance-quote-analysis></div>
@@ -323,8 +323,8 @@ foreach (($documentoRows ?? []) as $documento) {
             <section class="asset-insurance" data-asset-insurance-current data-asset-insurance-panel="vigente" hidden>
                 <div class="asset-participation-header">
                     <div>
-                        <h2>Poliza vigente</h2>
-                        <p>Esta vista toma la cotizacion adoptada como base para renovaciones, ajustes de valores y movimientos durante la vigencia.</p>
+                        <h2>Resumen poliza vigente</h2>
+                        <p>Aqui no se diligencia manualmente. El resumen aparece cuando tomas una cotizacion, registras una poliza anterior o registras una poliza matriz/global vigente.</p>
                     </div>
                 </div>
                 <div class="asset-insurance-history" data-asset-insurance-current-summary></div>
@@ -351,8 +351,8 @@ foreach (($documentoRows ?? []) as $documento) {
             <section class="asset-insurance" data-asset-insurance-movements data-asset-insurance-panel="movimientos" hidden>
                 <div class="asset-participation-header">
                     <div>
-                        <h2>Movimientos de vigencia <span class="asset-document-marker">*Control Documental*</span></h2>
-                        <p>Registra compras, retiros, aumentos, endosos o reportes durante la vigencia antes de comunicarlos a la aseguradora.</p>
+                        <h2>Cambios y endosos de vigencia <span class="asset-document-marker">*Control Documental*</span></h2>
+                        <p>Registra compras, retiros, aumentos de valor, disminuciones, endosos o reportes. Al agregar un cambio, el sistema toma la poliza vigente como base.</p>
                     </div>
                     <button type="button" data-add-asset-insurance-movement>Agregar movimiento</button>
                 </div>
