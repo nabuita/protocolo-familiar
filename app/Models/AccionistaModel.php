@@ -356,8 +356,8 @@ final readonly class AccionistaModel
     /** @return list<array<string, mixed>> */
     private function defaultRows(): array
     {
-        $empresa1 = 'Soluciones Comerciales y Constructivas';
-        $empresa2 = 'Disenos y Soluciones Creativas';
+        $empresa1 = 'Soluciones Comerciales y Constructivas SAS';
+        $empresa2 = 'Disenos y Soluciones Creativas SAS';
         return [
             ['codigo' => 'ACC-001', 'empresa' => $empresa1, 'accionista' => 'Nassif Abuita Nassar', 'vinculo_familiar' => 'Fundador(a)', 'numero_acciones_cuotas' => 6120, 'porcentaje' => 34.00, 'ano_ingreso' => 2013, 'forma_adquisicion' => 'Constitucion', 'valor_pagado_aportado' => 61200000, 'quien_aporto_recursos' => 'Nassif Abuita Nassar', 'estado_civil_adquirir' => 'Separado(a)', 'convivia_en_ese_momento' => 'Si', 'existe_documento_adquisicion' => 'No', 'registro_libro_accionistas' => 'No', 'restriccion_vigente' => 'No aplica', 'valor_estimado_actual' => 218968405, 'observaciones' => null],
             ['codigo' => 'ACC-002', 'empresa' => $empresa1, 'accionista' => 'Gloria Maria Correa Rivera', 'vinculo_familiar' => 'Fundador(a)', 'numero_acciones_cuotas' => 6480, 'porcentaje' => 36.00, 'ano_ingreso' => 2013, 'forma_adquisicion' => 'Constitucion', 'valor_pagado_aportado' => 64800000, 'quien_aporto_recursos' => 'Gloria Maria Correa Rivera', 'estado_civil_adquirir' => 'Separado(a)', 'convivia_en_ese_momento' => 'Si', 'existe_documento_adquisicion' => 'No', 'registro_libro_accionistas' => 'No', 'restriccion_vigente' => 'No aplica', 'valor_estimado_actual' => 231848899, 'observaciones' => null],
