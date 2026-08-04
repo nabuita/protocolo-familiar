@@ -2736,6 +2736,15 @@ const insuranceRequestedItems = (form) => assetInsuranceEquipmentRows(form)
 const insuranceRequestedTotal = (form) => insuranceRequestedCoverages(form)
     .reduce((sum, row) => sum + assetNumber(row.valor_asegurado), 0);
 
+const insuranceCoverageGroups = (rows = []) => rows.reduce((carry, row) => {
+    const key = row.ramo || 'Ramo por definir';
+    if (!carry.has(key)) {
+        carry.set(key, []);
+    }
+    carry.get(key).push(row);
+    return carry;
+}, new Map());
+
 const insuranceCoverageQuoteKey = (row = {}) => [row.ramo || '', row.cobertura || ''].join('::');
 
 const parseInsuranceQuoteMatrix = (value) => {
@@ -2839,6 +2848,101 @@ const syncInsuranceQuoteMatrix = (card) => {
     hidden.value = JSON.stringify(rows);
 };
 
+const syncAllInsuranceQuoteMatrices = (form) => {
+    const cards = [...form.querySelectorAll('[data-asset-insurance-policy-row]')];
+    cards.forEach((card, index) => {
+        const hidden = card.querySelector('[name$="[cotizacion_matriz]"]');
+        if (!(hidden instanceof HTMLInputElement)) {
+            return;
+        }
+        const rows = [...form.querySelectorAll(`[data-asset-insurance-offer-quote-row][data-policy-index="${index}"]`)].map((row) => {
+            const valueFor = (field) => {
+                const input = row.querySelector(`[data-quote-field="${field}"]`);
+                if (input instanceof HTMLInputElement) {
+                    return input.type === 'checkbox' ? (input.checked ? 'Si' : '') : input.value;
+                }
+                return '';
+            };
+            return {
+                ramo: row.dataset.ramo || '',
+                cobertura: row.dataset.cobertura || '',
+                cotiza: valueFor('cotiza'),
+                valor_asegurado: valueFor('valor_asegurado'),
+                limite_evento: valueFor('limite_evento'),
+                sublimite: valueFor('sublimite'),
+                deducible: valueFor('deducible'),
+                indice: valueFor('indice'),
+                tasa: valueFor('tasa'),
+                prima: valueFor('prima'),
+                fuente: valueFor('fuente'),
+            };
+        });
+        hidden.value = JSON.stringify(rows);
+        const premiumInput = card.querySelector('[name$="[prima_total]"]');
+        const totalPremium = rows.reduce((sum, row) => sum + assetNumber(row.prima), 0);
+        if (premiumInput instanceof HTMLInputElement && totalPremium > 0) {
+            premiumInput.value = String(Math.round(totalPremium));
+        }
+    });
+};
+
+const insuranceOfferComparisonMatrixHtml = (form, policies = []) => {
+    const coverages = insuranceRequestedCoverages(form);
+    if (!coverages.length) {
+        return `
+            <div class="asset-insurance-quote-empty">
+                Primero selecciona coberturas y diligencia valores asegurados. Despues aqui aparecera una sola matriz para comparar a todos los oferentes.
+            </div>
+        `;
+    }
+    const grouped = insuranceCoverageGroups(coverages);
+    const offerCount = Math.max(policies.length, 1);
+    const offerGridStyle = `grid-template-columns: minmax(210px, 1fr) minmax(190px, .8fr) repeat(${offerCount}, minmax(220px, 1fr)); min-width: ${400 + offerCount * 220}px`;
+    return `
+        <div class="asset-insurance-offer-matrix">
+            <div class="asset-insurance-offer-matrix-head">
+                <strong>Matriz unica de respuestas</strong>
+                <span>La solicitud base es igual para todos; aqui solo comparas la respuesta de cada aseguradora.</span>
+            </div>
+            <div class="asset-insurance-offer-table">
+                <div class="asset-insurance-offer-table-head" style="${assetEscape(offerGridStyle)}">
+                    <span>Ramo / cobertura solicitada</span>
+                    <span>Valor y fuente base</span>
+                    ${policies.map((policy, index) => `<span>${assetEscape(policy.aseguradora || `Oferente ${index + 1}`)}</span>`).join('')}
+                </div>
+                ${[...grouped.entries()].map(([ramo, rows]) => `
+                    <div class="asset-insurance-offer-group" style="min-width: ${400 + offerCount * 220}px">${assetEscape(ramo)}</div>
+                    ${rows.map((coverage) => `
+                        <div class="asset-insurance-offer-table-row" style="${assetEscape(offerGridStyle)}">
+                            <strong>${assetEscape(coverage.cobertura || 'Cobertura')}</strong>
+                            <span>
+                                ${assetEscape(assetMoney(assetNumber(coverage.valor_asegurado)) || 'Valor por definir')}
+                                <small>${assetEscape(coverage.fuente_valor_asegurado || coverage.observaciones || 'Fuente pendiente')}</small>
+                            </span>
+                            ${policies.map((policy, index) => {
+                                const quote = insuranceQuoteMatrixMap(policy).get(insuranceCoverageQuoteKey(coverage)) || {};
+                                return `
+                                    <div class="asset-insurance-offer-cell" data-asset-insurance-offer-quote-row data-policy-index="${index}" data-ramo="${assetEscape(coverage.ramo || '')}" data-cobertura="${assetEscape(coverage.cobertura || '')}">
+                                        <label class="asset-insurance-offer-check"><input type="checkbox" data-quote-field="cotiza" ${quote.cotiza === 'Si' ? 'checked' : ''}> Cotiza</label>
+                                        <input data-quote-field="valor_asegurado" data-money-format inputmode="decimal" value="${assetEscape(assetMoneyPlain(quote.valor_asegurado) || quote.valor_asegurado || '')}" placeholder="Valor asegurado">
+                                        <input data-quote-field="limite_evento" value="${assetEscape(quote.limite_evento || '')}" placeholder="Limite evento">
+                                        <input data-quote-field="sublimite" value="${assetEscape(quote.sublimite || '')}" placeholder="Sublimite">
+                                        <input data-quote-field="deducible" value="${assetEscape(quote.deducible || '')}" placeholder="Deducible">
+                                        <input data-quote-field="indice" value="${assetEscape(quote.indice || '')}" placeholder="Indice">
+                                        <input data-quote-field="tasa" inputmode="decimal" value="${assetEscape(quote.tasa || '')}" placeholder="Tasa">
+                                        <input data-quote-field="prima" data-money-format inputmode="decimal" value="${assetEscape(assetMoneyPlain(quote.prima) || quote.prima || '')}" placeholder="Prima">
+                                        <input data-quote-field="fuente" value="${assetEscape(quote.fuente || '')}" placeholder="Fuente / nota">
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    `).join('')}
+                `).join('')}
+            </div>
+        </div>
+    `;
+};
+
 const insuranceQuoteRecommendationHtml = (form) => {
     const targetCoverages = insuranceRequestedCoverages(form);
     const targetCount = targetCoverages.length;
@@ -2932,6 +3036,7 @@ const renderInsuranceQuoteAnalysis = (form) => {
 const insuranceQuotePackageHtml = (form, policy = {}) => {
     const products = splitInsuranceSelection(policy.ramo || joinInsuranceSelection(selectedInsuranceProductsFromForm(form)));
     const coverages = insuranceRequestedCoverages(form);
+    const grouped = insuranceCoverageGroups(coverages);
     const items = insuranceRequestedItems(form);
     const total = insuranceRequestedTotal(form);
     return `
@@ -2948,14 +3053,17 @@ const insuranceQuotePackageHtml = (form, policy = {}) => {
                     <span>Valor solicitado</span>
                     <span>Fuente / soporte</span>
                 </div>
-                ${coverages.map((row) => `
-                    <div>
-                        <span>${assetEscape(row.ramo || 'Por definir')}</span>
-                        <span>${assetEscape(row.cobertura || 'Cobertura')}</span>
-                        <span>${assetEscape(assetMoney(assetNumber(row.valor_asegurado)) || 'Por definir')}</span>
-                        <span>${assetEscape(row.fuente_valor_asegurado || row.observaciones || 'Pendiente')}</span>
-                    </div>
-                `).join('') || '<p class="muted">Selecciona coberturas y valores antes de solicitar cotizaciones.</p>'}
+                ${coverages.length ? [...grouped.entries()].map(([ramo, rows]) => `
+                    <div class="asset-insurance-quote-group"><span>${assetEscape(ramo)}</span></div>
+                    ${rows.map((row) => `
+                        <div>
+                            <span>${assetEscape(row.ramo || 'Por definir')}</span>
+                            <span>${assetEscape(row.cobertura || 'Cobertura')}</span>
+                            <span>${assetEscape(assetMoney(assetNumber(row.valor_asegurado)) || 'Por definir')}</span>
+                            <span>${assetEscape(row.fuente_valor_asegurado || row.observaciones || 'Pendiente')}</span>
+                        </div>
+                    `).join('')}
+                `).join('') : '<p class="muted">Selecciona coberturas y valores antes de solicitar cotizaciones.</p>'}
             </div>
             ${items.length ? `
                 <details class="asset-insurance-quote-items">
@@ -2986,6 +3094,7 @@ const printableInsuranceQuoteHtml = (form, policy = {}) => {
     const assetName = form.elements.nombre_descripcion?.value || 'Activo';
     const assetId = form.elements.identificador?.value || '';
     const insurer = policy.aseguradora || 'Aseguradora cotizante';
+    const coverageGroups = insuranceCoverageGroups(insuranceRequestedCoverages(form));
     return `
         <!doctype html>
         <html lang="es">
@@ -3016,14 +3125,17 @@ const printableInsuranceQuoteHtml = (form, policy = {}) => {
             <table>
                 <thead><tr><th>Ramo</th><th>Cobertura</th><th>Valor solicitado</th><th>Fuente / soporte</th><th>Observacion</th></tr></thead>
                 <tbody>
-                    ${insuranceRequestedCoverages(form).map((row) => `
-                        <tr>
-                            <td>${assetEscape(row.ramo || '')}</td>
-                            <td>${assetEscape(row.cobertura || '')}</td>
-                            <td>${assetEscape(assetMoney(assetNumber(row.valor_asegurado)) || 'Por definir')}</td>
-                            <td>${assetEscape(row.fuente_valor_asegurado || '')}</td>
-                            <td>${assetEscape(row.observaciones || '')}</td>
-                        </tr>
+                    ${[...coverageGroups.entries()].map(([ramo, rows]) => `
+                        <tr><th colspan="5">${assetEscape(ramo)}</th></tr>
+                        ${rows.map((row) => `
+                            <tr>
+                                <td>${assetEscape(row.ramo || '')}</td>
+                                <td>${assetEscape(row.cobertura || '')}</td>
+                                <td>${assetEscape(assetMoney(assetNumber(row.valor_asegurado)) || 'Por definir')}</td>
+                                <td>${assetEscape(row.fuente_valor_asegurado || '')}</td>
+                                <td>${assetEscape(row.observaciones || '')}</td>
+                            </tr>
+                        `).join('')}
                     `).join('')}
                 </tbody>
             </table>
@@ -3085,13 +3197,16 @@ const renderAssetInsurancePolicyRows = (form, rows = []) => {
     while (sourceRows.length < 3) {
         sourceRows.push(defaultQuote(sourceRows.length));
     }
-    container.innerHTML = sourceRows.map((row, index) => {
-        row = {
-            ...defaultQuote(index),
-            ...row,
-            ramo: row.ramo || joinInsuranceSelection(selectedProducts),
-            valor_asegurado_total: row.valor_asegurado_total || (requestedTotal > 0 ? String(Math.round(requestedTotal)) : ''),
-        };
+    const normalizedRows = sourceRows.map((row, index) => ({
+        ...defaultQuote(index),
+        ...row,
+        ramo: row.ramo || joinInsuranceSelection(selectedProducts),
+        valor_asegurado_total: row.valor_asegurado_total || (requestedTotal > 0 ? String(Math.round(requestedTotal)) : ''),
+    }));
+    container.innerHTML = `
+        ${insuranceQuotePackageHtml(form, { ramo: joinInsuranceSelection(selectedProducts) })}
+        <div class="asset-insurance-offer-cards">
+        ${normalizedRows.map((row, index) => {
         const documentTypeOptions = (options.tipo_documento_poliza || []).map((item) => `<option value="${assetEscape(item)}" ${item === (row.tipo_documento ?? '') ? 'selected' : ''}>${assetEscape(item)}</option>`).join('');
         const paymentOptions = (options.forma_pago_seguro || []).map((item) => `<option value="${assetEscape(item)}" ${item === (row.forma_pago ?? '') ? 'selected' : ''}>${assetEscape(item)}</option>`).join('');
         const stateOptions = (options.estado_poliza || []).map((item) => `<option value="${assetEscape(item)}" ${item === (row.estado ?? '') ? 'selected' : ''}>${assetEscape(item)}</option>`).join('');
@@ -3112,7 +3227,7 @@ const renderAssetInsurancePolicyRows = (form, rows = []) => {
         `;
         }).join('');
         return `
-            <details class="asset-insurance-policy-card" data-asset-insurance-policy-row open>
+            <details class="asset-insurance-policy-card asset-insurance-offer-card" data-asset-insurance-policy-row open>
                 <summary>
                     <strong>${adopted ? 'Poliza vigente' : `Oferta ${index + 1}`}</strong>
                     <span>${assetEscape([row.aseguradora, row.numero_poliza, row.prima_total ? assetMoney(row.prima_total) : '', adopted ? 'Adoptada' : ''].filter(Boolean).join(' / ') || 'Completa los datos basicos para cotizar')}</span>
@@ -3120,12 +3235,11 @@ const renderAssetInsurancePolicyRows = (form, rows = []) => {
                 <div class="asset-policy-decision ${adopted ? 'is-adopted' : ''}">
                     <input type="hidden" name="seguro_polizas[${index}][adoptada]" value="${assetEscape(row.adoptada ?? '')}">
                     <input type="hidden" name="seguro_polizas[${index}][fecha_adopcion]" value="${assetEscape(row.fecha_adopcion ?? '')}">
+                    <input type="hidden" name="seguro_polizas[${index}][cotizacion_matriz]" value="${assetEscape(row.cotizacion_matriz ?? '')}">
                     <label>Criterio decision<input name="seguro_polizas[${index}][criterio_adopcion]" value="${assetEscape(row.criterio_adopcion ?? '')}" placeholder="Mejor equilibrio cobertura, deducible y prima"></label>
                     <button type="button" data-print-asset-insurance-quote>Generar solicitud PDF</button>
                     <button type="button" data-adopt-asset-insurance-policy>${adopted ? 'Opcion adoptada' : 'Adoptar cotizacion'}</button>
                 </div>
-                ${insuranceQuotePackageHtml(form, row)}
-                ${insuranceQuoteMatrixHtml(form, row, index)}
                 <div class="asset-insurance-policy-row asset-insurance-quote-contact">
                     <input type="hidden" name="seguro_polizas[${index}][ano]" value="${assetEscape(row.ano ?? '')}">
                     <input type="hidden" name="seguro_polizas[${index}][tipo_documento]" value="${assetEscape(row.tipo_documento ?? '')}">
@@ -3177,7 +3291,10 @@ const renderAssetInsurancePolicyRows = (form, rows = []) => {
                 </div>
             </details>
         `;
-    }).join('');
+        }).join('')}
+        </div>
+        ${insuranceOfferComparisonMatrixHtml(form, normalizedRows)}
+    `;
     renderInsuranceQuoteAnalysis(form);
 };
 
@@ -4311,7 +4428,7 @@ if (assetForm instanceof HTMLFormElement) {
             }
             const adoptButton = target instanceof Element ? target.closest('[data-adopt-asset-insurance-policy]') : null;
             if (adoptButton instanceof HTMLElement) {
-                syncInsuranceQuoteMatrix(adoptButton.closest('[data-asset-insurance-policy-row]'));
+                syncAllInsuranceQuoteMatrices(assetForm);
                 let rows = historyRowsForType(assetForm, '[data-asset-insurance-policy-row]', assetInsurancePolicyFields);
                 const card = adoptButton.closest('[data-asset-insurance-policy-row]');
                 const index = [...assetForm.querySelectorAll('[data-asset-insurance-policy-row]')].indexOf(card);
@@ -4349,7 +4466,7 @@ if (assetForm instanceof HTMLFormElement) {
     assetForm.querySelector('[data-asset-insurance-policy-rows]')?.addEventListener('change', (event) => {
         const target = event.target;
         if (target instanceof HTMLInputElement && target.matches('[data-quote-field]')) {
-            syncInsuranceQuoteMatrix(target.closest('[data-asset-insurance-policy-row]'));
+            syncAllInsuranceQuoteMatrices(assetForm);
             renderInsuranceQuoteAnalysis(assetForm);
             renderAssetCurrentPolicy(assetForm);
             renderAssetInsuranceHistory(assetForm);
@@ -4374,7 +4491,7 @@ if (assetForm instanceof HTMLFormElement) {
     assetForm.querySelector('[data-asset-insurance-policy-rows]')?.addEventListener('input', (event) => {
         const target = event.target;
         if (target instanceof HTMLInputElement && target.matches('[data-quote-field]')) {
-            syncInsuranceQuoteMatrix(target.closest('[data-asset-insurance-policy-row]'));
+            syncAllInsuranceQuoteMatrices(assetForm);
             renderInsuranceQuoteAnalysis(assetForm);
         }
         renderAssetCurrentPolicy(assetForm);
@@ -4387,7 +4504,7 @@ if (assetForm instanceof HTMLFormElement) {
         if (target instanceof HTMLInputElement && target.matches('[data-money-format]')) {
             formatAssetMoneyInput(target);
             if (target.matches('[data-quote-field]')) {
-                syncInsuranceQuoteMatrix(target.closest('[data-asset-insurance-policy-row]'));
+                syncAllInsuranceQuoteMatrices(assetForm);
                 renderInsuranceQuoteAnalysis(assetForm);
                 saveAssetDraft(assetForm);
             }
