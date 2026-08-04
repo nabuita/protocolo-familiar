@@ -24,6 +24,8 @@ const assetFields = [
     'observaciones',
 ];
 
+const assetLoadedRows = new WeakMap();
+
 const assetMoney = (value) => {
     if (value === null || value === undefined || value === '') {
         return '';
@@ -4132,6 +4134,7 @@ const fillAssetForm = (form, row = null, { restoreDraft = false } = {}) => {
     form.reset();
     const draft = restoreDraft ? readAssetDraft(form, row?.id || 'nuevo') : null;
     const source = draft ? { ...(row || {}), ...(draft.fields || {}), detalle: draft.detalle || {}, participaciones: draft.participaciones || [], fiducia_beneficiarios: draft.fiducia_beneficiarios || [], subunidades: draft.subunidades || [], valoraciones_anuales: draft.valoraciones_anuales || [], ingresos_anuales: draft.ingresos_anuales || [], gastos_anuales: draft.gastos_anuales || [], seguro_polizas: draft.seguro_polizas || [], seguro_coberturas: draft.seguro_coberturas || [], seguro_equipos: draft.seguro_equipos || [], seguro_movimientos: draft.seguro_movimientos || [] } : row;
+    assetLoadedRows.set(form, source || null);
     form.elements.id.value = row?.id ?? '';
     form.elements.codigo.value = row?.codigo ?? 'Automatico';
     assetFields.forEach((field) => {
@@ -4273,20 +4276,37 @@ if (assetForm instanceof HTMLFormElement) {
     };
 
     assetForm.elements.tipo_activo?.addEventListener('change', () => {
+        const selectedType = assetForm.elements.tipo_activo?.value || '';
+        const loadedSource = assetLoadedRows.get(assetForm);
+        const sameLoadedType = loadedSource && loadedSource.tipo_activo === selectedType;
+        const source = sameLoadedType ? loadedSource : { tipo_activo: selectedType, moneda: 'COP' };
+        assetFields.forEach((field) => {
+            const input = assetForm.elements[field];
+            if (input instanceof HTMLInputElement || input instanceof HTMLSelectElement || input instanceof HTMLTextAreaElement) {
+                input.value = source?.[field] ?? '';
+            }
+        });
+        if (assetForm.elements.tipo_activo) {
+            assetForm.elements.tipo_activo.value = selectedType;
+        }
+        if (!source?.moneda && assetForm.elements.moneda) {
+            assetForm.elements.moneda.value = 'COP';
+        }
         assetForm.dataset.assetInsuranceTab = 'modelo';
         assetForm.dataset.assetCoverageActiveProduct = '';
         assetForm.dataset.assetValueActiveProduct = '';
         assetForm.dataset.assetCoveragePolicyIndex = '0';
-        renderAssetSpecificFields(assetForm);
-        renderAssetFiduciaRows(assetForm);
-        renderAssetSubunitRows(assetForm);
-        renderAssetAnnualHistory(assetForm);
-        renderAssetInsurancePolicyRows(assetForm, []);
-        renderAssetInsuranceCoverageRows(assetForm, []);
-        renderAssetInsuranceEquipmentRows(assetForm, []);
-        renderAssetInsuranceMovementRows(assetForm, []);
+        renderAssetSpecificFields(assetForm, source);
+        renderAssetFiduciaRows(assetForm, sameLoadedType ? source?.fiducia_beneficiarios || [] : []);
+        renderAssetSubunitRows(assetForm, sameLoadedType ? source?.subunidades || [] : []);
+        renderAssetAnnualHistory(assetForm, sameLoadedType ? source : null);
+        renderAssetInsurancePolicyRows(assetForm, sameLoadedType ? source?.seguro_polizas || [] : []);
+        renderAssetInsuranceCoverageRows(assetForm, sameLoadedType ? source?.seguro_coberturas || [] : []);
+        renderAssetInsuranceEquipmentRows(assetForm, sameLoadedType ? source?.seguro_equipos || [] : []);
+        renderAssetInsuranceMovementRows(assetForm, sameLoadedType ? source?.seguro_movimientos || [] : []);
         renderAssetCurrentPolicy(assetForm);
         renderAssetInsuranceHistory(assetForm);
+        status && (status.textContent = sameLoadedType ? 'Datos originales restaurados para esta categoria.' : 'Categoria cambiada: completa los datos propios del nuevo tipo de activo.');
     });
 
     assetSearch?.addEventListener('input', applyAssetSearch);
