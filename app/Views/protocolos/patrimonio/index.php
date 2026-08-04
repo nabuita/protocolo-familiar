@@ -320,7 +320,6 @@ foreach (($documentoRows ?? []) as $documento) {
                         <h2>2. Coberturas requeridas por seguro <span class="asset-document-marker">*Control Documental*</span></h2>
                         <p>Por cada seguro incorporado al activo, marca los amparos que deben cotizarse o contratarse. La matriz sale del catalogo tecnico de seguros.</p>
                     </div>
-                    <button type="button" data-add-asset-insurance-coverage>Agregar cobertura</button>
                 </div>
                 <div class="asset-insurance-rows" data-asset-insurance-coverage-rows></div>
             </section>

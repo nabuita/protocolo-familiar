@@ -3201,23 +3201,14 @@ const renderAssetInsuranceCoverageRows = (form, rows = []) => {
     const selected = new Set(existingRows
         .filter((row) => row.cobertura)
         .map((row) => coverageToggleValue(row.ramo || '', row.cobertura || '')));
-    const policyRows = assetFormRows(form, '[data-asset-insurance-policy-row]', ['numero_poliza', 'ramo', 'fecha_inicio', 'fecha_fin', 'fecha_renovacion'])
-        .filter((row) => row.numero_poliza || row.ramo);
-    const activePolicyIndex = Number(form.dataset.assetCoveragePolicyIndex || 0);
-    const activePolicy = policyRows[Number.isFinite(activePolicyIndex) ? activePolicyIndex : 0] || {};
     const selectedProducts = selectedInsuranceProductsFromForm(form);
     const activeProduct = activeInsuranceProduct(form, selectedProducts, 'assetCoverageActiveProduct');
     const visibleProducts = activeProduct ? [activeProduct] : selectedProducts;
-    const selectedRiskProfile = activePolicy.ramo || joinInsuranceSelection(selectedProducts);
+    const selectedRiskProfile = joinInsuranceSelection(selectedProducts);
     const profileCoverageNames = coverageOptionsForPolicy(selectedRiskProfile, allCoverageNames, form);
     const selectedCoverageNames = [...selected].map((item) => parseCoverageToggleValue(item).coverage).filter(Boolean);
     const extraSelected = selectedCoverageNames.filter((item) => !profileCoverageNames.includes(item));
-    const policyOptions = policyRows.map((policy, index) => {
-        const label = [policy.numero_poliza || `Poliza ${index + 1}`, policy.ramo].filter(Boolean).join(' / ');
-        return `<option value="${index}" ${index === activePolicyIndex ? 'selected' : ''}>${assetEscape(label)}</option>`;
-    }).join('');
     const sourceRows = existingRows;
-    const activeRows = sourceRows.filter((row) => (row.ramo || '') === activeProduct || (!activeProduct && row.ramo === ''));
     const extraChecklist = extraSelected.map((item) => `
         <label class="asset-coverage-chip ${selectedCoverageNames.includes(item) ? 'is-selected' : ''}">
             <input type="checkbox" data-asset-coverage-toggle value="${assetEscape(coverageToggleValue('', item))}" ${selectedCoverageNames.includes(item) ? 'checked' : ''}>
@@ -3231,40 +3222,16 @@ const renderAssetInsuranceCoverageRows = (form, rows = []) => {
                 <strong>Matriz ramo / amparo / bienes asegurables</strong>
                 <span>${selectedRiskProfile ? `Productos seleccionados: ${assetEscape(selectedRiskProfile)}. Marca solo los amparos que realmente se van a cotizar o contratar.` : 'Primero selecciona uno o varios productos de seguro.'}</span>
             </div>
-            <label class="asset-coverage-policy-source">Poliza base<select data-asset-coverage-policy-source>${policyOptions || '<option value="">Primera poliza registrada</option>'}</select></label>
             ${insuranceProductTabsHtml(selectedProducts, activeProduct, 'coverage')}
             ${insuranceCoverageMatrixHtml(visibleProducts, selected, form)}
             ${extraChecklist ? `<div class="asset-coverage-extra"><strong>Amparos agregados manualmente</strong><div class="asset-coverage-chips">${extraChecklist}</div></div>` : ''}
         </div>
-        <div class="asset-coverage-selected">
-            ${sourceRows.map((row, index) => {
-                const coverageOptions = allCoverageNames.map((item) => `<option value="${assetEscape(item)}" ${item === (row.cobertura ?? '') ? 'selected' : ''}>${assetEscape(item)}</option>`).join('');
-                const isActiveRow = (row.ramo || '') === activeProduct || (!activeProduct && row.ramo === '');
-                return `
-                    <div class="asset-insurance-coverage-row" data-asset-insurance-coverage-row ${isActiveRow ? '' : 'hidden'}>
-                        <label>Ano<input name="seguro_coberturas[${index}][ano]" inputmode="numeric" value="${assetEscape(row.ano ?? '')}" placeholder="2026"></label>
-                        <label>Numero poliza<input name="seguro_coberturas[${index}][numero_poliza]" value="${assetEscape(row.numero_poliza ?? '')}" placeholder="JWS797, LWY154..."></label>
-                <label>Producto<input name="seguro_coberturas[${index}][ramo]" value="${assetEscape(row.ramo ?? '')}" placeholder="Producto de la poliza base"></label>
-                        <label>Cobertura<select name="seguro_coberturas[${index}][cobertura]">${assetPlaceholderOption(row.cobertura ?? '')}${coverageOptions}</select></label>
-                        <label>Riesgo cubierto<input name="seguro_coberturas[${index}][riesgo_cubierto]" value="${assetEscape(row.riesgo_cubierto ?? row.cobertura ?? '')}" placeholder="Incendio, terremoto, corriente debil..."></label>
-                        <label>Valor asegurado<input name="seguro_coberturas[${index}][valor_asegurado]" inputmode="decimal" value="${assetEscape(row.valor_asegurado ?? '')}" placeholder="$0"></label>
-                        <label>Limite por evento<input name="seguro_coberturas[${index}][limite_evento]" inputmode="decimal" value="${assetEscape(row.limite_evento ?? '')}" placeholder="$ / % por evento"></label>
-                        <label>Sublimite<input name="seguro_coberturas[${index}][sublimite]" value="${assetEscape(row.sublimite ?? '')}" placeholder="% evento / vigencia / valor"></label>
-                        <label>Indice variable<input name="seguro_coberturas[${index}][indice_variable]" inputmode="decimal" value="${assetEscape(row.indice_variable ?? '')}" placeholder="IPC, 5%, pactado"></label>
-                        <label>% invar<input name="seguro_coberturas[${index}][porcentaje_invar]" inputmode="decimal" value="${assetEscape(row.porcentaje_invar ?? '')}" placeholder="5%"></label>
-                        <label>Tasa<input name="seguro_coberturas[${index}][tasa]" inputmode="decimal" value="${assetEscape(row.tasa ?? '')}" placeholder="0% / tarifa"></label>
-                        <label>Prima<input name="seguro_coberturas[${index}][prima]" inputmode="decimal" data-coverage-premium value="${assetEscape(row.prima ?? '')}" placeholder="$0"></label>
-                        <label>Deducible<input name="seguro_coberturas[${index}][deducible]" value="${assetEscape(row.deducible ?? '')}" placeholder="% o valor"></label>
-                        <label>Fuente valor asegurado<input name="seguro_coberturas[${index}][fuente_valor_asegurado]" value="${assetEscape(row.fuente_valor_asegurado ?? '')}" placeholder="Avaluo, cotizacion, factura, relacion de bienes..."></label>
-                        <label>Inicio cobertura<input name="seguro_coberturas[${index}][fecha_inicio]" type="date" value="${assetEscape(row.fecha_inicio ?? '')}"></label>
-                        <label>Fin cobertura<input name="seguro_coberturas[${index}][fecha_fin]" type="date" value="${assetEscape(row.fecha_fin ?? '')}"></label>
-                        <label>Renovacion<input name="seguro_coberturas[${index}][fecha_renovacion]" type="date" value="${assetEscape(row.fecha_renovacion ?? '')}"></label>
-                        <label>Observaciones<input name="seguro_coberturas[${index}][observaciones]" value="${assetEscape(row.observaciones ?? '')}" placeholder="Condicion, sublimite, soporte..."></label>
-                        <button type="button" class="asset-remove-insurance" aria-label="Quitar cobertura" data-remove-asset-insurance-coverage>&times;</button>
-                    </div>
-                `;
-            }).join('') || '<p class="muted">Marca una cobertura para diligenciar valores asegurados, prima, tasa y deducible.</p>'}
-            ${activeRows.length === 0 && sourceRows.length > 0 ? '<p class="muted">Este ramo aun no tiene coberturas marcadas.</p>' : ''}
+        <div class="asset-coverage-hidden-rows" hidden>
+            ${sourceRows.map((row, index) => `
+                <div class="asset-insurance-coverage-row" data-asset-insurance-coverage-row>
+                    ${assetInsuranceCoverageFields.map((field) => `<input type="hidden" name="seguro_coberturas[${index}][${field}]" value="${assetEscape(row[field] ?? '')}">`).join('')}
+                </div>
+            `).join('')}
         </div>
     `;
     syncCoveragePremiumRows(form);
