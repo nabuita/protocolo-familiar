@@ -1192,6 +1192,50 @@ const coverageSupportTabsHtml = (categories = []) => {
     `;
 };
 
+const insuranceCoverageRequestTableHtml = (rows = []) => {
+    if (rows.length === 0) {
+        return `
+            <div class="asset-insurance-request-empty">
+                Primero marca las coberturas requeridas. Despues esta tabla mostrara los valores y condiciones que se solicitaran a las aseguradoras.
+            </div>
+        `;
+    }
+    return `
+        <div class="asset-insurance-request-table" role="table" aria-label="Solicitud de coberturas para cotizar">
+            <div class="asset-insurance-request-head" role="row">
+                <span>Cobertura</span>
+                <span>Dato base</span>
+                <span>Valor asegurado</span>
+                <span>Limite evento</span>
+                <span>Sublimite</span>
+                <span>Deducible</span>
+                <span>Indice</span>
+                <span>Tasa</span>
+                <span>Prima</span>
+                <span>Fuente</span>
+            </div>
+            ${rows.map((row) => {
+                const insuredValue = assetNumber(row.valor_asegurado);
+                const premium = assetNumber(row.prima);
+                return `
+                    <div class="asset-insurance-request-row" role="row">
+                        <strong>${assetEscape(row.cobertura || 'Cobertura por definir')}</strong>
+                        <span>${assetEscape(coverageAssetsLabel(row.cobertura || ''))}</span>
+                        <span>${insuredValue > 0 ? assetMoney(insuredValue) : 'Por definir'}</span>
+                        <span>${assetEscape(row.limite_evento || 'Por definir')}</span>
+                        <span>${assetEscape(row.sublimite || 'Por definir')}</span>
+                        <span>${assetEscape(row.deducible || 'Por definir')}</span>
+                        <span>${assetEscape(row.indice_variable || row.porcentaje_invar || 'Por definir')}</span>
+                        <span>${assetEscape(row.tasa || 'Por definir')}</span>
+                        <span>${premium > 0 ? assetMoney(premium) : 'Por calcular'}</span>
+                        <span>${assetEscape(row.fuente_valor_asegurado || 'Pendiente')}</span>
+                    </div>
+                `;
+            }).join('')}
+        </div>
+    `;
+};
+
 const selectedInsuranceStripHtml = (form) => {
     const products = selectedInsuranceProductsFromForm(form);
     if (products.length === 0) {
@@ -2860,7 +2904,6 @@ const renderAssetInsuranceEquipmentRows = (form, rows = []) => {
     const selectedCoverageRows = historyRowsForType(form, '[data-asset-insurance-coverage-row]', assetInsuranceCoverageFields)
         .filter((item) => item.cobertura || item.ramo);
     const activeCoverageRows = selectedCoverageRows.filter((item) => (item.ramo || '') === activeProduct || (!activeProduct && item.ramo === ''));
-    const activeSupportCategories = coverageSupportCategories(activeCoverageRows);
     const productOptions = [...new Set([...(options.ramo_seguro || []), ...selectedProducts])]
         .filter(Boolean)
         .map((item) => `<option value="${assetEscape(item)}">${assetEscape(item)}</option>`)
@@ -2871,17 +2914,10 @@ const renderAssetInsuranceEquipmentRows = (form, rows = []) => {
             return `<option value="${assetEscape(value)}">${assetEscape(value)}</option>`;
         })
         .join('');
-    const coverageGuide = activeCoverageRows.length > 0
-        ? activeCoverageRows.map((item) => `<span>${assetEscape([item.ramo, item.cobertura].filter(Boolean).join(' / '))}</span>`).join('')
-        : '<p class="muted">Primero marca las coberturas requeridas. Despues relaciona aqui los bienes, limites o exposiciones que soportan cada valor asegurado.</p>';
     container.innerHTML = `
         ${selectedInsuranceStripHtml(form)}
         ${insuranceProductTabsHtml(selectedProducts, activeProduct, 'values')}
-        <div class="asset-insurance-value-guide">
-            <strong>Coberturas que necesitan valor asegurado o limite</strong>
-            <div>${coverageGuide}</div>
-            ${coverageSupportTabsHtml(activeSupportCategories)}
-        </div>
+        ${insuranceCoverageRequestTableHtml(activeCoverageRows)}
         ${sourceRows.map((row, index) => {
         const isActiveRow = (row.ramo || '') === activeProduct || (!activeProduct && row.ramo === '');
         const rowRamoOptions = productOptions.replace(`value="${assetEscape(row.ramo ?? '')}"`, `value="${assetEscape(row.ramo ?? '')}" selected`);
