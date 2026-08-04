@@ -414,11 +414,11 @@
 .asset-insurance-coverage-row,
 .asset-insurance-equipment-row,
 .asset-insurance-movement-row {
-    grid-template-columns: repeat(5, minmax(150px, 1fr)) 40px;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
 }
 
 .asset-insurance-policy-row {
-    grid-template-columns: repeat(4, minmax(165px, 1fr)) 40px;
+    grid-template-columns: repeat(auto-fit, minmax(185px, 1fr));
 }
 
 .asset-insurance-policy-card {
@@ -686,6 +686,35 @@
 .asset-coverage-selected {
     display: grid;
     gap: 10px;
+}
+
+.asset-insurance-value-guide {
+    display: grid;
+    gap: 8px;
+    padding: 12px;
+    border: 1px dashed var(--line);
+    border-radius: 10px;
+    background: #fff;
+}
+
+.asset-insurance-value-guide strong {
+    color: var(--primary);
+    font-size: 13px;
+}
+
+.asset-insurance-value-guide div {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.asset-insurance-value-guide span {
+    padding: 6px 9px;
+    border-radius: 999px;
+    background: #edf6f1;
+    color: var(--primary);
+    font-size: 12px;
+    font-weight: 800;
 }
 
 .asset-insurance-history {
