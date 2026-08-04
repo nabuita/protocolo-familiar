@@ -5458,7 +5458,7 @@ if (assetForm instanceof HTMLFormElement) {
         saveAssetDraft(assetForm);
     });
 
-    assetForm.querySelector('[data-add-asset-insurance-matrix]')?.addEventListener('click', () => {
+    assetForm.querySelectorAll('[data-add-asset-insurance-matrix]').forEach((matrixButton) => matrixButton.addEventListener('click', () => {
         const rows = historyRowsForType(assetForm, '[data-asset-insurance-policy-row]', assetInsurancePolicyFields);
         const assetLabel = [assetForm.elements.nombre_descripcion?.value, assetForm.elements.identificador?.value]
             .filter(Boolean)
@@ -5480,7 +5480,7 @@ if (assetForm instanceof HTMLFormElement) {
         renderAssetInsuranceMatrixSummary(assetForm);
         renderAssetInsuranceHistory(assetForm);
         saveAssetDraft(assetForm);
-    });
+    }));
 
     assetForm.querySelector('[data-add-asset-insurance-previous]')?.addEventListener('click', () => {
         const rows = historyRowsForType(assetForm, '[data-asset-insurance-policy-row]', assetInsurancePolicyFields);
