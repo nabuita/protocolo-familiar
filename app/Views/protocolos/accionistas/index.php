@@ -18,6 +18,12 @@ $number = static function (mixed $value): string {
     }
     return number_format((float) $value, 0, ',', '.');
 };
+$moneyDecimal = static function (mixed $value): string {
+    if ($value === null || $value === '') {
+        return '';
+    }
+    return '$' . number_format((float) $value, 2, ',', '.');
+};
 $date = static function (mixed $value): string {
     if (!is_string($value) || $value === '') {
         return '';
@@ -229,11 +235,20 @@ foreach ($accionistaRows as $row) {
                         <span><?= $e($number($group['acciones_total'])) ?> acciones</span>
                         <?php if ($group['valor_estimado_total'] > 0): ?><span><?= $e($money($group['valor_estimado_total'])) ?></span><?php endif; ?>
                     </span>
+                    <button type="button" class="shareholder-accordion-toggle" data-shareholder-toggle aria-label="Abrir o cerrar accionista" aria-expanded="false"></button>
                 </summary>
                 <div class="shareholder-detail">
                     <div class="shareholder-company-list">
                         <?php foreach ($group['participaciones'] as $row): ?>
                             <?php $stats = $docStats((string) $row['codigo']); ?>
+                            <?php
+                                $shares = (float) ($row['numero_acciones_cuotas'] ?? 0);
+                                $estimatedValue = (float) ($row['valor_estimado_actual'] ?? 0);
+                                $valuePerShare = $shares > 0 && $estimatedValue > 0
+                                    ? $estimatedValue / $shares
+                                    : (float) ($row['valor_nominal'] ?? 0);
+                                $valuationSource = trim((string) ($row['fuente_valoracion'] ?? '') . (($row['fecha_valoracion'] ?? '') ? ' / ' . $date($row['fecha_valoracion']) : ''), ' /');
+                            ?>
                             <article class="shareholder-company" data-shareholder-row="<?= $e($row['id']) ?>" data-row="<?= $json($row) ?>">
                                 <div class="shareholder-company-head">
                                     <div>
@@ -245,6 +260,28 @@ foreach ($accionistaRows as $row) {
                                         <span><?= $e($number($row['numero_acciones_cuotas'])) ?> acciones</span>
                                         <?php if (($row['valor_estimado_actual'] ?? '') !== ''): ?><span><?= $e($money($row['valor_estimado_actual'])) ?></span><?php endif; ?>
                                         <span class="<?= $stats['pending'] > 0 ? 'is-danger' : 'is-ok' ?>"><?= $e($stats['pending']) ?> docs pendientes</span>
+                                    </div>
+                                </div>
+                                <div class="shareholder-economic-strip" aria-label="Valor economico de la participacion">
+                                    <div>
+                                        <span>Valor nominal actual</span>
+                                        <strong><?= $e($moneyDecimal(($row['valor_nominal'] ?? '') !== '' ? $row['valor_nominal'] : $valuePerShare)) ?: 'Pendiente' ?></strong>
+                                        <small>Por accion/cuota</small>
+                                    </div>
+                                    <div>
+                                        <span>Acciones / cuotas</span>
+                                        <strong><?= $e($number($row['numero_acciones_cuotas'] ?? '')) ?: 'Pendiente' ?></strong>
+                                        <small><?= $e($percent($row['porcentaje'])) ?> de participacion</small>
+                                    </div>
+                                    <div>
+                                        <span>Valor estimado actual</span>
+                                        <strong><?= $e($money($row['valor_estimado_actual'] ?? '')) ?: 'Pendiente' ?></strong>
+                                        <small><?= $e(($row['metodo_valoracion'] ?? '') ?: 'Metodo pendiente') ?></small>
+                                    </div>
+                                    <div>
+                                        <span>Valor pagado / aportado</span>
+                                        <strong><?= $e($money($row['valor_pagado_aportado'] ?? '')) ?: 'Pendiente' ?></strong>
+                                        <small><?= $e($valuationSource ?: 'Fuente pendiente') ?></small>
                                     </div>
                                 </div>
                                 <dl class="shareholder-detail-grid">

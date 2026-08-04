@@ -361,6 +361,7 @@ const renderShareholderRows = (container, rows, documentsByCode = {}) => {
                     <span>${shareholderEscape(shareholderNumber(group.accionesTotal))} acciones</span>
                     ${group.valorTotal > 0 ? `<span>${shareholderEscape(shareholderMoney(group.valorTotal))}</span>` : ''}
                 </span>
+                <button type="button" class="shareholder-accordion-toggle" data-shareholder-toggle aria-label="Abrir o cerrar accionista" aria-expanded="false"></button>
             </summary>
             <div class="shareholder-detail">
                 <div class="shareholder-company-list">
@@ -618,6 +619,19 @@ if (shareholderForm instanceof HTMLFormElement) {
     tableBody?.addEventListener('click', async (event) => {
         const target = event.target;
         if (!(target instanceof Element)) {
+            return;
+        }
+        const summary = target.closest('.shareholder-accordion-item > summary');
+        const toggle = target.closest('[data-shareholder-toggle]');
+        if (summary instanceof HTMLElement) {
+            event.preventDefault();
+            if (toggle instanceof HTMLButtonElement) {
+                const item = summary.closest('.shareholder-accordion-item');
+                if (item instanceof HTMLDetailsElement) {
+                    item.open = !item.open;
+                    toggle.setAttribute('aria-expanded', item.open ? 'true' : 'false');
+                }
+            }
             return;
         }
         const tr = target.closest('[data-shareholder-row]');
