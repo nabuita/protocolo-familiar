@@ -2062,12 +2062,30 @@ const syncInsuranceRequestField = (form, input) => {
     if (!field || !coverage) {
         return;
     }
-    const coverageRow = [...form.querySelectorAll('[data-asset-insurance-coverage-row]')]
+    let coverageRow = [...form.querySelectorAll('[data-asset-insurance-coverage-row]')]
         .find((row) => {
             const rowProduct = row.querySelector('[name$="[ramo]"]')?.value || '';
             const rowCoverage = row.querySelector('[name$="[cobertura]"]')?.value || '';
             return rowProduct === product && rowCoverage === coverage;
         });
+    if (!coverageRow) {
+        const rows = historyRowsForType(form, '[data-asset-insurance-coverage-row]', assetInsuranceCoverageFields);
+        rows.push({
+            ano: String(new Date().getFullYear()),
+            ramo: product,
+            cobertura: coverage,
+            riesgo_cubierto: coverage,
+            [field]: input.value,
+            observaciones: field === 'observaciones' ? input.value : 'Definir valor o limite con soporte antes de cotizar.',
+        });
+        renderAssetInsuranceCoverageRows(form, rows);
+        coverageRow = [...form.querySelectorAll('[data-asset-insurance-coverage-row]')]
+            .find((row) => {
+                const rowProduct = row.querySelector('[name$="[ramo]"]')?.value || '';
+                const rowCoverage = row.querySelector('[name$="[cobertura]"]')?.value || '';
+                return rowProduct === product && rowCoverage === coverage;
+            });
+    }
     const target = coverageRow?.querySelector(`[name$="[${field}]"]`);
     if (target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement || target instanceof HTMLSelectElement) {
         target.value = input.value;
@@ -3574,9 +3592,35 @@ const updateInsuredItemRows = (container) => {
     container.querySelectorAll('[data-asset-insurance-equipment-row]').forEach(updateInsuredItemRow);
 };
 
+const insuranceRequestRowsForProduct = (form, product, existingRows = []) => {
+    const existingForProduct = existingRows.filter((item) => {
+        const rowProduct = item.ramo || '';
+        return rowProduct === product || (!product && !rowProduct);
+    });
+    if (existingForProduct.length > 0) {
+        return existingForProduct;
+    }
+    const options = parseAssetJson(form, 'assetOptions');
+    const allCoverageNames = [...new Set([
+        ...(options.tipo_cobertura_seguro || []),
+        ...insuranceAcademyData(form).coverages.map((row) => row.Cobertura).filter(Boolean),
+    ])];
+    return coverageOptionsForPolicy(product, allCoverageNames, form).map((coverage) => {
+        const suggestion = suggestCoverageValue(form, coverage);
+        return {
+            ano: String(new Date().getFullYear()),
+            ramo: product,
+            cobertura: coverage,
+            riesgo_cubierto: coverage,
+            valor_asegurado: suggestion.value > 0 ? String(Math.round(suggestion.value)) : '',
+            fuente_valor_asegurado: suggestion.source || '',
+            observaciones: suggestion.source ? `Valor sugerido segun relacion de bienes a reposicion. Fuente: ${suggestion.source}` : 'Definir valor o limite con soporte antes de cotizar.',
+        };
+    });
+};
+
 const renderAssetInsuranceEquipmentRows = (form, rows = []) => {
     const container = form.querySelector('[data-asset-insurance-equipment-rows]');
-    const options = parseAssetJson(form, 'assetOptions');
     const type = form.elements.tipo_activo.value;
     updateAssetInsuranceSections(form, type);
     if (!(container instanceof HTMLElement)) {
@@ -3591,7 +3635,9 @@ const renderAssetInsuranceEquipmentRows = (form, rows = []) => {
     const activeProduct = activeInsuranceProduct(form, selectedProducts, 'assetValueActiveProduct');
     const selectedCoverageRows = historyRowsForType(form, '[data-asset-insurance-coverage-row]', assetInsuranceCoverageFields)
         .filter((item) => item.cobertura || item.ramo);
-    const activeCoverageRows = selectedCoverageRows.filter((item) => (item.ramo || '') === activeProduct || (!activeProduct && item.ramo === ''));
+    const activeCoverageRows = insuranceRequestRowsForProduct(form, activeProduct, selectedCoverageRows);
+    const activeSourceRows = sourceRows.filter((item) => (item.ramo || '') === activeProduct || (!activeProduct && !item.ramo));
+    const inactiveSourceRows = sourceRows.filter((item) => !activeSourceRows.includes(item));
     container.innerHTML = `
         ${selectedInsuranceStripHtml(form)}
         ${insuranceProductTabsHtml(selectedProducts, activeProduct, 'values')}
@@ -3601,7 +3647,7 @@ const renderAssetInsuranceEquipmentRows = (form, rows = []) => {
                 <strong>Relacion de bienes o valores base</strong>
                 <span>Usala cuando el valor asegurado salga de construccion, equipos, muebles, mercancias, maquinaria, corriente debil, obras, joyas o dinero.</span>
             </div>
-            ${sourceRows.map((row, index) => `
+            ${activeSourceRows.map((row, index) => `
                 <div class="asset-insurance-equipment-row" data-asset-insurance-equipment-row>
                     <label>Ano<input name="seguro_equipos[${index}][ano]" inputmode="numeric" value="${assetEscape(row.ano ?? '')}" placeholder="2026"></label>
                     <label>Ramo<input name="seguro_equipos[${index}][ramo]" value="${assetEscape(row.ramo ?? activeProduct ?? '')}" placeholder="Ramo"></label>
@@ -3634,6 +3680,11 @@ const renderAssetInsuranceEquipmentRows = (form, rows = []) => {
                     <button type="button" class="asset-remove-insurance" aria-label="Quitar item asegurable" data-remove-asset-insurance-equipment>&times;</button>
                 </div>
             `).join('') || '<p class="muted">Agrega un item cuando el valor de la cobertura deba salir de inventario o calculo soportado.</p>'}
+            ${inactiveSourceRows.map((row, index) => `
+                <div data-asset-insurance-equipment-row hidden>
+                    ${insuredItemFields.map((field) => `<input type="hidden" name="seguro_equipos[hidden_${index}][${field}]" value="${assetEscape(row[field] ?? '')}">`).join('')}
+                </div>
+            `).join('')}
         </div>
     `;
     updateInsuredItemRows(container);
