@@ -94,6 +94,24 @@ const assetDaysUntil = (dateValue) => {
     return Math.round((target.getTime() - today.getTime()) / 86400000);
 };
 
+const assetShiftDate = (dateValue, { months = 0, days = 0 } = {}) => {
+    if (!dateValue || !/^\d{4}-\d{2}-\d{2}$/.test(String(dateValue))) {
+        return '';
+    }
+    const date = new Date(`${dateValue}T00:00:00`);
+    if (months) {
+        const originalDay = date.getDate();
+        date.setMonth(date.getMonth() + months);
+        if (date.getDate() !== originalDay) {
+            date.setDate(0);
+        }
+    }
+    if (days) {
+        date.setDate(date.getDate() + days);
+    }
+    return date.toISOString().slice(0, 10);
+};
+
 const assetExpiryFieldMap = [
     ['fecha_fin_poliza', 'Fin de vigencia poliza', 'Poliza'],
     ['fecha_renovacion_poliza', 'Renovacion de poliza', 'Poliza'],
@@ -179,12 +197,13 @@ const assetRenewalItemsFromRow = (row) => {
     });
     (Array.isArray(row?.seguro_polizas) ? row.seguro_polizas : []).forEach((policy, index) => {
         const name = [policy.ramo, policy.numero_poliza].filter(Boolean).join(' / ') || `Poliza ${index + 1}`;
+        const preventiveDate = policy.fecha_renovacion || assetShiftDate(policy.fecha_fin, { months: -1 });
         addAssetExpiryItem(items, row, policy.fecha_fin, `Fin vigencia ${name}`, 'Poliza', {
             responsable: policy.intermediario || policy.aseguradora || '',
             costo: policy.prima_total || '',
             estado: policy.estado || '',
         });
-        addAssetExpiryItem(items, row, policy.fecha_renovacion, `Renovacion ${name}`, 'Poliza', {
+        addAssetExpiryItem(items, row, preventiveDate, `Renovar un mes antes ${name}`, 'Poliza', {
             responsable: policy.intermediario || policy.aseguradora || '',
             costo: policy.prima_total || '',
             estado: policy.estado || '',
@@ -1894,6 +1913,32 @@ const syncInsuranceRequestField = (form, input) => {
     if (target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement || target instanceof HTMLSelectElement) {
         target.value = input.value;
     }
+};
+
+const applyAdoptedPolicyToCoverages = (form, adoptedPolicy) => {
+    const policyProducts = splitInsuranceSelection(adoptedPolicy.ramo || '');
+    const policyNumber = adoptedPolicy.numero_poliza || '';
+    const policyStart = adoptedPolicy.fecha_inicio || '';
+    const policyEnd = adoptedPolicy.fecha_fin || '';
+    const policyRenewal = adoptedPolicy.fecha_renovacion || '';
+    const rows = historyRowsForType(form, '[data-asset-insurance-coverage-row]', assetInsuranceCoverageFields);
+    let total = 0;
+    const updated = rows.map((row) => {
+        const belongs = policyProducts.length === 0 || policyProducts.includes(row.ramo || '') || !row.numero_poliza || row.numero_poliza === policyNumber;
+        if (!belongs) {
+            return row;
+        }
+        total += assetNumber(row.valor_asegurado);
+        return {
+            ...row,
+            numero_poliza: policyNumber || row.numero_poliza,
+            fecha_inicio: row.fecha_inicio || policyStart,
+            fecha_fin: row.fecha_fin || policyEnd,
+            fecha_renovacion: row.fecha_renovacion || policyRenewal,
+        };
+    });
+    renderAssetInsuranceCoverageRows(form, updated);
+    return total;
 };
 
 const syncCoveragePremiumRow = (row) => {
@@ -3912,10 +3957,19 @@ if (assetForm instanceof HTMLFormElement) {
                 const card = adoptButton.closest('[data-asset-insurance-policy-row]');
                 const index = [...assetForm.querySelectorAll('[data-asset-insurance-policy-row]')].indexOf(card);
                 const today = new Date().toISOString().slice(0, 10);
+                const selectedPolicy = rows[index] || {};
+                const preventiveRenewal = selectedPolicy.fecha_renovacion || assetShiftDate(selectedPolicy.fecha_fin, { months: -1 });
+                const adoptedDraft = {
+                    ...selectedPolicy,
+                    fecha_renovacion: preventiveRenewal || selectedPolicy.fecha_renovacion || '',
+                };
+                const adoptedCoverageTotal = applyAdoptedPolicyToCoverages(assetForm, adoptedDraft);
                 rows = rows.map((row, rowIndex) => ({
                     ...row,
                     adoptada: rowIndex === index ? 'Si' : '',
                     fecha_adopcion: rowIndex === index ? (row.fecha_adopcion || today) : '',
+                    fecha_renovacion: rowIndex === index ? (preventiveRenewal || row.fecha_renovacion) : row.fecha_renovacion,
+                    valor_asegurado_total: rowIndex === index && adoptedCoverageTotal > 0 ? String(Math.round(adoptedCoverageTotal)) : row.valor_asegurado_total,
                     estado: rowIndex === index ? 'Vigente' : (row.estado === 'Vigente' ? 'En renovacion' : row.estado),
                     criterio_adopcion: rowIndex === index ? (row.criterio_adopcion || 'Mejor equilibrio entre cobertura, deducible, sublimites, exclusiones y prima.') : row.criterio_adopcion,
                 }));
