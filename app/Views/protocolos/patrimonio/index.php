@@ -288,9 +288,9 @@ foreach (($documentoRows ?? []) as $documento) {
                 <div class="asset-participation-header">
                     <div>
                         <h2>Cotizaciones comparables <span class="asset-document-marker">*Control Documental*</span></h2>
-                        <p>Registra cada aseguradora sobre la misma base asegurable. Con un clic puedes adoptar la mejor opcion como poliza vigente.</p>
+                        <p>Registra minimo tres aseguradoras sobre la misma base asegurable. Cada oferta recibe el paquete consolidado de ramos, coberturas, valores asegurados y bienes reportados.</p>
                     </div>
-                    <button type="button" data-add-asset-insurance-policy>Agregar cotizacion</button>
+                    <button type="button" data-add-asset-insurance-policy>Agregar oferta</button>
                 </div>
                 <div class="asset-insurance-guide" aria-label="Guia practica de seguros">
                     <strong>Ruta simple del analista</strong>
@@ -298,7 +298,7 @@ foreach (($documentoRows ?? []) as $documento) {
                         <li>Relaciona bienes y construccion a valor de reposicion con fuente y fecha.</li>
                         <li>Marca los amparos que aplican y valida que su valor salga de esa relacion.</li>
                         <li>Define RCE por exposicion: actividad, terceros, empleados, parqueaderos, contratistas y predios.</li>
-                        <li>Pide minimo dos cotizaciones con las mismas sumas aseguradas para comparar prima, tasa, deducible, sublimites y exclusiones.</li>
+                        <li>Pide minimo tres ofertas con las mismas sumas aseguradas para comparar prima, tasa, deducible, sublimites y exclusiones.</li>
                         <li>Escoge la mejor cobertura neta: no solo la prima mas baja.</li>
                     </ol>
                 </div>
