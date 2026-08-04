@@ -235,7 +235,6 @@ foreach ($accionistaRows as $row) {
                         <span><?= $e($number($group['acciones_total'])) ?> acciones</span>
                         <?php if ($group['valor_estimado_total'] > 0): ?><span><?= $e($money($group['valor_estimado_total'])) ?></span><?php endif; ?>
                     </span>
-                    <button type="button" class="shareholder-accordion-toggle" data-shareholder-toggle aria-label="Abrir o cerrar accionista" aria-expanded="false"></button>
                 </summary>
                 <div class="shareholder-detail">
                     <div class="shareholder-company-list">

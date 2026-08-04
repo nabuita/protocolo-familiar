@@ -269,8 +269,9 @@
     align-items: center;
     min-height: 64px;
     padding: 13px 18px;
-    cursor: default;
+    cursor: pointer;
     list-style: none;
+    user-select: none;
 }
 
 .shareholder-accordion-item summary::-webkit-details-marker {
@@ -278,37 +279,27 @@
 }
 
 .shareholder-accordion-item summary::after {
-    display: none;
-    content: none;
-}
-
-.shareholder-accordion-toggle {
+    content: "+";
     grid-column: 3;
     justify-self: end;
-    width: 30px;
-    height: 30px;
+    width: 28px;
+    height: 28px;
     display: inline-grid;
     place-items: center;
     border: 1px solid #cddbd0;
     border-radius: 50%;
-    background: #fff;
     color: var(--primary);
     font-size: 20px;
     font-weight: 900;
     line-height: 1;
-    cursor: pointer;
 }
 
-.shareholder-accordion-toggle::before {
-    content: "+";
-}
-
-.shareholder-accordion-item[open] .shareholder-accordion-toggle::before {
+.shareholder-accordion-item[open] summary::after {
     content: "-";
 }
 
-.shareholder-accordion-toggle:hover,
-.shareholder-accordion-toggle:focus-visible {
+.shareholder-accordion-item summary:hover::after,
+.shareholder-accordion-item summary:focus-visible::after {
     border-color: var(--primary);
     background: #eaf5ef;
     outline: none;
