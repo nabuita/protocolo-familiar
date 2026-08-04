@@ -999,6 +999,431 @@ const insuranceProductAcademy = {
     },
 };
 
+const insuranceCalculationAcademy = {
+    'Danos materiales inmueble arrendado': {
+        method: 'Valor de reposicion y perdida de canon',
+        tool: 'Tabla de construccion, contenidos y arrendamientos',
+        formula: 'Construccion sin terreno + contenidos declarados + canon mensual por unidad x meses cubiertos si se solicita perdida de arrendamiento.',
+        source: 'Avaluo, m2, fuente de reposicion por m2, inventario, contratos de arrendamiento, canon por unidad y clausulado.',
+        warning: 'No mezclar terreno con construccion. Separar dano material, responsabilidad y perdida de canon.',
+    },
+    'Todo riesgo dano material': {
+        method: 'Valor de reposicion integral',
+        tool: 'Tabla de bienes asegurables por categoria',
+        formula: 'Suma de construccion, mejoras, contenidos, maquinaria, equipos, mercancias y extensiones asegurables a valor de reposicion.',
+        source: 'Avaluo, cotizaciones, facturas, inventario, fotos, seriales, fuente de m2 y fecha de consulta.',
+        warning: 'Una poliza puede agrupar ramos, pero los valores deben quedar separados por cobertura.',
+    },
+    Copropiedad: {
+        method: 'Valor de reposicion de bienes comunes',
+        tool: 'Tabla de zonas comunes y coeficientes',
+        formula: 'Valor reposicion de bienes comunes y privados cubiertos segun reglamento, coeficiente o distribucion aprobada.',
+        source: 'Reglamento PH, certificado de administracion, avaluo, presupuesto, poliza matriz y coeficientes.',
+        warning: 'Confirmar que cubre bienes comunes, privados, RC copropiedad y participacion de cada unidad.',
+    },
+    'Cumplimiento arrendamiento': {
+        method: 'Canon y obligaciones contractuales',
+        tool: 'Tabla de obligaciones del contrato',
+        formula: 'Canon mensual, administracion, servicios y clausula penal x numero de meses o limite pactado.',
+        source: 'Contrato de arrendamiento, canon, administracion, servicios, clausula penal y condiciones de garantia.',
+        warning: 'No confundir con perdida de arrendamiento por siniestro; aqui el riesgo es incumplimiento del arrendatario.',
+    },
+    Deudores: {
+        method: 'Saldo insoluto asegurado',
+        tool: 'Tabla de deudores y creditos',
+        formula: 'Saldo de deuda o cupo asegurado por deudor segun certificado, edad, plazo y condiciones.',
+        source: 'Pagare, credito, saldo, certificado de deuda, edad, beneficiario oneroso y clausulado.',
+        warning: 'Controlar novedades de saldo, edad, exclusiones y beneficiario.',
+    },
+    'Cyber / riesgo digital': {
+        method: 'Exposicion digital y continuidad',
+        tool: 'Matriz de sistemas, datos y costos de respuesta',
+        formula: 'Limite solicitado segun datos, sistemas criticos, facturacion digital, costos de respuesta, multas, defensa y lucro cesante.',
+        source: 'Inventario de sistemas, politicas de seguridad, contratos TI, historico de incidentes, facturacion y clausulado.',
+        warning: 'Separar dano propio, responsabilidad frente a terceros, respuesta a incidentes y continuidad.',
+    },
+    'Key person / hombre clave': {
+        method: 'Impacto economico por persona clave',
+        tool: 'Tabla de personas clave y continuidad',
+        formula: 'Costo de reemplazo + perdida esperada de margen/contratos + deuda o continuidad durante meses definidos.',
+        source: 'Nomina, contratos, responsabilidades, facturacion atribuible, plan de sucesion y analisis financiero.',
+        warning: 'No es valor sentimental; debe justificar el impacto economico asegurable.',
+    },
+    'Automóviles': {
+        method: 'Valor oficial o guia comercial',
+        tool: 'Ficha de vehiculo',
+        formula: 'Valor Fasecolda o valor comercial soportado + accesorios declarados si aplican.',
+        source: 'Guia Fasecolda, factura, avaluo, tarjeta de propiedad, inspeccion y fecha de consulta.',
+        warning: 'No usar valor sentimental ni saldo de deuda como valor del vehiculo.',
+    },
+    'Automovil todo riesgo': {
+        method: 'Valor oficial o guia comercial',
+        tool: 'Ficha de vehiculo',
+        formula: 'Valor Fasecolda o valor comercial soportado + accesorios declarados si aplican.',
+        source: 'Guia Fasecolda, factura, avaluo, tarjeta de propiedad, inspeccion y fecha de consulta.',
+        warning: 'Separar valor del vehiculo, accesorios y limite de RCE.',
+    },
+    SOAT: {
+        method: 'Tarifa regulada',
+        tool: 'Control de vigencia',
+        formula: 'Prima segun clase de vehiculo, capacidad/cilindraje, modelo y reglas vigentes.',
+        source: 'Certificado SOAT, tarjeta de propiedad y soporte de pago.',
+        warning: 'No es una poliza patrimonial; el control principal es vigencia y renovacion.',
+    },
+    Cumplimiento: {
+        method: 'Valor contractual',
+        tool: 'Tabla de obligaciones garantizadas',
+        formula: 'Valor del contrato u obligacion x porcentaje exigido para cada amparo.',
+        source: 'Contrato, pliego, otrosies, acta de inicio, anticipo y solicitud del beneficiario.',
+        warning: 'Cada amparo puede tener porcentaje y vigencia distinta.',
+    },
+    'Responsabilidad Civil': {
+        method: 'Limite de responsabilidad por exposicion',
+        tool: 'Matriz de exposicion a terceros',
+        formula: 'Limite solicitado segun actividad, aforo, empleados, contratos, parqueaderos, predios y severidad posible.',
+        source: 'Contratos, actividad real, flujo de visitantes, nomina, predios, matriz de riesgos y clausulado.',
+        warning: 'No sale de inventario de bienes. Se define por exposicion y apetito de riesgo.',
+    },
+    'Responsabilidad civil extracontractual': {
+        method: 'Limite de responsabilidad por exposicion',
+        tool: 'Matriz de exposicion a terceros',
+        formula: 'Limite solicitado por evento/vigencia segun actividad, terceros, empleados, contratistas y predios.',
+        source: 'Contratos, actividad real, flujo de visitantes, nomina, predios, matriz de riesgos y clausulado.',
+        warning: 'Validar subamparos: patronal, cruzada, parqueaderos, gastos medicos y defensa.',
+    },
+    'Responsabilidad civil profesional': {
+        method: 'Limite de responsabilidad profesional',
+        tool: 'Tabla de contratos y servicios',
+        formula: 'Limite solicitado segun valor de contratos, posible perjuicio patrimonial, clientes y retroactividad.',
+        source: 'Contratos, propuestas, facturacion, historial de reclamaciones y clausulado claims made.',
+        warning: 'Confirmar retroactividad, errores u omisiones, defensa y exclusiones profesionales.',
+    },
+    'Responsabilidad civil contractual': {
+        method: 'Limite de responsabilidad contractual',
+        tool: 'Tabla de obligaciones contractuales',
+        formula: 'Valor del contrato, obligacion o perjuicio maximo razonable que se desea trasladar.',
+        source: 'Contrato, anexos, obligaciones asumidas, limites exigidos y clausulado.',
+        warning: 'No confundir con cumplimiento; validar si la obligacion asumida es asegurable.',
+    },
+    Incendio: {
+        method: 'Valor de reposicion de bienes materiales',
+        tool: 'Tabla de bienes asegurables',
+        formula: 'Construccion: m2 asegurables x valor reposicion m2. Contenidos/equipos: suma por item a valor de reposicion.',
+        source: 'Avaluo, Construdata/Sispac, cotizaciones, facturas, inventario, fotos y fecha de consulta.',
+        warning: 'El terreno no se asegura. Separar construccion, mejoras, muebles, mercancias y equipos.',
+    },
+    'Incendio y terremoto': {
+        method: 'Valor de reposicion de bienes materiales',
+        tool: 'Tabla de bienes asegurables',
+        formula: 'Construccion sin terreno + contenidos declarados, separados por ubicacion y categoria.',
+        source: 'Avaluo, areas, fuente de reposicion por m2, inventario de contenidos y clausulado.',
+        warning: 'Terremoto suele tener deducible especial por evento/articulo afectado.',
+    },
+    Terremoto: {
+        method: 'Valor de reposicion con deducible catastrofico',
+        tool: 'Tabla de construccion y contenidos',
+        formula: 'Valor reposicion de construccion y contenidos asegurados, excluyendo terreno.',
+        source: 'Avaluo, areas, fuente de reposicion por m2, inventario y clausulado de deducibles.',
+        warning: 'Confirmar minimo, porcentaje y base del deducible.',
+    },
+    'Sustracción': {
+        method: 'Inventario valorizado contra hurto',
+        tool: 'Tabla de bienes expuestos',
+        formula: 'Suma de bienes susceptibles de sustraccion por item, valor reposicion o valor declarado segun poliza.',
+        source: 'Inventario, factura, cotizacion, seriales, fotos, avaluos de joyas/arte y controles de seguridad.',
+        warning: 'Confirmar modalidad cubierta: hurto calificado, violencia, alarma, dinero y bienes excluidos.',
+    },
+    Sustraccion: {
+        method: 'Inventario valorizado contra hurto',
+        tool: 'Tabla de bienes expuestos',
+        formula: 'Suma de bienes susceptibles de sustraccion por item, valor reposicion o valor declarado segun poliza.',
+        source: 'Inventario, factura, cotizacion, seriales, fotos, avaluos de joyas/arte y controles de seguridad.',
+        warning: 'Confirmar modalidad cubierta: hurto calificado, violencia, alarma, dinero y bienes excluidos.',
+    },
+    Transporte: {
+        method: 'Valor por despacho o vigencia',
+        tool: 'Tabla de mercancias transportadas',
+        formula: 'Valor factura/costo/valor declarado por despacho x limite por trayecto o vigencia.',
+        source: 'Factura, remision, guia, manifiesto, contrato de transporte, valor declarado y trayectos.',
+        warning: 'Revisar embalaje, transportador, custodia, trayecto y limite por despacho.',
+    },
+    'Transporte de mercancias': {
+        method: 'Valor por despacho o vigencia',
+        tool: 'Tabla de mercancias transportadas',
+        formula: 'Valor factura/costo/valor declarado por despacho x limite por trayecto o vigencia.',
+        source: 'Factura, remision, guia, manifiesto, contrato de transporte, valor declarado y trayectos.',
+        warning: 'Revisar embalaje, transportador, custodia, trayecto y limite por despacho.',
+    },
+    'Corriente Débil': {
+        method: 'Inventario electronico a valor de reposicion',
+        tool: 'Tabla de equipos electronicos',
+        formula: 'Suma item por item: UPS, CCTV, redes, servidores, controles, computadores y equipos de baja tension.',
+        source: 'Inventario, seriales, facturas, cotizaciones, ficha tecnica, fotos y fecha de consulta.',
+        warning: 'Separar hardware, software/datos y servicios. Revisar demerito y protecciones electricas.',
+    },
+    'Equipo electronico / corriente debil': {
+        method: 'Inventario electronico a valor de reposicion',
+        tool: 'Tabla de equipos electronicos',
+        formula: 'Suma item por item: UPS, CCTV, redes, servidores, controles, computadores y equipos de baja tension.',
+        source: 'Inventario, seriales, facturas, cotizaciones, ficha tecnica, fotos y fecha de consulta.',
+        warning: 'Separar hardware, software/datos y servicios. Revisar demerito y protecciones electricas.',
+    },
+    'Todo Riesgo Contratista': {
+        method: 'Presupuesto de obra y exposicion de obra',
+        tool: 'Tabla de presupuesto, equipos y RC',
+        formula: 'Valor de obra + materiales + equipos temporales + remocion/gastos + limites de RC segun contrato.',
+        source: 'Contrato de obra, presupuesto, cronograma, acta, planos, equipos, subcontratos y clausulado.',
+        warning: 'Controlar vigencia por etapa, prorrogas, periodo de mantenimiento y cambios de valor.',
+    },
+    Manejo: {
+        method: 'Exposicion maxima a fraude o apropiacion',
+        tool: 'Tabla de cargos, procesos y valores administrados',
+        formula: 'Mayor valor expuesto por caja, bancos, recaudos, inventarios, pagos o procesos sensibles en una vigencia.',
+        source: 'Arqueos, conciliaciones, manual de funciones, perfiles, autorizaciones, organigrama e historial.',
+        warning: 'No sale de activos fisicos solamente; depende de controles internos y cargos con acceso.',
+    },
+    'Lucro Cesante': {
+        method: 'Tabla financiera de ingresos o utilidad',
+        tool: 'Tabla de ingresos, canon, utilidad y periodo',
+        formula: 'Ingreso/canon/utilidad bruta mensual x meses de indemnizacion x participacion, mas gastos permanentes si aplica.',
+        source: 'Estados financieros, contratos, canon mensual por unidad, historico de ingresos, participacion y clausulado.',
+        warning: 'Debe existir evento material detonante salvo pacto distinto. Confirmar deducible temporal e indice variable.',
+    },
+    'Lucro cesante': {
+        method: 'Tabla financiera de ingresos o utilidad',
+        tool: 'Tabla de ingresos, canon, utilidad y periodo',
+        formula: 'Ingreso/canon/utilidad bruta mensual x meses de indemnizacion x participacion, mas gastos permanentes si aplica.',
+        source: 'Estados financieros, contratos, canon mensual por unidad, historico de ingresos, participacion y clausulado.',
+        warning: 'Debe existir evento material detonante salvo pacto distinto. Confirmar deducible temporal e indice variable.',
+    },
+    'Montaje y Rotura de Maquinaria': {
+        method: 'Inventario tecnico a valor de reposicion',
+        tool: 'Tabla de maquinaria',
+        formula: 'Valor reposicion por maquina/equipo, con serial, edad, mantenimiento, vida util y demerito si aplica.',
+        source: 'Factura, ficha tecnica, cotizacion de reposicion, mantenimientos, seriales, fotos y fecha de consulta.',
+        warning: 'No incluir desgaste normal. Confirmar maquinaria cubierta y excluida.',
+    },
+    'Rotura de maquinaria': {
+        method: 'Inventario tecnico a valor de reposicion',
+        tool: 'Tabla de maquinaria',
+        formula: 'Valor reposicion por maquina/equipo, con serial, edad, mantenimiento, vida util y demerito si aplica.',
+        source: 'Factura, ficha tecnica, cotizacion de reposicion, mantenimientos, seriales, fotos y fecha de consulta.',
+        warning: 'No incluir desgaste normal. Confirmar maquinaria cubierta y excluida.',
+    },
+    'Aviación': {
+        method: 'Avaluo especializado aeronautico',
+        tool: 'Ficha tecnica de aeronave y RC',
+        formula: 'Valor casco/aeronave + equipos + limites de responsabilidad por pasajeros/terceros/carga.',
+        source: 'Matricula aeronave, avaluo, bitacoras, mantenimiento, horas de vuelo, contratos y clausulado.',
+        warning: 'Requiere soporte tecnico especializado y cumplimiento regulatorio.',
+    },
+    'Navegación y Casco': {
+        method: 'Avaluo especializado de embarcacion',
+        tool: 'Ficha de embarcacion y exposicion maritima',
+        formula: 'Valor casco/maquinaria/equipos + limites de responsabilidad y valores transportados si aplican.',
+        source: 'Matricula, avaluo naval, mantenimiento, certificados, rutas, tripulacion y clausulado.',
+        warning: 'Validar navegacion autorizada, zonas, averia gruesa, salvamento y exclusiones.',
+    },
+    'Minas y Petróleos': {
+        method: 'Valor tecnico especializado por operacion',
+        tool: 'Matriz de activos, pozos, equipos y responsabilidad',
+        formula: 'Valor reposicion de instalaciones/equipos + limites de control de pozos, contaminacion y lucro cesante.',
+        source: 'Estudios tecnicos, inventario, contratos, licencias, reportes operativos, avaluos y clausulado.',
+        warning: 'Ramo altamente especializado; exigir broker/ingenieria de riesgos.',
+    },
+    Vidrios: {
+        method: 'Relacion de vidrios a valor de reposicion',
+        tool: 'Tabla de vidrios',
+        formula: 'Medida x tipo/espesor/instalacion x valor de reposicion por unidad.',
+        source: 'Cotizacion de proveedor, medidas, fotos, ubicacion y fecha de consulta.',
+        warning: 'Separar fachadas, vitrinas, divisiones, espejos, avisos y domos.',
+    },
+    'Crédito Comercial': {
+        method: 'Cartera asegurada y limite de credito',
+        tool: 'Tabla de compradores y cartera',
+        formula: 'Cuentas por cobrar asegurables por comprador, limite de credito y porcentaje cubierto.',
+        source: 'Cartera, facturacion, historial de pagos, cupos, estados financieros de clientes y condiciones.',
+        warning: 'No toda cartera es asegurable; revisar exclusiones, mora previa y deducible/coaseguro.',
+    },
+    'Crédito a la Exportación': {
+        method: 'Cartera exportadora y riesgo pais/comprador',
+        tool: 'Tabla de compradores externos',
+        formula: 'Cuentas por cobrar de exportacion por comprador/pais x porcentaje cubierto.',
+        source: 'Facturas, contratos, embarques, cartera, pais destino, comprador y condiciones de pago.',
+        warning: 'Distinguir riesgo comercial y riesgo politico.',
+    },
+    Agropecuario: {
+        method: 'Valor tecnico agropecuario',
+        tool: 'Tabla de cultivos, animales o produccion',
+        formula: 'Area/cabezas/unidades productivas x costo o valor asegurado tecnico segun producto.',
+        source: 'Inventario agropecuario, areas, costos de produccion, aval tecnico, clima, ciclo y clausulado.',
+        warning: 'Puede ser parametrico o indemnizatorio; validar evento, periodo y exclusiones.',
+    },
+    Desempleo: {
+        method: 'Obligacion mensual cubierta',
+        tool: 'Tabla de cuotas u obligaciones',
+        formula: 'Cuota/canon/obligacion mensual x numero maximo de meses cubiertos.',
+        source: 'Contrato laboral, certificacion de ingresos, credito, canon, cuota y clausulado.',
+        warning: 'Validar carencias, definicion de desempleo involuntario y periodo maximo.',
+    },
+    Hogar: {
+        method: 'Construccion y contenidos a valor de reposicion',
+        tool: 'Tabla de vivienda, menaje y contenidos',
+        formula: 'Construccion sin terreno + menaje/contenidos por inventario o estimacion soportada.',
+        source: 'Avaluo, areas, inventario, facturas, fotos, cotizaciones y clausulado.',
+        warning: 'Separar vivienda, contenidos, joyas, arte, dinero y RCE familiar.',
+    },
+    Decenal: {
+        method: 'Valor de construccion y responsabilidad estructural',
+        tool: 'Tabla tecnica de proyecto',
+        formula: 'Valor de obra/edificacion asegurada segun presupuesto, costos directos y alcance estructural.',
+        source: 'Licencia, presupuesto, estudios, actas, planos, interventoria, certificaciones y clausulado.',
+        warning: 'Especial para ruina o amenaza de ruina; requiere soporte tecnico de obra.',
+    },
+    Exequias: {
+        method: 'Plan o limite de servicio',
+        tool: 'Listado de asegurados',
+        formula: 'Valor del plan funerario o limite por asegurado segun edad/grupo.',
+        source: 'Listado de asegurados, edades, parentesco, plan contratado y certificado.',
+        warning: 'Normalmente es servicio, no valor de reposicion de activo.',
+    },
+    'Accidentes Personales': {
+        method: 'Suma asegurada por persona y cobertura',
+        tool: 'Listado de personas aseguradas',
+        formula: 'Suma asegurada por muerte/invalidez/gastos medicos segun rol, ingreso o politica.',
+        source: 'Listado, cedulas, edad, ocupacion, salario/ingreso y certificado.',
+        warning: 'Validar actividad, exclusiones, beneficiarios y acumulacion con vida grupo.',
+    },
+    'Colectivo Vida': {
+        method: 'Suma asegurada por persona o grupo',
+        tool: 'Listado de asegurados',
+        formula: 'Valor fijo o multiplo de salario por asegurado, segun politica o plan.',
+        source: 'Listado de asegurados, salarios, cargos, beneficiarios, edades y certificado.',
+        warning: 'Controlar ingresos/retiros y actualizacion de nomina.',
+    },
+    Educativo: {
+        method: 'Costo educativo proyectado',
+        tool: 'Tabla de beneficiarios y costos',
+        formula: 'Matricula/pension/costo educativo proyectado x periodos cubiertos.',
+        source: 'Certificados de institucion, costos historicos, beneficiario, edad y plan.',
+        warning: 'Validar incrementos, periodos cubiertos y condiciones de pago.',
+    },
+    'Vida Grupo': {
+        method: 'Suma asegurada por persona o grupo',
+        tool: 'Listado de asegurados',
+        formula: 'Valor fijo o multiplo de salario por asegurado, segun politica o plan.',
+        source: 'Listado de asegurados, salarios, cargos, beneficiarios, edades y certificado.',
+        warning: 'Controlar ingresos/retiros y actualizacion de nomina.',
+    },
+    Salud: {
+        method: 'Plan medico o limite de gasto',
+        tool: 'Listado de asegurados y plan',
+        formula: 'Prima/plan por persona y limites segun red, coberturas, edades y condiciones.',
+        source: 'Listado de asegurados, edades, plan, preexistencias declaradas y certificado.',
+        warning: 'No se calcula por valor patrimonial; revisar exclusiones, copagos y red.',
+    },
+    'Enfermedades de Alto Costo': {
+        method: 'Suma o limite por evento medico',
+        tool: 'Listado de asegurados y coberturas',
+        formula: 'Limite por enfermedad/persona segun plan, edad y condiciones.',
+        source: 'Listado, edades, plan, declaraciones de salud, certificado y clausulado.',
+        warning: 'Validar definiciones de enfermedad, carencias, preexistencias y exclusiones.',
+    },
+    'Vida Individual': {
+        method: 'Necesidad financiera personal',
+        tool: 'Analisis de proteccion familiar',
+        formula: 'Deudas + gastos familiares + educacion + continuidad patrimonial - activos disponibles.',
+        source: 'Estados financieros personales, deudas, beneficiarios, ingresos, patrimonio y certificado.',
+        warning: 'Alinear con sucesion, beneficiarios, insurabilidad y objetivo familiar.',
+    },
+    'Previsional de Invalidez y Sobrevivencia': {
+        method: 'Calculo actuarial/regulatorio',
+        tool: 'Ficha de afiliado y pension',
+        formula: 'Suma adicional necesaria para financiar pension segun regimen y normas aplicables.',
+        source: 'Historia laboral, salario base, edad, beneficiarios, AFP/aseguradora y regulacion.',
+        warning: 'Requiere calculo tecnico de seguridad social.',
+    },
+    'Riesgos Laborales': {
+        method: 'Cotizacion por clase de riesgo y nomina',
+        tool: 'Nomina y clase de riesgo',
+        formula: 'Ingreso base de cotizacion x tarifa segun clase de riesgo y actividad.',
+        source: 'Nomina, cargos, centros de trabajo, actividad economica, ARL y soportes de afiliacion.',
+        warning: 'Controlar clasificacion real del riesgo laboral y novedades.',
+    },
+    'Pensiones Ley 100': {
+        method: 'Modalidad pensional regulada',
+        tool: 'Ficha pensionado/beneficiarios',
+        formula: 'Capital necesario o prima segun modalidad, edad, beneficiarios y regulacion.',
+        source: 'Historia laboral, bono, capital, beneficiarios, AFP/aseguradora y documentos pensionales.',
+        warning: 'No es valor asegurable patrimonial ordinario; requiere calculo actuarial.',
+    },
+    'Pensiones Voluntarias': {
+        method: 'Meta de ahorro o renta',
+        tool: 'Plan de ahorro/renta',
+        formula: 'Aporte objetivo o capital meta segun horizonte, beneficio esperado y perfil.',
+        source: 'Plan voluntario, aportes, beneficiarios, extractos y condiciones.',
+        warning: 'Distinguir ahorro/inversion de seguro de riesgo.',
+    },
+    'Pensiones con Conmutación Pensional': {
+        method: 'Calculo actuarial de pasivo pensional',
+        tool: 'Tabla de beneficiarios y obligaciones',
+        formula: 'Valor presente actuarial de mesadas y obligaciones conmutadas.',
+        source: 'Estudio actuarial, listado de pensionados, mesadas, edades, beneficiarios y aprobaciones.',
+        warning: 'Requiere soporte actuarial y validacion legal/laboral.',
+    },
+    'Rentas Voluntarias': {
+        method: 'Capital para renta contratada',
+        tool: 'Plan de renta',
+        formula: 'Capital aportado o necesario para renta periodica segun edad, plazo y modalidad.',
+        source: 'Contrato de renta, beneficiario, capital, condiciones y certificado.',
+        warning: 'Validar irrevocabilidad, beneficiarios, liquidez y tratamiento tributario.',
+    },
+    BEPS: {
+        method: 'Beneficio periodico regulado',
+        tool: 'Ficha del beneficiario',
+        formula: 'Ahorro acumulado y beneficio periodico segun reglas del mecanismo.',
+        source: 'Extractos BEPS, identificacion, edad, beneficiario y condiciones oficiales.',
+        warning: 'No tratar como poliza patrimonial ordinaria.',
+    },
+};
+
+const insuranceCalculationGuideForProduct = (product) => {
+    if (insuranceCalculationAcademy[product]) {
+        return insuranceCalculationAcademy[product];
+    }
+    const normalized = String(product || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+    const entry = Object.entries(insuranceCalculationAcademy).find(([key]) => key.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase() === normalized);
+    if (entry) {
+        return entry[1];
+    }
+    return {
+        method: 'Valor a definir con soporte',
+        tool: 'Tabla de soporte segun cobertura',
+        formula: 'Documentar valor solicitado, fuente, fecha, limite, deducible y observacion para cotizar.',
+        source: 'Cotizacion, contrato, avaluo, inventario, estados financieros o documento tecnico aplicable.',
+        warning: 'No enviar a cotizar sin fuente verificable.',
+    };
+};
+
+const insurableAssetGuidance = {
+    Construccion: 'Asegura valor de reposicion de la construccion, sin terreno: m2 asegurables x valor de reposicion por m2.',
+    'Muebles y enseres': 'Asegura valor de reposicion nuevo o equivalente, con inventario, factura, cotizacion, fotos o avaluo.',
+    'Menaje domestico': 'Asegura relacion detallada o estimacion soportada por categoria; evita valores globales sin respaldo.',
+    'Maquinaria y equipo': 'Asegura valor de reposicion de equipo equivalente, con marca, modelo, serial, ano, estado, mantenimiento y fuente.',
+    'Equipo electronico / corriente debil': 'Asegura UPS, CCTV, redes, servidores, controles y equipos electronicos a valor de reposicion con serial y fuente.',
+    'Mercancias / inventario': 'Asegura costo, valor declarado o valor asegurado segun poliza, con inventario actualizado y metodo de valoracion.',
+    Vidrios: 'Asegura por medida, tipo, espesor, instalacion y valor de reposicion cotizado.',
+    'Obras de arte': 'Asegura por avaluo especializado, certificado de autenticidad, autor, tecnica, medidas, fecha y registro fotografico.',
+    Joyas: 'Asegura por avaluo, factura o certificacion, con material, peso, piedras, descripcion y fotos.',
+    'Dinero en efectivo': 'Asegura limite maximo probable en caja o transito, con controles, arqueos y condiciones de custodia.',
+    Vehiculo: 'Asegura valor comercial soportado, usualmente Fasecolda, avaluo o factura, separando accesorios.',
+    'Exposicion frente a terceros': 'No sale de inventario; define limite por evento/vigencia segun actividad, contratos, visitantes y severidad.',
+    'Contrato de arrendamiento': 'Usa canon, administracion, servicios o clausula pactada por los meses cubiertos.',
+    'Contrato': 'Usa valor contractual, porcentaje exigido, vigencia y obligacion garantizada.',
+};
+
+const insurableAssetTooltip = (category) => insurableAssetGuidance[category] || 'Define el valor con fuente verificable, fecha de consulta y soporte documental.';
+
 const getAssetDetailValue = (form, name) => {
     const field = form?.elements?.[`detalle[${name}]`];
     return field instanceof HTMLInputElement || field instanceof HTMLSelectElement || field instanceof HTMLTextAreaElement ? field.value : '';
@@ -2021,8 +2446,47 @@ const insuranceSourcesForCategories = (form, categories) => insuranceEquipmentRo
     .slice(0, 4)
     .join(' | ');
 
+const lossOfRentCoverageText = (coverage) => {
+    const normalized = normalizeInsuranceText(coverage);
+    return normalized.includes('arrendamiento') && (normalized.includes('perdida') || normalized.includes('canon') || normalized.includes('siniestro') || normalized.includes('ingreso'));
+};
+
+const lossOfRentBasisForForm = (form) => {
+    const sharePercent = assetParticipationShare(form) > 0 ? assetParticipationShare(form) * 100 : 100;
+    const months = 12;
+    const subunits = assetFormRows(form, '[data-asset-subunit-row]', ['codigo_subunidad', 'nombre_subunidad', 'canon_mensual', 'arrendatario', 'contrato_soporte'])
+        .filter((row) => assetNumber(row.canon_mensual) > 0);
+    const rows = subunits.length > 0 ? subunits.map((row, index) => ({
+        unit: row.nombre_subunidad || row.codigo_subunidad || `Unidad ${index + 1}`,
+        canon: assetNumber(row.canon_mensual),
+        share: sharePercent,
+        months,
+        source: row.contrato_soporte || row.arrendatario || 'Contrato/canon por soportar',
+    })) : [{
+        unit: form.elements.nombre?.value || 'Inmueble principal',
+        canon: assetNumber(form.elements['detalle[canon_arrendamiento]']?.value || form.elements['detalle[renta_potencial_mensual]']?.value),
+        share: sharePercent,
+        months,
+        source: 'Contrato de arrendamiento, canon mensual y vigencia',
+    }];
+    const valuedRows = rows.map((row) => ({
+        ...row,
+        value: row.canon * row.months * (row.share / 100),
+    }));
+    const total = valuedRows.reduce((sum, row) => sum + row.value, 0);
+    const source = valuedRows
+        .filter((row) => row.canon > 0)
+        .map((row) => `${row.unit}: canon ${assetMoney(row.canon)} x ${row.months} meses x ${assetPercent(row.share)}`)
+        .join(' | ');
+    return { rows: valuedRows, total, months, source: source || 'Diligenciar canon mensual por unidad, meses de indemnizacion y soporte contractual.' };
+};
+
 const suggestCoverageValue = (form, coverage) => {
     const text = String(coverage || '').toLowerCase();
+    if (lossOfRentCoverageText(coverage)) {
+        const basis = lossOfRentBasisForForm(form);
+        return { value: basis.total, source: basis.source };
+    }
     if (text.includes('responsabilidad') || text.includes('tercero') || text.includes('lesion') || text.includes('muerte') || text.includes('defensa')) {
         return { value: 0, source: 'Definir limite por evento/vigencia segun contrato, actividad y apetito de riesgo.' };
     }
@@ -3711,6 +4175,80 @@ const updateInsuranceItemTotalsDisplay = (form) => {
     }
 };
 
+const insuranceCalculationGuideHtml = (product, coverageRows = []) => {
+    if (!product) {
+        return '';
+    }
+    const productGuide = insuranceCalculationGuideForProduct(product);
+    const coverageNames = coverageRows.map((row) => row.cobertura).filter(Boolean);
+    return `
+        <div class="asset-insurance-calculation-guide">
+            <div class="asset-insurance-calculation-summary">
+                <strong>${assetEscape(productGuide.method)}</strong>
+                <span>${assetEscape(productGuide.tool)}</span>
+            </div>
+            <div class="asset-insurance-calculation-table" role="table" aria-label="Metodo para calcular valor asegurable">
+                <div role="row">
+                    <strong>Ramo</strong>
+                    <span>${assetEscape(product)}</span>
+                </div>
+                <div role="row">
+                    <strong>Formula base</strong>
+                    <span>${assetEscape(productGuide.formula)}</span>
+                </div>
+                <div role="row">
+                    <strong>Fuente requerida</strong>
+                    <span>${assetEscape(productGuide.source)}</span>
+                </div>
+                <div role="row">
+                    <strong>Alerta</strong>
+                    <span>${assetEscape(productGuide.warning)}</span>
+                </div>
+                <div role="row">
+                    <strong>Coberturas</strong>
+                    <span>${coverageNames.length > 0 ? assetEscape(coverageNames.join(' / ')) : 'Primero marca coberturas requeridas en la pestaña anterior.'}</span>
+                </div>
+            </div>
+        </div>
+    `;
+};
+
+const insuranceSpecialCalculatorHtml = (form, coverageRows = []) => {
+    if (!coverageRows.some((row) => lossOfRentCoverageText(row.cobertura || ''))) {
+        return '';
+    }
+    const basis = lossOfRentBasisForForm(form);
+    return `
+        <div class="asset-insurance-special-calculator">
+            <div class="asset-insurance-special-head">
+                <strong>Calculo de perdida de arrendamiento</strong>
+                <span>Base sugerida: canon mensual por unidad x meses cubiertos x participacion.</span>
+                <output>${assetEscape(assetMoney(basis.total))}</output>
+            </div>
+            <div class="asset-insurance-loss-rent-table" role="table" aria-label="Calculo de perdida de arrendamiento">
+                <div class="asset-insurance-loss-rent-head" role="row">
+                    <span>Unidad</span>
+                    <span>Canon mensual</span>
+                    <span>Participacion</span>
+                    <span>Meses</span>
+                    <span>Valor asegurable</span>
+                    <span>Fuente</span>
+                </div>
+                ${basis.rows.map((row) => `
+                    <div role="row">
+                        <span>${assetEscape(row.unit)}</span>
+                        <span>${assetEscape(assetMoney(row.canon))}</span>
+                        <span>${assetEscape(assetPercent(row.share))}</span>
+                        <span>${assetEscape(String(row.months))}</span>
+                        <strong>${assetEscape(assetMoney(row.value))}</strong>
+                        <span>${assetEscape(row.source)}</span>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    `;
+};
+
 const renderAssetInsuranceEquipmentRows = (form, rows = []) => {
     const container = form.querySelector('[data-asset-insurance-equipment-rows]');
     const type = form.elements.tipo_activo.value;
@@ -3733,6 +4271,8 @@ const renderAssetInsuranceEquipmentRows = (form, rows = []) => {
     container.innerHTML = `
         ${selectedInsuranceStripHtml(form)}
         ${insuranceProductTabsHtml(selectedProducts, activeProduct, 'values')}
+        ${insuranceCalculationGuideHtml(activeProduct, activeCoverageRows)}
+        ${insuranceSpecialCalculatorHtml(form, activeCoverageRows)}
         ${insuranceCoverageRequestTableHtml(activeCoverageRows)}
         <div class="asset-insurance-item-list">
             <div class="asset-insurance-item-list-head">
@@ -3764,7 +4304,7 @@ const renderAssetInsuranceEquipmentRows = (form, rows = []) => {
                 </div>
                 ${activeSourceRows.map((row, index) => `
                     <div class="asset-insurance-equipment-row asset-insurance-item-row" data-asset-insurance-equipment-row role="row">
-                        <label><span>Categoria</span><input name="seguro_equipos[${index}][categoria_item]" value="${assetEscape(row.categoria_item ?? '')}" placeholder="Construccion, maquinaria..."></label>
+                        <label title="${assetEscape(insurableAssetTooltip(row.categoria_item || ''))}"><span>Categoria</span><input name="seguro_equipos[${index}][categoria_item]" value="${assetEscape(row.categoria_item ?? '')}" placeholder="Construccion, maquinaria..." title="${assetEscape(insurableAssetTooltip(row.categoria_item || ''))}"></label>
                         <label><span>Item</span><input name="seguro_equipos[${index}][item]" value="${assetEscape(row.item ?? '')}" placeholder="Equipo, mueble, edificio..."><input name="seguro_equipos[${index}][descripcion]" value="${assetEscape(row.descripcion ?? '')}" placeholder="Descripcion breve"></label>
                         <label><span>Und</span><input name="seguro_equipos[${index}][unidad]" value="${assetEscape(row.unidad ?? '')}" placeholder="und, m2"></label>
                         <label><span>Cant</span><input name="seguro_equipos[${index}][cantidad]" data-insured-item-calc inputmode="decimal" value="${assetEscape(row.cantidad ?? '')}" placeholder="1"></label>
@@ -5086,6 +5626,11 @@ if (assetForm instanceof HTMLFormElement) {
         }
         const row = target.closest('[data-asset-insurance-equipment-row]');
         if (row instanceof HTMLElement) {
+            if (target instanceof HTMLInputElement && target.name.endsWith('[categoria_item]')) {
+                const tooltip = insurableAssetTooltip(target.value);
+                target.title = tooltip;
+                target.closest('label')?.setAttribute('title', tooltip);
+            }
             updateInsuredItemRow(row);
             refreshCoverageSuggestedValues(assetForm);
             updateInsuranceItemTotalsDisplay(assetForm);
@@ -5101,6 +5646,11 @@ if (assetForm instanceof HTMLFormElement) {
         }
         const row = target.closest('[data-asset-insurance-equipment-row]');
         if (row instanceof HTMLElement) {
+            if (target instanceof HTMLInputElement && target.name.endsWith('[categoria_item]')) {
+                const tooltip = insurableAssetTooltip(target.value);
+                target.title = tooltip;
+                target.closest('label')?.setAttribute('title', tooltip);
+            }
             updateInsuredItemRow(row);
             refreshCoverageSuggestedValues(assetForm);
             updateInsuranceItemTotalsDisplay(assetForm);
