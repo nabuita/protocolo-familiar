@@ -1143,6 +1143,68 @@ const parseCoverageToggleValue = (value) => {
     };
 };
 
+const activeInsuranceProduct = (form, products, key) => {
+    if (products.length === 0) {
+        form.dataset[key] = '';
+        return '';
+    }
+    const active = form.dataset[key] || products[0];
+    if (!products.includes(active)) {
+        form.dataset[key] = products[0];
+        return products[0];
+    }
+    return active;
+};
+
+const insuranceProductTabsHtml = (products, active, target) => {
+    if (products.length === 0) {
+        return '';
+    }
+    return `
+        <div class="asset-insurance-product-tabs" role="tablist" aria-label="Ramos seleccionados">
+            ${products.map((product) => `
+                <button type="button" role="tab" class="${product === active ? 'is-active' : ''}" data-asset-insurance-product-tab="${assetEscape(target)}" data-product="${assetEscape(product)}">
+                    ${assetEscape(product)}
+                </button>
+            `).join('')}
+        </div>
+    `;
+};
+
+const coverageSupportCategories = (rows = []) => [...new Set(rows
+    .flatMap((row) => coverageValueCategoriesFor(row.cobertura || ''))
+    .filter(Boolean))];
+
+const coverageSupportTabsHtml = (categories = []) => {
+    if (categories.length === 0) {
+        return `
+            <div class="asset-insurance-support-tabs">
+                <span>No requiere relacion de bienes; define limite por evento/vigencia, deducible y fuente contractual.</span>
+            </div>
+        `;
+    }
+    return `
+        <div class="asset-insurance-support-tabs" aria-label="Datos solicitados">
+            ${categories.map((category, index) => `
+                <span class="${index === 0 ? 'is-active' : ''}">${assetEscape(category)}</span>
+            `).join('')}
+        </div>
+    `;
+};
+
+const selectedInsuranceStripHtml = (form) => {
+    const products = selectedInsuranceProductsFromForm(form);
+    if (products.length === 0) {
+        return '<div class="asset-insurance-selected-strip"><strong>Ramos seleccionados</strong><span>Marca primero los seguros a incorporar al activo.</span></div>';
+    }
+    return `
+        <div class="asset-insurance-selected-strip">
+            <strong>Ramos seleccionados</strong>
+            <div>${products.map((product) => `<span>${assetEscape(product)}</span>`).join('')}</div>
+        </div>
+    `;
+};
+
 const coverageOptionsForPolicy = (ramo, allCoverages, form = null) => {
     const selectedProfiles = splitInsuranceSelection(ramo);
     const academyCoverages = form ? insuranceAcademyData(form).coverages : [];
@@ -1183,11 +1245,11 @@ const insuranceCoverageMatrixHtml = (products = [], selected = new Set(), form =
         const coverages = [...new Set(academyRows.length > 0 ? academyRows.map((row) => row.Cobertura).filter(Boolean) : (insuranceCoverageProfiles[product] || insuranceCoverageProfiles[normalized] || []))];
         const coverageMeta = (coverage) => academyRows.find((row) => row.Cobertura === coverage) || null;
         return `
-            <details class="asset-coverage-matrix-card" ${productIndex === 0 ? 'open' : ''}>
-                <summary>
+            <section class="asset-coverage-matrix-card">
+                <div class="asset-coverage-matrix-header">
                     <strong>${assetEscape(product)}</strong>
                     <span>${coverages.length} amparos sugeridos</span>
-                </summary>
+                </div>
                 <div class="asset-coverage-matrix-table">
                     ${coverages.map((coverage) => `
                         <label class="asset-coverage-matrix-row ${selected.has(coverageToggleValue(product, coverage)) ? 'is-selected' : ''}">
@@ -1199,7 +1261,7 @@ const insuranceCoverageMatrixHtml = (products = [], selected = new Set(), form =
                         </label>
                     `).join('')}
                 </div>
-            </details>
+            </section>
         `;
     }).join('');
 };
@@ -2642,6 +2704,8 @@ const renderAssetInsuranceCoverageRows = (form, rows = []) => {
     const activePolicyIndex = Number(form.dataset.assetCoveragePolicyIndex || 0);
     const activePolicy = policyRows[Number.isFinite(activePolicyIndex) ? activePolicyIndex : 0] || {};
     const selectedProducts = selectedInsuranceProductsFromForm(form);
+    const activeProduct = activeInsuranceProduct(form, selectedProducts, 'assetCoverageActiveProduct');
+    const visibleProducts = activeProduct ? [activeProduct] : selectedProducts;
     const selectedRiskProfile = activePolicy.ramo || joinInsuranceSelection(selectedProducts);
     const profileCoverageNames = coverageOptionsForPolicy(selectedRiskProfile, allCoverageNames, form);
     const selectedCoverageNames = [...selected].map((item) => parseCoverageToggleValue(item).coverage).filter(Boolean);
@@ -2651,6 +2715,7 @@ const renderAssetInsuranceCoverageRows = (form, rows = []) => {
         return `<option value="${index}" ${index === activePolicyIndex ? 'selected' : ''}>${assetEscape(label)}</option>`;
     }).join('');
     const sourceRows = existingRows;
+    const activeRows = sourceRows.filter((row) => (row.ramo || '') === activeProduct || (!activeProduct && row.ramo === ''));
     const extraChecklist = extraSelected.map((item) => `
         <label class="asset-coverage-chip ${selectedCoverageNames.includes(item) ? 'is-selected' : ''}">
             <input type="checkbox" data-asset-coverage-toggle value="${assetEscape(coverageToggleValue('', item))}" ${selectedCoverageNames.includes(item) ? 'checked' : ''}>
@@ -2658,20 +2723,23 @@ const renderAssetInsuranceCoverageRows = (form, rows = []) => {
         </label>
     `).join('');
     container.innerHTML = `
+        ${selectedInsuranceStripHtml(form)}
         <div class="asset-coverage-selector" data-asset-coverage-selector>
             <div>
                 <strong>Matriz ramo / amparo / bienes asegurables</strong>
                 <span>${selectedRiskProfile ? `Productos seleccionados: ${assetEscape(selectedRiskProfile)}. Marca solo los amparos que realmente se van a cotizar o contratar.` : 'Primero selecciona uno o varios productos de seguro.'}</span>
             </div>
             <label class="asset-coverage-policy-source">Poliza base<select data-asset-coverage-policy-source>${policyOptions || '<option value="">Primera poliza registrada</option>'}</select></label>
-            ${insuranceCoverageMatrixHtml(selectedProducts, selected, form)}
+            ${insuranceProductTabsHtml(selectedProducts, activeProduct, 'coverage')}
+            ${insuranceCoverageMatrixHtml(visibleProducts, selected, form)}
             ${extraChecklist ? `<div class="asset-coverage-extra"><strong>Amparos agregados manualmente</strong><div class="asset-coverage-chips">${extraChecklist}</div></div>` : ''}
         </div>
         <div class="asset-coverage-selected">
             ${sourceRows.map((row, index) => {
                 const coverageOptions = allCoverageNames.map((item) => `<option value="${assetEscape(item)}" ${item === (row.cobertura ?? '') ? 'selected' : ''}>${assetEscape(item)}</option>`).join('');
+                const isActiveRow = (row.ramo || '') === activeProduct || (!activeProduct && row.ramo === '');
                 return `
-                    <div class="asset-insurance-coverage-row" data-asset-insurance-coverage-row>
+                    <div class="asset-insurance-coverage-row" data-asset-insurance-coverage-row ${isActiveRow ? '' : 'hidden'}>
                         <label>Ano<input name="seguro_coberturas[${index}][ano]" inputmode="numeric" value="${assetEscape(row.ano ?? '')}" placeholder="2026"></label>
                         <label>Numero poliza<input name="seguro_coberturas[${index}][numero_poliza]" value="${assetEscape(row.numero_poliza ?? '')}" placeholder="JWS797, LWY154..."></label>
                 <label>Producto<input name="seguro_coberturas[${index}][ramo]" value="${assetEscape(row.ramo ?? '')}" placeholder="Producto de la poliza base"></label>
@@ -2694,6 +2762,7 @@ const renderAssetInsuranceCoverageRows = (form, rows = []) => {
                     </div>
                 `;
             }).join('') || '<p class="muted">Marca una cobertura para diligenciar valores asegurados, prima, tasa y deducible.</p>'}
+            ${activeRows.length === 0 && sourceRows.length > 0 ? '<p class="muted">Este ramo aun no tiene coberturas marcadas.</p>' : ''}
         </div>
     `;
     syncCoveragePremiumRows(form);
@@ -2787,8 +2856,11 @@ const renderAssetInsuranceEquipmentRows = (form, rows = []) => {
     }
     const sourceRows = rows.length > 0 ? rows : [];
     const selectedProducts = selectedInsuranceProductsFromForm(form);
+    const activeProduct = activeInsuranceProduct(form, selectedProducts, 'assetValueActiveProduct');
     const selectedCoverageRows = historyRowsForType(form, '[data-asset-insurance-coverage-row]', assetInsuranceCoverageFields)
         .filter((item) => item.cobertura || item.ramo);
+    const activeCoverageRows = selectedCoverageRows.filter((item) => (item.ramo || '') === activeProduct || (!activeProduct && item.ramo === ''));
+    const activeSupportCategories = coverageSupportCategories(activeCoverageRows);
     const productOptions = [...new Set([...(options.ramo_seguro || []), ...selectedProducts])]
         .filter(Boolean)
         .map((item) => `<option value="${assetEscape(item)}">${assetEscape(item)}</option>`)
@@ -2799,19 +2871,23 @@ const renderAssetInsuranceEquipmentRows = (form, rows = []) => {
             return `<option value="${assetEscape(value)}">${assetEscape(value)}</option>`;
         })
         .join('');
-    const coverageGuide = selectedCoverageRows.length > 0
-        ? selectedCoverageRows.map((item) => `<span>${assetEscape([item.ramo, item.cobertura].filter(Boolean).join(' / '))}</span>`).join('')
+    const coverageGuide = activeCoverageRows.length > 0
+        ? activeCoverageRows.map((item) => `<span>${assetEscape([item.ramo, item.cobertura].filter(Boolean).join(' / '))}</span>`).join('')
         : '<p class="muted">Primero marca las coberturas requeridas. Despues relaciona aqui los bienes, limites o exposiciones que soportan cada valor asegurado.</p>';
     container.innerHTML = `
+        ${selectedInsuranceStripHtml(form)}
+        ${insuranceProductTabsHtml(selectedProducts, activeProduct, 'values')}
         <div class="asset-insurance-value-guide">
             <strong>Coberturas que necesitan valor asegurado o limite</strong>
             <div>${coverageGuide}</div>
+            ${coverageSupportTabsHtml(activeSupportCategories)}
         </div>
         ${sourceRows.map((row, index) => {
+        const isActiveRow = (row.ramo || '') === activeProduct || (!activeProduct && row.ramo === '');
         const rowRamoOptions = productOptions.replace(`value="${assetEscape(row.ramo ?? '')}"`, `value="${assetEscape(row.ramo ?? '')}" selected`);
         const rowCoverageOptions = coverageOptions.replace(`value="${assetEscape(row.cobertura_asociada ?? '')}"`, `value="${assetEscape(row.cobertura_asociada ?? '')}" selected`);
         return `
-            <div class="asset-insurance-equipment-row" data-asset-insurance-equipment-row>
+            <div class="asset-insurance-equipment-row" data-asset-insurance-equipment-row ${isActiveRow ? '' : 'hidden'}>
                 <label>Ano<input name="seguro_equipos[${index}][ano]" inputmode="numeric" value="${assetEscape(row.ano ?? '')}" placeholder="2026"></label>
                 <label>Numero poliza<input name="seguro_equipos[${index}][numero_poliza]" value="${assetEscape(row.numero_poliza ?? '')}" placeholder="JWS797, LWY154..."></label>
                 <label>Ramo<select name="seguro_equipos[${index}][ramo]">${assetPlaceholderOption(row.ramo ?? '')}${rowRamoOptions}</select></label>
@@ -3928,6 +4004,13 @@ if (assetForm instanceof HTMLFormElement) {
 
     assetForm.querySelector('[data-asset-insurance-coverage-rows]')?.addEventListener('click', (event) => {
         const target = event.target;
+        const productTab = target instanceof Element ? target.closest('[data-asset-insurance-product-tab="coverage"]') : null;
+        if (productTab instanceof HTMLButtonElement) {
+            assetForm.dataset.assetCoverageActiveProduct = productTab.dataset.product || '';
+            renderAssetInsuranceCoverageRows(assetForm, historyRowsForType(assetForm, '[data-asset-insurance-coverage-row]', assetInsuranceCoverageFields));
+            saveAssetDraft(assetForm);
+            return;
+        }
         if (!(target instanceof Element) || !target.closest('[data-remove-asset-insurance-coverage]')) {
             return;
         }
@@ -3977,7 +4060,20 @@ if (assetForm instanceof HTMLFormElement) {
 
     assetForm.querySelector('[data-add-asset-insurance-equipment]')?.addEventListener('click', () => {
         const rows = assetInsuranceEquipmentRows(assetForm);
-        rows.push({});
+        const selectedProducts = selectedInsuranceProductsFromForm(assetForm);
+        const activeProduct = activeInsuranceProduct(assetForm, selectedProducts, 'assetValueActiveProduct');
+        const selectedCoverageRows = historyRowsForType(assetForm, '[data-asset-insurance-coverage-row]', assetInsuranceCoverageFields)
+            .filter((item) => (item.ramo || '') === activeProduct || (!activeProduct && item.ramo === ''));
+        const coverage = selectedCoverageRows[0] || {};
+        const category = coverageSupportCategories(selectedCoverageRows)[0] || '';
+        rows.push({
+            ano: String(new Date().getFullYear()),
+            ramo: activeProduct || coverage.ramo || '',
+            cobertura_asociada: [coverage.ramo, coverage.cobertura].filter(Boolean).join(' / '),
+            categoria_item: category,
+            unidad: category === 'Construccion' ? 'm2' : category ? 'und' : '',
+            incluye_terreno: category === 'Construccion' ? 'No' : '',
+        });
         renderAssetInsuranceEquipmentRows(assetForm, rows);
         renderAssetInsuranceHistory(assetForm);
         saveAssetDraft(assetForm);
@@ -4000,6 +4096,13 @@ if (assetForm instanceof HTMLFormElement) {
     });
     insuranceEquipmentRows?.addEventListener('click', (event) => {
         const target = event.target;
+        const productTab = target instanceof Element ? target.closest('[data-asset-insurance-product-tab="values"]') : null;
+        if (productTab instanceof HTMLButtonElement) {
+            assetForm.dataset.assetValueActiveProduct = productTab.dataset.product || '';
+            renderAssetInsuranceEquipmentRows(assetForm, assetInsuranceEquipmentRows(assetForm));
+            saveAssetDraft(assetForm);
+            return;
+        }
         if (!(target instanceof Element) || !target.closest('[data-remove-asset-insurance-equipment]')) {
             return;
         }

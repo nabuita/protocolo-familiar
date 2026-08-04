@@ -567,16 +567,24 @@
     overflow-x: auto;
 }
 
-.asset-coverage-matrix-card summary {
+.asset-coverage-matrix-header {
     display: flex;
     justify-content: space-between;
+    align-items: center;
     gap: 12px;
     padding: 10px 12px;
-    cursor: pointer;
+    background: #f8fbf9;
 }
 
-.asset-coverage-matrix-card summary strong {
+.asset-coverage-matrix-header strong {
+    color: var(--primary);
     font-size: 13px;
+}
+
+.asset-coverage-matrix-header span {
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 750;
 }
 
 .asset-coverage-matrix-table {
@@ -587,7 +595,7 @@
 
 .asset-coverage-matrix-row {
     display: grid;
-    grid-template-columns: 22px minmax(150px, 1fr) minmax(180px, 1.1fr) minmax(220px, 1.4fr) minmax(220px, 1.4fr);
+    grid-template-columns: 24px minmax(170px, 1fr) minmax(170px, 1fr) minmax(220px, 1.25fr) minmax(220px, 1.25fr);
     gap: 8px;
     align-items: start;
     padding: 9px 10px;
@@ -614,6 +622,66 @@
 .asset-coverage-extra {
     display: grid;
     gap: 8px;
+}
+
+.asset-insurance-product-tabs,
+.asset-insurance-support-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.asset-insurance-selected-strip {
+    display: grid;
+    gap: 8px;
+    padding: 10px 12px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: #f8fbf9;
+}
+
+.asset-insurance-selected-strip strong {
+    color: var(--primary);
+    font-size: 12px;
+}
+
+.asset-insurance-selected-strip div {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.asset-insurance-selected-strip span {
+    width: fit-content;
+    padding: 6px 9px;
+    border-radius: 999px;
+    background: #edf6f1;
+    color: var(--primary);
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.asset-insurance-product-tabs button,
+.asset-insurance-support-tabs span {
+    min-height: 36px;
+    padding: 8px 12px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: #fff;
+    color: #40544a;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.asset-insurance-product-tabs button {
+    cursor: pointer;
+}
+
+.asset-insurance-product-tabs button.is-active,
+.asset-insurance-support-tabs span.is-active {
+    border-color: var(--primary);
+    background: #eaf5ef;
+    color: var(--primary);
 }
 
 .asset-insurance-type-grid {
@@ -706,6 +774,20 @@
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
+}
+
+.asset-insurance-value-guide p {
+    margin: 0;
+}
+
+@media (max-width: 900px) {
+    .asset-coverage-matrix-row {
+        grid-template-columns: 24px minmax(180px, 1fr);
+    }
+
+    .asset-coverage-matrix-row span:not(.asset-coverage-matrix-name) {
+        grid-column: 2;
+    }
 }
 
 .asset-insurance-value-guide span {
