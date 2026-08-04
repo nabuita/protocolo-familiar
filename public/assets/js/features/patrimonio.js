@@ -378,7 +378,7 @@ const renderAssetModalDocuments = (form, row, docsByCode, basePath) => {
         <div class="asset-doc-inline-header">
             <div>
                 <h2>Documentos del activo</h2>
-                <p>Sube aqui los soportes marcados como *Control Documental*. Tambien quedaran visibles en 05_Documentos.</p>
+                <p>Expediente general del activo. Abrelo solo cuando necesites subir o revisar soportes.</p>
             </div>
             <button type="button" data-asset-new-document>Nuevo soporte</button>
             <div class="asset-doc-inline-summary">
@@ -387,16 +387,19 @@ const renderAssetModalDocuments = (form, row, docsByCode, basePath) => {
                 <span><strong>${stats.uploaded}</strong> subidos</span>
             </div>
         </div>
-        <div class="asset-document-folders">
-            ${Object.entries(grouped).map(([folder, items], index) => `
-                <details class="asset-document-folder" ${index < 2 ? 'open' : ''}>
-                    <summary><strong>${assetEscape(folder)}</strong><span>${items.length} docs</span></summary>
-                    <div class="asset-document-list">
-                        ${items.map((item) => `<article class="asset-document-item" data-asset-doc-row="${assetEscape(item.id)}" data-row="${assetEscape(JSON.stringify(item))}" data-state="${assetEscape(item.estado || '')}">${assetDocumentItemHtml(item, basePath)}</article>`).join('')}
-                    </div>
-                </details>
-            `).join('')}
-        </div>
+        <details class="asset-document-expedient">
+            <summary><strong>Ver expediente documental</strong><span>${stats.total} documentos / ${stats.pending} pendientes</span></summary>
+            <div class="asset-document-folders">
+                ${Object.entries(grouped).map(([folder, items]) => `
+                    <details class="asset-document-folder">
+                        <summary><strong>${assetEscape(folder)}</strong><span>${items.length} docs</span></summary>
+                        <div class="asset-document-list">
+                            ${items.map((item) => `<article class="asset-document-item" data-asset-doc-row="${assetEscape(item.id)}" data-row="${assetEscape(JSON.stringify(item))}" data-state="${assetEscape(item.estado || '')}">${assetDocumentItemHtml(item, basePath)}</article>`).join('')}
+                        </div>
+                    </details>
+                `).join('')}
+            </div>
+        </details>
     `;
 };
 
