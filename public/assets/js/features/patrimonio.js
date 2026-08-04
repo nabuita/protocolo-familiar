@@ -2890,7 +2890,7 @@ const updateAssetInsuranceSections = (form, type) => {
     updateAssetContextSections(form);
 };
 
-const insuranceRequestedCoverages = (form) => assetFormRows(form, '[data-asset-insurance-coverage-row]', assetInsuranceCoverageFields)
+const insuranceRequestedCoverages = (form) => insuranceRequestRowsForSelectedProducts(form)
     .filter((row) => row.ramo || row.cobertura || assetNumber(row.valor_asegurado) > 0);
 
 const insuranceRequestedItems = (form) => assetInsuranceEquipmentRows(form)
@@ -3617,6 +3617,20 @@ const insuranceRequestRowsForProduct = (form, product, existingRows = []) => {
             observaciones: suggestion.source ? `Valor sugerido segun relacion de bienes a reposicion. Fuente: ${suggestion.source}` : 'Definir valor o limite con soporte antes de cotizar.',
         };
     });
+};
+
+const insuranceRequestRowsForSelectedProducts = (form) => {
+    const selectedProducts = selectedInsuranceProductsFromForm(form);
+    const existingRows = historyRowsForType(form, '[data-asset-insurance-coverage-row]', assetInsuranceCoverageFields)
+        .filter((row) => row.ramo || row.cobertura || row.valor_asegurado || row.fuente_valor_asegurado || row.observaciones);
+    const selectedRows = selectedProducts.flatMap((product) => insuranceRequestRowsForProduct(form, product, existingRows));
+    const selectedKeys = new Set(selectedRows.map(coverageRowKey));
+    const selectedProductSet = new Set(selectedProducts);
+    const orphanRows = existingRows.filter((row) => {
+        const key = coverageRowKey(row);
+        return key && !selectedKeys.has(key) && (!row.ramo || !selectedProductSet.has(row.ramo));
+    });
+    return [...selectedRows, ...orphanRows];
 };
 
 const renderAssetInsuranceEquipmentRows = (form, rows = []) => {
