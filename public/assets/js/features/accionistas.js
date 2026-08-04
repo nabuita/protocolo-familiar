@@ -52,6 +52,13 @@ const shareholderMoney = (value) => {
     return new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(Number(value));
 };
 
+const shareholderMoneyDecimal = (value) => {
+    if (value === null || value === undefined || value === '') {
+        return '';
+    }
+    return new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(value));
+};
+
 const shareholderPercent = (value) => `${new Intl.NumberFormat('es-CO', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(value || 0))}%`;
 
 const shareholderDate = (value) => {
@@ -277,6 +284,10 @@ const renderShareholderCompany = (row, documentsByCode = {}) => {
     const typeLine = [row.tipo_participacion, row.naturaleza_participacion].filter(Boolean).join(' / ');
     const restriction = [row.restriccion_vigente, row.tipo_restriccion].filter(Boolean).join(' / ');
     const valuation = [row.metodo_valoracion, shareholderDate(row.fecha_valoracion)].filter(Boolean).join(' / ');
+    const shares = Number(row.numero_acciones_cuotas || 0);
+    const estimatedValue = Number(row.valor_estimado_actual || 0);
+    const valuePerShare = shares > 0 && estimatedValue > 0 ? estimatedValue / shares : Number(row.valor_nominal || 0);
+    const valuationSource = [row.fuente_valoracion, shareholderDate(row.fecha_valoracion)].filter(Boolean).join(' / ');
     return `
         <article class="shareholder-company" data-shareholder-row="${shareholderEscape(row.id)}" data-row="${shareholderEscape(JSON.stringify(row))}">
             <div class="shareholder-company-head">
@@ -289,6 +300,28 @@ const renderShareholderCompany = (row, documentsByCode = {}) => {
                     <span>${shareholderEscape(shareholderNumber(row.numero_acciones_cuotas))} acciones</span>
                     ${row.valor_estimado_actual ? `<span>${shareholderEscape(shareholderMoney(row.valor_estimado_actual))}</span>` : ''}
                     <span class="${stats.pending > 0 ? 'is-danger' : 'is-ok'}">${stats.pending} docs pendientes</span>
+                </div>
+            </div>
+            <div class="shareholder-economic-strip" aria-label="Valor economico de la participacion">
+                <div>
+                    <span>Valor nominal actual</span>
+                    <strong>${shareholderEscape(shareholderMoneyDecimal(row.valor_nominal || valuePerShare) || 'Pendiente')}</strong>
+                    <small>Por accion/cuota</small>
+                </div>
+                <div>
+                    <span>Acciones / cuotas</span>
+                    <strong>${shareholderEscape(shareholderNumber(row.numero_acciones_cuotas) || 'Pendiente')}</strong>
+                    <small>${shareholderEscape(shareholderPercent(row.porcentaje))} de participacion</small>
+                </div>
+                <div>
+                    <span>Valor estimado actual</span>
+                    <strong>${shareholderEscape(shareholderMoney(row.valor_estimado_actual) || 'Pendiente')}</strong>
+                    <small>${shareholderEscape(row.metodo_valoracion || 'Metodo pendiente')}</small>
+                </div>
+                <div>
+                    <span>Valor pagado / aportado</span>
+                    <strong>${shareholderEscape(shareholderMoney(row.valor_pagado_aportado) || 'Pendiente')}</strong>
+                    <small>${shareholderEscape(valuationSource || 'Fuente pendiente')}</small>
                 </div>
             </div>
             <dl class="shareholder-detail-grid">
