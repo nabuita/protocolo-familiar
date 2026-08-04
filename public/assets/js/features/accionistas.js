@@ -61,6 +61,50 @@ const shareholderMoneyDecimal = (value) => {
 
 const shareholderPercent = (value) => `${new Intl.NumberFormat('es-CO', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(value || 0))}%`;
 
+const shareholderMoneyFields = ['valor_pagado_aportado', 'valor_nominal', 'valor_estimado_actual'];
+
+const parseShareholderLocalizedNumber = (value) => {
+    const raw = String(value ?? '').replace(/[$\s\u00a0\u202f]/g, '').trim();
+    if (!raw) {
+        return null;
+    }
+    let clean = raw;
+    if (clean.includes(',')) {
+        clean = clean.replace(/\./g, '').replace(',', '.');
+    } else if ((clean.match(/\./g) || []).length > 1 || /\.\d{3}$/.test(clean)) {
+        clean = clean.replace(/\./g, '');
+    }
+    const number = Number(clean);
+    return Number.isFinite(number) ? number : null;
+};
+
+const formatShareholderMoneyInputValue = (value) => {
+    const number = parseShareholderLocalizedNumber(value);
+    return number === null ? '' : shareholderMoneyDecimal(number);
+};
+
+const shareholderMoneySubmitValue = (value) => {
+    const number = parseShareholderLocalizedNumber(value);
+    return number === null ? '' : number.toFixed(2);
+};
+
+const formatShareholderMoneyInputs = (form) => {
+    shareholderMoneyFields.forEach((field) => {
+        const input = form.elements[field];
+        if (input instanceof HTMLInputElement && input.value.trim() !== '') {
+            input.value = formatShareholderMoneyInputValue(input.value);
+        }
+    });
+};
+
+const shareholderFormData = (form) => {
+    const data = new FormData(form);
+    shareholderMoneyFields.forEach((field) => {
+        data.set(field, shareholderMoneySubmitValue(data.get(field)));
+    });
+    return data;
+};
+
 const shareholderDate = (value) => {
     if (!value || !/^\d{4}-\d{2}-\d{2}$/.test(String(value))) {
         return value ?? '';
@@ -446,6 +490,7 @@ const fillShareholderForm = (form, row = null) => {
             form.elements[field].value = row?.[field] ?? '';
         }
     });
+    formatShareholderMoneyInputs(form);
     activateShareholderTab(form, 'participacion');
     updateShareholderAcademy(form, 'tipo_participacion');
     updateShareholderAcademy(form, 'naturaleza_participacion');
@@ -532,7 +577,7 @@ if (shareholderForm instanceof HTMLFormElement) {
         const url = id ? `${basePath}/protocolo-familiar/accionistas/${id}` : `${basePath}/protocolo-familiar/accionistas`;
         status && (status.textContent = 'Guardando...');
         try {
-            const response = await fetch(url, { method: 'POST', body: new FormData(shareholderForm), credentials: 'same-origin' });
+            const response = await fetch(url, { method: 'POST', body: shareholderFormData(shareholderForm), credentials: 'same-origin' });
             const contentType = response.headers.get('content-type') || '';
             const payload = contentType.includes('application/json') ? await response.json() : { ok: false, error: await response.text() };
             if (!response.ok || !payload.ok) {
@@ -564,6 +609,21 @@ if (shareholderForm instanceof HTMLFormElement) {
     document.querySelector('[data-cancel-shareholder]')?.addEventListener('click', () => {
         fillShareholderForm(shareholderForm);
         status && (status.textContent = '');
+    });
+
+    shareholderMoneyFields.forEach((field) => {
+        const input = shareholderForm.elements[field];
+        if (!(input instanceof HTMLInputElement)) {
+            return;
+        }
+        input.addEventListener('focus', () => {
+            const number = parseShareholderLocalizedNumber(input.value);
+            input.value = number === null ? '' : String(number).replace('.', ',');
+            window.setTimeout(() => input.select(), 0);
+        });
+        input.addEventListener('blur', () => {
+            input.value = formatShareholderMoneyInputValue(input.value);
+        });
     });
 
     document.querySelector('[data-close-shareholder]')?.addEventListener('click', closeShareholderModal);

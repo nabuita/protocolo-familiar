@@ -340,7 +340,10 @@ final readonly class AccionistaModel
         if ($value === null || trim((string) $value) === '') {
             return null;
         }
-        $clean = str_replace(['$', ' ', "\xc2\xa0"], '', (string) $value);
+        $clean = preg_replace('/[$\s\x{00A0}\x{202F}]+/u', '', (string) $value);
+        if (!is_string($clean)) {
+            throw new RuntimeException('Valor monetario invalido.');
+        }
         if (str_contains($clean, ',')) {
             $clean = str_replace('.', '', $clean);
             $clean = str_replace(',', '.', $clean);
