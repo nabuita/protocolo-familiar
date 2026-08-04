@@ -500,7 +500,8 @@ if (shareholderForm instanceof HTMLFormElement) {
         status && (status.textContent = 'Guardando...');
         try {
             const response = await fetch(url, { method: 'POST', body: new FormData(shareholderForm), credentials: 'same-origin' });
-            const payload = await response.json();
+            const contentType = response.headers.get('content-type') || '';
+            const payload = contentType.includes('application/json') ? await response.json() : { ok: false, error: await response.text() };
             if (!response.ok || !payload.ok) {
                 throw new Error(payload.error || 'No fue posible guardar.');
             }
@@ -517,7 +518,9 @@ if (shareholderForm instanceof HTMLFormElement) {
             status && (status.textContent = 'Guardado.');
             closeShareholderModal();
         } catch (error) {
-            status && (status.textContent = error instanceof Error ? error.message : 'No fue posible guardar.');
+            const message = error instanceof Error ? error.message : 'No fue posible guardar.';
+            status && (status.textContent = message);
+            window.alert(message);
         }
     });
 

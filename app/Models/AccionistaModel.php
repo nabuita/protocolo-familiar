@@ -282,10 +282,38 @@ final readonly class AccionistaModel
         if (!is_string($value) || trim($value) === '') {
             return null;
         }
-        if (preg_match('/^\d{4}-\d{2}-\d{2}$/', trim($value)) !== 1) {
+        $value = trim($value);
+        if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $value) === 1) {
+            return $value;
+        }
+        if (preg_match('/^(\d{2})\/(\d{2})\/(\d{4})$/', $value, $matches) === 1) {
+            $day = (int) $matches[1];
+            $month = (int) $matches[2];
+            $year = (int) $matches[3];
+            if (checkdate($month, $day, $year)) {
+                return sprintf('%04d-%02d-%02d', $year, $month, $day);
+            }
+        }
+        if (preg_match('/^(\d{2})-(\d{2})-(\d{4})$/', $value, $matches) === 1) {
+            $day = (int) $matches[1];
+            $month = (int) $matches[2];
+            $year = (int) $matches[3];
+            if (checkdate($month, $day, $year)) {
+                return sprintf('%04d-%02d-%02d', $year, $month, $day);
+            }
+        }
+        if (preg_match('/^(\d{4})\/(\d{2})\/(\d{2})$/', $value, $matches) === 1) {
+            $year = (int) $matches[1];
+            $month = (int) $matches[2];
+            $day = (int) $matches[3];
+            if (checkdate($month, $day, $year)) {
+                return sprintf('%04d-%02d-%02d', $year, $month, $day);
+            }
+        }
+        if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $value) !== 1) {
             throw new RuntimeException('Fecha invalida.');
         }
-        return trim($value);
+        return $value;
     }
 
     private function decimal(mixed $value, bool $required = false): ?float
@@ -312,9 +340,13 @@ final readonly class AccionistaModel
         if ($value === null || trim((string) $value) === '') {
             return null;
         }
-        $clean = str_replace(['$', ' '], '', (string) $value);
-        $clean = str_replace('.', '', $clean);
-        $clean = str_replace(',', '.', $clean);
+        $clean = str_replace(['$', ' ', "\xc2\xa0"], '', (string) $value);
+        if (str_contains($clean, ',')) {
+            $clean = str_replace('.', '', $clean);
+            $clean = str_replace(',', '.', $clean);
+        } elseif (substr_count($clean, '.') > 1 || preg_match('/\.\d{3}$/', $clean) === 1) {
+            $clean = str_replace('.', '', $clean);
+        }
         if (!is_numeric($clean)) {
             throw new RuntimeException('Valor monetario invalido.');
         }
