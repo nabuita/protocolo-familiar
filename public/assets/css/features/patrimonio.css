@@ -1445,6 +1445,12 @@
     background: #eaf5ef;
 }
 
+.asset-insurance-quick-items button[aria-pressed="true"] {
+    border-color: var(--primary);
+    background: #e7f4ed;
+    box-shadow: inset 0 0 0 1px var(--primary);
+}
+
 .asset-insurance-item-totals {
     display: flex;
     flex-wrap: wrap;

@@ -4065,6 +4065,42 @@ const assetInsuranceEquipmentRows = (form) => [...form.querySelectorAll('[data-a
     return item;
 });
 
+const generatedInsuranceItemNames = new Set([
+    'Construccion',
+    'Vidrios',
+    'Muebles y enseres',
+    'Construccion asegurable',
+    'Vidrios instalados',
+    'Grupo homogeneo de muebles',
+    'Grupo homogeneo de maquinaria',
+    'Grupo homogeneo de equipos electronicos',
+    'Inventario por grupo asegurable',
+    'Obra, joya o coleccion soportada',
+    'Limite maximo de efectivo',
+]);
+
+const isEmptyGeneratedInsuranceItem = (row = {}) => {
+    const itemName = String(row.item || '').trim();
+    const description = String(row.descripcion || '').trim();
+    const category = String(row.categoria_item || '').trim();
+    const hasMoney = [
+        row.valor_compra,
+        row.valor_reposicion_unitario,
+        row.valor_reposicion,
+        row.valor_asegurable_sugerido,
+    ].some((value) => assetNumber(value) > 0);
+    const hasSupport = [
+        row.fuente_consulta,
+        row.fecha_consulta,
+        row.serial_referencia,
+        row.observaciones,
+    ].some((value) => String(value || '').trim() !== '');
+    return !hasMoney
+        && !hasSupport
+        && !description
+        && (generatedInsuranceItemNames.has(itemName) || (itemName === category && category !== ''));
+};
+
 const updateInsuredItemRow = (row) => {
     const quantityInput = row.querySelector('[name$="[cantidad]"]');
     const unitInput = row.querySelector('[name$="[valor_reposicion_unitario]"]');
@@ -4100,20 +4136,20 @@ const updateInsuredItemRows = (container) => {
 };
 
 const insuredItemQuickCategories = [
-    { category: 'Construccion', label: 'Construccion', unit: 'm2', item: 'Construccion asegurable', note: 'Area construida asegurable; no incluir terreno.' },
-    { category: 'Vidrios', label: 'Vidrios', unit: 'm2', item: 'Vidrios instalados', note: 'Agrupa por tipo, espesor o ubicacion cuando sean homogeneos.' },
-    { category: 'Muebles y enseres', label: 'Muebles y enseres', unit: 'und', item: 'Grupo homogeneo de muebles', note: 'Agrupa bienes iguales o similares: escritorios, sillas, archivadores, estanterias.' },
-    { category: 'Maquinaria y equipo', label: 'Maquinaria/equipo', unit: 'und', item: 'Grupo homogeneo de maquinaria', note: 'Agrupa equipos iguales: A/A 3/4 HP, A/A 1 HP, motobombas, bombas contra incendio.' },
-    { category: 'Equipo electronico / corriente debil', label: 'Corriente debil', unit: 'und', item: 'Grupo homogeneo de equipos electronicos', note: 'Agrupa UPS, camaras, DVR/NVR, redes, controles o equipos equivalentes.' },
-    { category: 'Mercancias / inventario', label: 'Mercancias', unit: 'lote', item: 'Inventario por grupo asegurable', note: 'Usa grupos por linea o categoria con fuente contable/inventario; evita detalle item por item si es masivo.' },
-    { category: 'Obras de arte', label: 'Arte/joyas', unit: 'und', item: 'Obra, joya o coleccion soportada', note: 'Usa avaluo especializado, descripcion y evidencia fotografica.' },
-    { category: 'Dinero en efectivo', label: 'Dinero', unit: 'limite', item: 'Limite maximo de efectivo', note: 'Define limite maximo probable en caja o transito, con controles de custodia.' },
+    { category: 'Construccion', label: 'Construccion', unit: 'm2' },
+    { category: 'Vidrios', label: 'Vidrios', unit: 'm2' },
+    { category: 'Muebles y enseres', label: 'Muebles y enseres', unit: 'und' },
+    { category: 'Maquinaria y equipo', label: 'Maquinaria/equipo', unit: 'und' },
+    { category: 'Equipo electronico / corriente debil', label: 'Corriente debil', unit: 'und' },
+    { category: 'Mercancias / inventario', label: 'Mercancias', unit: 'lote' },
+    { category: 'Obras de arte', label: 'Arte/joyas', unit: 'und' },
+    { category: 'Dinero en efectivo', label: 'Dinero', unit: 'limite' },
 ];
 
-const insuredItemQuickButtonsHtml = () => `
-    <div class="asset-insurance-quick-items" aria-label="Agregar grupos asegurables">
+const insuredItemQuickButtonsHtml = (activeCategory = '') => `
+    <div class="asset-insurance-quick-items" aria-label="Categorias de bienes asegurables">
         ${insuredItemQuickCategories.map((item) => `
-            <button type="button" data-add-asset-insurance-equipment-category="${assetEscape(item.category)}">
+            <button type="button" data-filter-asset-insurance-equipment-category="${assetEscape(item.category)}" aria-pressed="${activeCategory === item.category ? 'true' : 'false'}">
                 ${assetEscape(item.label)}
             </button>
         `).join('')}
@@ -4126,11 +4162,12 @@ const buildInsuranceEquipmentRow = (form, category = '', product = '') => {
         ano: String(new Date().getFullYear()),
         ramo: product || activeInsuranceProduct(form, selectedInsuranceProductsFromForm(form), 'assetValueActiveProduct') || '',
         categoria_item: template?.category || category || '',
-        item: template?.item || '',
+        item: '',
+        descripcion: '',
         unidad: template?.unit || (category === 'Construccion' || category === 'Vidrios' ? 'm2' : category ? 'und' : ''),
         cantidad: '1',
         incluye_terreno: category === 'Construccion' ? 'No' : '',
-        observaciones: template ? `Grupo homogeneo asegurable. ${template.note}` : 'Grupo homogeneo asegurable; documentar fuente, fecha y valor de reposicion.',
+        observaciones: '',
     };
 };
 
@@ -4295,13 +4332,25 @@ const renderAssetInsuranceEquipmentRows = (form, rows = []) => {
         container.innerHTML = '';
         return;
     }
-    const sourceRows = rows.length > 0 ? rows : [];
+    const sourceRows = (rows.length > 0 ? rows : []).filter((row) => !isEmptyGeneratedInsuranceItem(row));
     const selectedProducts = selectedInsuranceProductsFromForm(form);
     const activeProduct = activeInsuranceProduct(form, selectedProducts, 'assetValueActiveProduct');
     const activeCoverageRows = selectedInsuranceRequestRowsForProduct(form, activeProduct);
-    const activeSourceRows = sourceRows.filter((item) => (item.ramo || '') === activeProduct || (!activeProduct && !item.ramo));
+    const productSourceRows = sourceRows.filter((item) => (item.ramo || '') === activeProduct || (!activeProduct && !item.ramo));
+    const productCategories = [...new Set(productSourceRows.map((item) => item.categoria_item).filter(Boolean))];
+    const requestedCategory = form.dataset.assetInsuranceItemCategory || '';
+    const knownCategories = insuredItemQuickCategories.map((item) => item.category);
+    const activeCategory = requestedCategory && (knownCategories.includes(requestedCategory) || productCategories.includes(requestedCategory))
+        ? form.dataset.assetInsuranceItemCategory
+        : productCategories[0] || insuredItemQuickCategories[0]?.category || '';
+    form.dataset.assetInsuranceItemCategory = activeCategory;
+    const activeSourceRows = productSourceRows.filter((item) => (item.categoria_item || '') === activeCategory);
     const inactiveSourceRows = sourceRows.filter((item) => !activeSourceRows.includes(item));
-    const activeTotalsByCategory = insuranceItemTotalsForProduct(form, activeProduct);
+    const activeTotalsByCategory = productSourceRows.reduce((carry, item) => {
+        const category = item.categoria_item || 'Sin categoria';
+        carry[category] = (carry[category] || 0) + (assetNumber(item.valor_asegurable_sugerido) || assetNumber(item.valor_reposicion) || 0);
+        return carry;
+    }, {});
     const activeGrandTotal = Object.values(activeTotalsByCategory).reduce((sum, value) => sum + value, 0);
     container.innerHTML = `
         ${selectedInsuranceStripHtml(form)}
@@ -4315,7 +4364,7 @@ const renderAssetInsuranceEquipmentRows = (form, rows = []) => {
                 <span>Registra grupos homogeneos cuando aplique: cantidad x valor de reposicion unitario. Detalla uno a uno solo los bienes singulares o de alto valor.</span>
                 <output data-insurance-item-total-all>${assetEscape(assetMoney(activeGrandTotal))}</output>
             </div>
-            ${insuredItemQuickButtonsHtml()}
+            ${insuredItemQuickButtonsHtml(activeCategory)}
             ${Object.keys(activeTotalsByCategory).length > 0 ? `
                 <div class="asset-insurance-item-totals" data-insurance-item-totals>
                     ${Object.entries(activeTotalsByCategory).map(([category, total]) => `<span><strong>${assetEscape(category)}</strong>${assetEscape(assetMoney(total))}</span>`).join('')}
@@ -4369,7 +4418,7 @@ const renderAssetInsuranceEquipmentRows = (form, rows = []) => {
                         <input type="hidden" name="seguro_equipos[${index}][fecha_fin]" value="${assetEscape(row.fecha_fin ?? '')}">
                         <input type="hidden" name="seguro_equipos[${index}][fecha_renovacion]" value="${assetEscape(row.fecha_renovacion ?? '')}">
                     </div>
-                `).join('') || '<p class="muted">Agrega una fila cuando una cobertura deba salir de inventario o calculo soportado.</p>'}
+                `).join('') || '<p class="muted">Agrega una fila para registrar activos reales de esta categoria. No se crean filas automaticas.</p>'}
             </div>
             ${inactiveSourceRows.map((row, index) => `
                 <div data-asset-insurance-equipment-row hidden>
@@ -5633,7 +5682,7 @@ if (assetForm instanceof HTMLFormElement) {
         const selectedCoverageRows = historyRowsForType(assetForm, '[data-asset-insurance-coverage-row]', assetInsuranceCoverageFields)
             .filter((item) => (item.ramo || '') === activeProduct || (!activeProduct && item.ramo === ''));
         const coverage = selectedCoverageRows[0] || {};
-        const category = coverageSupportCategories(selectedCoverageRows)[0] || '';
+        const category = assetForm.dataset.assetInsuranceItemCategory || coverageSupportCategories(selectedCoverageRows)[0] || '';
         rows.push({
             ...buildInsuranceEquipmentRow(assetForm, category, activeProduct || coverage.ramo || ''),
             cobertura_asociada: [coverage.ramo, coverage.cobertura].filter(Boolean).join(' / '),
@@ -5700,14 +5749,10 @@ if (assetForm instanceof HTMLFormElement) {
             saveAssetDraft(assetForm);
             return;
         }
-        const categoryButton = target instanceof Element ? target.closest('[data-add-asset-insurance-equipment-category]') : null;
+        const categoryButton = target instanceof Element ? target.closest('[data-filter-asset-insurance-equipment-category]') : null;
         if (categoryButton instanceof HTMLButtonElement) {
-            const rows = assetInsuranceEquipmentRows(assetForm);
-            const selectedProducts = selectedInsuranceProductsFromForm(assetForm);
-            const activeProduct = activeInsuranceProduct(assetForm, selectedProducts, 'assetValueActiveProduct');
-            rows.push(buildInsuranceEquipmentRow(assetForm, categoryButton.dataset.addAssetInsuranceEquipmentCategory || '', activeProduct));
-            renderAssetInsuranceEquipmentRows(assetForm, rows);
-            renderAssetInsuranceHistory(assetForm);
+            assetForm.dataset.assetInsuranceItemCategory = categoryButton.dataset.filterAssetInsuranceEquipmentCategory || '';
+            renderAssetInsuranceEquipmentRows(assetForm, assetInsuranceEquipmentRows(assetForm));
             saveAssetDraft(assetForm);
             return;
         }
