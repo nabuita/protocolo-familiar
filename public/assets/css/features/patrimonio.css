@@ -365,6 +365,13 @@
     font-weight: 600;
 }
 
+.asset-header-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
 .asset-participation-meter {
     display: flex;
     flex-wrap: wrap;

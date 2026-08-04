@@ -290,7 +290,10 @@ foreach (($documentoRows ?? []) as $documento) {
                         <h2>Cotizaciones comparables <span class="asset-document-marker">*Control Documental*</span></h2>
                         <p>Registra minimo tres aseguradoras sobre la misma base asegurable. Cada oferta recibe el paquete consolidado de ramos, coberturas, valores asegurados y bienes reportados.</p>
                     </div>
-                    <button type="button" data-add-asset-insurance-policy>Agregar oferta</button>
+                    <div class="asset-header-actions">
+                        <button type="button" data-add-asset-insurance-previous>Registrar poliza anterior</button>
+                        <button type="button" data-add-asset-insurance-policy>Agregar oferta</button>
+                    </div>
                 </div>
                 <div class="asset-insurance-guide" aria-label="Guia practica de seguros">
                     <strong>Ruta simple del analista</strong>

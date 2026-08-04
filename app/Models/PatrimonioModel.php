@@ -621,6 +621,13 @@ final readonly class PatrimonioModel
                 'fecha_adopcion' => $this->date($row['fecha_adopcion'] ?? null),
                 'criterio_adopcion' => $this->optional($row['criterio_adopcion'] ?? null),
                 'cotizacion_matriz' => $this->optional($row['cotizacion_matriz'] ?? null),
+                'alcance_poliza' => $this->optional($row['alcance_poliza'] ?? null),
+                'grupo_poliza' => $this->optional($row['grupo_poliza'] ?? null),
+                'metodo_distribucion' => $this->optional($row['metodo_distribucion'] ?? null),
+                'coeficiente_participacion' => $this->decimal($row['coeficiente_participacion'] ?? null),
+                'numero_unidades_cubiertas' => $this->positiveInt($row['numero_unidades_cubiertas'] ?? null),
+                'prima_asignada' => $this->money($row['prima_asignada'] ?? null),
+                'observaciones_distribucion' => $this->optional($row['observaciones_distribucion'] ?? null),
                 'soporte' => $this->optional($row['soporte'] ?? null),
                 'observaciones' => $this->optional($row['observaciones'] ?? null),
             ];
