@@ -640,6 +640,7 @@ const assetCoverageValueRules = {
     Sustraccion: ['Muebles y enseres', 'Maquinaria y equipo', 'Equipo electronico / corriente debil', 'Mercancias / inventario', 'Obras de arte', 'Joyas', 'Dinero en efectivo'],
     'Lucro cesante': ['Construccion', 'Maquinaria y equipo', 'Equipo electronico / corriente debil', 'Mercancias / inventario'],
     'Arrendamiento dejado de percibir': ['Construccion'],
+    'Perdida de arrendamiento por siniestro': ['Construccion'],
     'Danos propios': ['Maquinaria y equipo', 'Equipo electronico / corriente debil'],
     'Perdida parcial por danos': ['Maquinaria y equipo'],
     'Perdida total por danos': ['Maquinaria y equipo'],
@@ -675,7 +676,7 @@ const coverageValueCategoriesFor = (coverage) => {
     if (text.includes('hurto') || text.includes('sustraccion')) {
         return ['Muebles y enseres', 'Maquinaria y equipo', 'Equipo electronico / corriente debil', 'Mercancias / inventario', 'Obras de arte', 'Joyas', 'Dinero en efectivo'];
     }
-    if (text.includes('lucro') || text.includes('arrendamiento')) {
+    if (text.includes('lucro') || text.includes('arrendamiento') || text.includes('canon')) {
         return ['Construccion', 'Mercancias / inventario', 'Maquinaria y equipo', 'Equipo electronico / corriente debil'];
     }
     if (text.includes('perdida') || text.includes('vehiculo') || text.includes('auto')) {
@@ -686,10 +687,10 @@ const coverageValueCategoriesFor = (coverage) => {
 
 const insuranceCoverageProfiles = {
     'Danos materiales inmueble arrendado': ['Incendio', 'Rayo', 'Explosion', 'Humo', 'Danos por agua', 'Anegacion', 'Terremoto', 'Temblor / erupcion volcanica', 'Vidrios', 'Extension de cobertura', 'Actos mal intencionados de terceros', 'Terrorismo', 'Remocion de escombros', 'Gastos de extincion', 'Honorarios profesionales', 'Responsabilidad civil extracontractual', 'Asistencia'],
-    'Todo riesgo dano material': ['Incendio', 'Rayo', 'Explosion', 'Humo', 'Danos por agua', 'Anegacion', 'Inundacion', 'Terremoto', 'Temblor / erupcion volcanica', 'Hurto', 'Sustraccion', 'Actos mal intencionados de terceros', 'Terrorismo', 'Rotura de maquinaria', 'Equipo electronico / corriente debil', 'Lucro cesante', 'Remocion de escombros', 'Gastos de extincion', 'Honorarios profesionales', 'Asistencia'],
-    'Incendio y terremoto': ['Incendio', 'Rayo', 'Explosion', 'Humo', 'Danos por agua', 'Anegacion', 'Terremoto', 'Temblor / erupcion volcanica', 'Actos mal intencionados de terceros', 'Terrorismo', 'Remocion de escombros', 'Gastos de extincion', 'Lucro cesante', 'Asistencia'],
-    Incendio: ['Incendio', 'Rayo', 'Explosion', 'Humo', 'Danos por agua', 'Anegacion', 'Actos mal intencionados de terceros', 'Terrorismo', 'Remocion de escombros', 'Gastos de extincion', 'Lucro cesante', 'Asistencia'],
-    Terremoto: ['Terremoto', 'Temblor / erupcion volcanica', 'Anegacion', 'Remocion de escombros'],
+    'Todo riesgo dano material': ['Incendio', 'Rayo', 'Explosion', 'Humo', 'Danos por agua', 'Anegacion', 'Inundacion', 'Terremoto', 'Temblor / erupcion volcanica', 'Hurto', 'Sustraccion', 'Actos mal intencionados de terceros', 'Terrorismo', 'Rotura de maquinaria', 'Equipo electronico / corriente debil', 'Lucro cesante', 'Perdida de arrendamiento por siniestro', 'Remocion de escombros', 'Gastos de extincion', 'Honorarios profesionales', 'Asistencia'],
+    'Incendio y terremoto': ['Incendio', 'Rayo', 'Explosion', 'Humo', 'Danos por agua', 'Anegacion', 'Terremoto', 'Temblor / erupcion volcanica', 'Actos mal intencionados de terceros', 'Terrorismo', 'Remocion de escombros', 'Gastos de extincion', 'Lucro cesante', 'Perdida de arrendamiento por siniestro', 'Asistencia'],
+    Incendio: ['Incendio', 'Rayo', 'Explosion', 'Humo', 'Danos por agua', 'Anegacion', 'Actos mal intencionados de terceros', 'Terrorismo', 'Remocion de escombros', 'Gastos de extincion', 'Lucro cesante', 'Perdida de arrendamiento por siniestro', 'Asistencia'],
+    Terremoto: ['Terremoto', 'Temblor / erupcion volcanica', 'Anegacion', 'Remocion de escombros', 'Perdida de arrendamiento por siniestro'],
     'Muebles y enseres': ['Incendio', 'Rayo', 'Explosion', 'Danos por agua', 'Hurto', 'Sustraccion', 'Actos mal intencionados de terceros', 'Terrorismo'],
     'Rotura de maquinaria': ['Rotura de maquinaria', 'Dano interno', 'Actos mal intencionados de terceros', 'Gastos adicionales'],
     'Maquinaria y equipo': ['Rotura de maquinaria', 'Dano interno', 'Hurto', 'Sustraccion', 'Incendio'],
@@ -699,14 +700,14 @@ const insuranceCoverageProfiles = {
     'Responsabilidad civil contractual': ['Responsabilidad civil contractual', 'Asistencia juridica'],
     'Automovil todo riesgo': ['Danos propios', 'Perdida parcial por danos', 'Perdida total por danos', 'Perdida parcial por hurto', 'Perdida total por hurto', 'Responsabilidad civil extracontractual', 'Asistencia juridica', 'Asistencia', 'Gastos de grua'],
     SOAT: ['Responsabilidad civil extracontractual'],
-    Hogar: ['Incendio', 'Rayo', 'Explosion', 'Danos por agua', 'Terremoto', 'Hurto', 'Sustraccion', 'Responsabilidad civil extracontractual', 'Asistencia'],
+    Hogar: ['Incendio', 'Rayo', 'Explosion', 'Danos por agua', 'Terremoto', 'Hurto', 'Sustraccion', 'Responsabilidad civil extracontractual', 'Perdida de arrendamiento por siniestro', 'Asistencia'],
     Copropiedad: ['Incendio', 'Rayo', 'Explosion', 'Danos por agua', 'Terremoto', 'Responsabilidad civil extracontractual', 'Actos mal intencionados de terceros', 'Terrorismo', 'Rotura de maquinaria', 'Equipo electronico / corriente debil'],
     Cumplimiento: ['Responsabilidad civil contractual', 'Seriedad de oferta', 'Cumplimiento del contrato', 'Buen manejo del anticipo', 'Calidad del servicio', 'Pago de salarios y prestaciones'],
     'Cumplimiento arrendamiento': ['Responsabilidad civil contractual', 'Canon de arrendamiento', 'Cuotas de administracion', 'Servicios publicos', 'Clausula penal'],
     Manejo: ['Hurto', 'Sustraccion'],
     Deudores: ['Responsabilidad civil contractual'],
     'Cyber / riesgo digital': ['Responsabilidad civil profesional', 'Lucro cesante', 'Asistencia juridica'],
-    'Lucro cesante': ['Lucro cesante'],
+    'Lucro cesante': ['Lucro cesante', 'Perdida de arrendamiento por siniestro'],
 };
 
 const insuranceCoverageAcademy = {
@@ -733,6 +734,7 @@ const insuranceCoverageAcademy = {
     'Equipo electronico / corriente debil': { kind: 'Equipo electronico', assets: ['Equipo electronico / corriente debil'], basis: 'Inventario por item: UPS, CCTV, red, telefonia, computadores, controles, fuente y fecha.', review: 'Protecciones electricas, mantenimiento, portabilidad, software y datos excluidos.' },
     'Lucro cesante': { kind: 'Perdida financiera', assets: ['Construccion', 'Maquinaria y equipo', 'Equipo electronico / corriente debil', 'Mercancias / inventario'], basis: 'Ingresos, canon, utilidad bruta o gastos permanentes soportados.', review: 'Periodo de indemnizacion, evento detonante, base contable y deducible temporal.' },
     'Arrendamiento dejado de percibir': { kind: 'Perdida financiera', assets: ['Construccion'], basis: 'Canon mensual, contrato, porcentaje de participacion y meses cubiertos.', review: 'Si aplica por imposibilidad fisica del inmueble y periodo maximo.' },
+    'Perdida de arrendamiento por siniestro': { kind: 'Perdida financiera', assets: ['Construccion'], basis: 'Canon mensual dejado de percibir por meses cubiertos, contrato y porcentaje de participacion.', review: 'Debe depender de un siniestro cubierto; confirmar periodo maximo, limite asegurado, deducible y que no sea seguro de arrendamiento por mora.' },
     'Responsabilidad civil extracontractual': { kind: 'Responsabilidad', assets: ['Exposicion frente a terceros'], basis: 'Limite por evento/vigencia definido por actividad, visitantes, contratos y capacidad de perdida.', review: 'RC predios, labores, operaciones, patronal, cruzada, parqueaderos, contratistas y exclusiones.' },
     'RC predios labores y operaciones': { kind: 'Responsabilidad', assets: ['Exposicion frente a terceros'], basis: 'Limite por evento/vigencia.', review: 'Que cubra danos a terceros por uso del predio y operacion normal.' },
     'RC patronal': { kind: 'Responsabilidad', assets: ['Trabajadores y contratistas'], basis: 'Sublimite por trabajador/evento.', review: 'Compatibilidad con seguridad social y exclusiones laborales.' },
@@ -989,10 +991,10 @@ const insuranceProductAcademy = {
         appliesTo: ['Inmueble', 'Vehiculo/Maquinaria/Equipo', 'Otro activo'],
         title: 'Lucro cesante',
         what: 'Cubre perdida de utilidad o ingresos por interrupcion de la actividad a causa de un evento material amparado.',
-        includes: 'Utilidad bruta, gastos permanentes, perdida de ingresos, gastos extra o periodo de indemnizacion segun poliza.',
+        includes: 'Utilidad bruta, gastos permanentes, perdida de ingresos, perdida de arrendamiento por siniestro, gastos extra o periodo de indemnizacion segun poliza.',
         assets: 'Actividad economica dependiente del inmueble, maquinaria, equipo o proceso asegurado.',
         value: 'Debe salir de estados financieros, ingresos historicos, canon o utilidad bruta soportada.',
-        analyst: 'Confirmar evento disparador, periodo de indemnizacion, base contable y que no haya doble conteo con perdida de arrendamiento.',
+        analyst: 'Confirmar evento disparador, periodo de indemnizacion, base contable y que no haya doble conteo con seguro de arrendamiento o alojamiento temporal.',
         supports: 'Estados financieros, contratos, canon, ingresos historicos, gastos fijos, caratula y clausulado.',
     },
 };
@@ -1446,11 +1448,11 @@ const insuranceValueGuidanceFor = (coverage) => {
         source = 'Fuente: inventario fisico, factura, cotizacion, registro fotografico o avaluo para obras/joyas.';
         alert = 'Alerta: revisar modalidad cubierta, alarma, cerraduras, vigilancia, dinero, joyas y bienes excluidos.';
     }
-    if (text.includes('lucro') || text.includes('arrendamiento dejado')) {
+    if (text.includes('lucro') || text.includes('arrendamiento dejado') || text.includes('perdida de arrendamiento') || text.includes('canon') || text.includes('canones')) {
         title = 'Perdida financiera o canon';
-        basis = 'Define ingreso, canon, utilidad bruta o gastos permanentes y el periodo de indemnizacion solicitado.';
+        basis = 'Define ingreso, canon mensual dejado de percibir, utilidad bruta o gastos permanentes y el periodo de indemnizacion solicitado.';
         source = 'Fuente: contrato de arrendamiento, estados financieros, canon mensual, participacion e historico de ingresos.';
-        alert = 'Alerta: normalmente exige dano material amparado como evento detonante y puede tener deducible temporal.';
+        alert = 'Alerta: normalmente exige dano material amparado como evento detonante; no confundir con seguro de arrendamiento por mora ni alojamiento temporal.';
     }
     if (text.includes('vehiculo') || text.includes('auto') || text.includes('perdida total') || text.includes('perdida parcial')) {
         title = 'Valor comercial del vehiculo';
