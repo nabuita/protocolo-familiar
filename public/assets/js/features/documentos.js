@@ -497,7 +497,7 @@ if (documentForm instanceof HTMLFormElement) {
 
     modal?.addEventListener('click', (event) => {
         if (event.target === modal) {
-            closeDocumentModal();
+            event.preventDefault();
         }
     });
 

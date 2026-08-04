@@ -313,7 +313,7 @@ if (companyForm instanceof HTMLFormElement) {
 
     modal?.addEventListener('click', (event) => {
         if (event.target === modal) {
-            closeCompanyModal();
+            event.preventDefault();
         }
     });
 

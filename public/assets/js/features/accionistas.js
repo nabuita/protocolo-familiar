@@ -665,7 +665,7 @@ if (shareholderForm instanceof HTMLFormElement) {
 
     modal?.addEventListener('click', (event) => {
         if (event.target === modal) {
-            closeShareholderModal();
+            event.preventDefault();
         }
     });
 

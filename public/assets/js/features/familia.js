@@ -377,7 +377,7 @@ if (familyForm instanceof HTMLFormElement) {
 
     modal?.addEventListener('click', (event) => {
         if (event.target === modal) {
-            closeFamilyModal();
+            event.preventDefault();
         }
     });
 
