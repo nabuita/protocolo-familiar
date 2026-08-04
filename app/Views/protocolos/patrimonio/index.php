@@ -302,6 +302,7 @@ foreach (($documentoRows ?? []) as $documento) {
                         <li>Escoge la mejor cobertura neta: no solo la prima mas baja.</li>
                     </ol>
                 </div>
+                <div class="asset-insurance-quote-analysis" data-asset-insurance-quote-analysis></div>
                 <div class="asset-insurance-rows" data-asset-insurance-policy-rows></div>
             </section>
             <section class="asset-insurance" data-asset-insurance-current data-asset-insurance-panel="vigente" hidden>

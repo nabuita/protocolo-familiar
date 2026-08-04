@@ -467,7 +467,7 @@ const collectAssetDraft = (form) => {
         valoraciones_anuales: assetFormRows(form, '[data-asset-value-year-row]', ['ano', 'valor_catastral', 'valor_comercial', 'fecha_corte', 'fuente', 'observaciones']),
         ingresos_anuales: assetFormRows(form, '[data-asset-income-year-row]', ['ano', 'fecha_inicio_vigencia', 'fecha_fin_vigencia', 'meses_vigencia', 'canon_mensual', 'porcentaje_participacion', 'incremento_porcentaje', 'incremento_valor', 'nuevo_canon_mensual', 'fecha_renovacion', 'observaciones']),
         gastos_anuales: assetFormRows(form, '[data-asset-expense-year-row]', ['ano', 'predial', 'administracion', 'seguros', 'mantenimiento', 'reparaciones', 'servicios_publicos', 'valorizacion', 'impuestos', 'honorarios_administracion', 'comisiones', 'juridicos_notariales', 'financieros_hipoteca', 'adecuaciones', 'otros', 'observaciones']),
-        seguro_polizas: assetFormRows(form, '[data-asset-insurance-policy-row]', ['ano', 'tipo_documento', 'ramo', 'aseguradora', 'contacto_nombre', 'contacto_correo', 'contacto_celular', 'intermediario', 'agencia_expedidora', 'codigo_agencia', 'numero_poliza', 'numero_emision', 'numero_pago_electronico', 'modalidad_facturacion', 'coaseguro', 'tomador', 'asegurado', 'beneficiario', 'direccion_riesgo', 'ciudad_riesgo', 'actividad_riesgo', 'tipo_riesgo', 'fecha_inicio', 'fecha_fin', 'fecha_renovacion', 'prima_neta', 'iva', 'gastos_expedicion', 'prima_total', 'valor_asegurado_total', 'deducible_general', 'forma_pago', 'numero_cuotas', 'clausulado', 'anexos_endosos', 'exclusiones_relevantes', 'texto_aclaratorio', 'asistencias', 'estado', 'adoptada', 'fecha_adopcion', 'criterio_adopcion', 'soporte', 'observaciones']),
+        seguro_polizas: assetFormRows(form, '[data-asset-insurance-policy-row]', ['ano', 'tipo_documento', 'ramo', 'aseguradora', 'contacto_nombre', 'contacto_correo', 'contacto_celular', 'intermediario', 'agencia_expedidora', 'codigo_agencia', 'numero_poliza', 'numero_emision', 'numero_pago_electronico', 'modalidad_facturacion', 'coaseguro', 'tomador', 'asegurado', 'beneficiario', 'direccion_riesgo', 'ciudad_riesgo', 'actividad_riesgo', 'tipo_riesgo', 'fecha_inicio', 'fecha_fin', 'fecha_renovacion', 'prima_neta', 'iva', 'gastos_expedicion', 'prima_total', 'valor_asegurado_total', 'deducible_general', 'forma_pago', 'numero_cuotas', 'clausulado', 'anexos_endosos', 'exclusiones_relevantes', 'texto_aclaratorio', 'asistencias', 'estado', 'adoptada', 'fecha_adopcion', 'criterio_adopcion', 'cotizacion_matriz', 'soporte', 'observaciones']),
         seguro_coberturas: assetFormRows(form, '[data-asset-insurance-coverage-row]', ['ano', 'numero_poliza', 'ramo', 'cobertura', 'riesgo_cubierto', 'valor_asegurado', 'limite_evento', 'porcentaje_invar', 'indice_variable', 'sublimite', 'tasa', 'prima', 'deducible', 'fuente_valor_asegurado', 'fecha_inicio', 'fecha_fin', 'fecha_renovacion', 'observaciones']),
         seguro_equipos: assetFormRows(form, '[data-asset-insurance-equipment-row]', ['ano', 'numero_poliza', 'ramo', 'cobertura_asociada', 'categoria_item', 'item', 'descripcion', 'unidad', 'cantidad', 'ubicacion', 'serial_referencia', 'valor_compra', 'fecha_adquisicion', 'valor_reposicion_unitario', 'valor_reposicion', 'fuente_consulta', 'fecha_consulta', 'ano_adquisicion', 'edad_anos', 'vida_util_anos', 'regla_demerito', 'depreciacion_porcentaje', 'depreciacion_valor', 'valor_asegurable_sugerido', 'incluye_terreno', 'fecha_inicio', 'fecha_fin', 'fecha_renovacion', 'observaciones']),
         seguro_movimientos: assetFormRows(form, '[data-asset-insurance-movement-row]', ['ano', 'fecha', 'tipo_movimiento', 'numero_poliza', 'ramo', 'cobertura', 'item', 'valor_variacion', 'estado_reporte', 'fecha_reporte_aseguradora', 'soporte', 'observaciones']),
@@ -1154,6 +1154,8 @@ const splitInsuranceSelection = (value) => String(value ?? '')
     .filter(Boolean);
 
 const joinInsuranceSelection = (values = []) => [...new Set(values.filter(Boolean))].join(' | ');
+
+const assetInsurancePolicyFields = ['ano', 'tipo_documento', 'ramo', 'aseguradora', 'contacto_nombre', 'contacto_correo', 'contacto_celular', 'intermediario', 'agencia_expedidora', 'codigo_agencia', 'numero_poliza', 'numero_emision', 'numero_pago_electronico', 'modalidad_facturacion', 'coaseguro', 'tomador', 'asegurado', 'beneficiario', 'direccion_riesgo', 'ciudad_riesgo', 'actividad_riesgo', 'tipo_riesgo', 'fecha_inicio', 'fecha_fin', 'fecha_renovacion', 'prima_neta', 'iva', 'gastos_expedicion', 'prima_total', 'valor_asegurado_total', 'deducible_general', 'forma_pago', 'numero_cuotas', 'clausulado', 'anexos_endosos', 'exclusiones_relevantes', 'texto_aclaratorio', 'asistencias', 'estado', 'adoptada', 'fecha_adopcion', 'criterio_adopcion', 'cotizacion_matriz', 'soporte', 'observaciones'];
 
 const assetInsuranceCoverageFields = ['ano', 'numero_poliza', 'ramo', 'cobertura', 'riesgo_cubierto', 'valor_asegurado', 'limite_evento', 'porcentaje_invar', 'indice_variable', 'sublimite', 'tasa', 'prima', 'deducible', 'fuente_valor_asegurado', 'fecha_inicio', 'fecha_fin', 'fecha_renovacion', 'observaciones'];
 
@@ -2734,6 +2736,199 @@ const insuranceRequestedItems = (form) => assetInsuranceEquipmentRows(form)
 const insuranceRequestedTotal = (form) => insuranceRequestedCoverages(form)
     .reduce((sum, row) => sum + assetNumber(row.valor_asegurado), 0);
 
+const insuranceCoverageQuoteKey = (row = {}) => [row.ramo || '', row.cobertura || ''].join('::');
+
+const parseInsuranceQuoteMatrix = (value) => {
+    if (Array.isArray(value)) {
+        return value;
+    }
+    try {
+        const parsed = JSON.parse(String(value || '[]'));
+        return Array.isArray(parsed) ? parsed : [];
+    } catch (_) {
+        return [];
+    }
+};
+
+const insuranceQuoteMatrixMap = (policy = {}) => parseInsuranceQuoteMatrix(policy.cotizacion_matriz)
+    .reduce((carry, row) => {
+        const key = insuranceCoverageQuoteKey(row);
+        if (key !== '::') {
+            carry.set(key, row);
+        }
+        return carry;
+    }, new Map());
+
+const insuranceQuoteMatrixHtml = (form, policy = {}, index = 0) => {
+    const coverages = insuranceRequestedCoverages(form);
+    const saved = insuranceQuoteMatrixMap(policy);
+    if (!coverages.length) {
+        return '<p class="muted">Primero registra las coberturas y valores solicitados. Luego aqui comparas la respuesta de cada aseguradora.</p>';
+    }
+    return `
+        <input type="hidden" name="seguro_polizas[${index}][cotizacion_matriz]" value="${assetEscape(policy.cotizacion_matriz || '')}">
+        <div class="asset-insurance-quote-matrix" role="table" aria-label="Matriz comparable de cotizacion">
+            <div class="asset-insurance-quote-matrix-head" role="row">
+                <span>Cobertura</span>
+                <span>Valor solicitado</span>
+                <span>Cotiza</span>
+                <span>Valor asegurado</span>
+                <span>Limite evento</span>
+                <span>Sublimite</span>
+                <span>Deducible</span>
+                <span>Indice</span>
+                <span>Tasa</span>
+                <span>Prima</span>
+                <span>Fuente / nota</span>
+            </div>
+            ${coverages.map((coverage) => {
+                const key = insuranceCoverageQuoteKey(coverage);
+                const quote = saved.get(key) || {};
+                return `
+                    <div class="asset-insurance-quote-matrix-row" role="row" data-asset-insurance-quote-matrix-row data-ramo="${assetEscape(coverage.ramo || '')}" data-cobertura="${assetEscape(coverage.cobertura || '')}">
+                        <strong>${assetEscape([coverage.ramo, coverage.cobertura].filter(Boolean).join(' / ') || 'Cobertura')}</strong>
+                        <span>${assetEscape(assetMoney(assetNumber(coverage.valor_asegurado)) || 'Por definir')}</span>
+                        <label class="asset-insurance-quote-check">
+                            <input type="checkbox" data-quote-field="cotiza" ${quote.cotiza === 'Si' ? 'checked' : ''}>
+                        </label>
+                        <input data-quote-field="valor_asegurado" data-money-format inputmode="decimal" value="${assetEscape(assetMoneyPlain(quote.valor_asegurado) || quote.valor_asegurado || '')}" placeholder="$0">
+                        <input data-quote-field="limite_evento" value="${assetEscape(quote.limite_evento || '')}" placeholder="Por evento">
+                        <input data-quote-field="sublimite" value="${assetEscape(quote.sublimite || '')}" placeholder="Si aplica">
+                        <input data-quote-field="deducible" value="${assetEscape(quote.deducible || '')}" placeholder="% o valor">
+                        <input data-quote-field="indice" value="${assetEscape(quote.indice || '')}" placeholder="IVA / variable">
+                        <input data-quote-field="tasa" inputmode="decimal" value="${assetEscape(quote.tasa || '')}" placeholder="% o por mil">
+                        <input data-quote-field="prima" data-money-format inputmode="decimal" value="${assetEscape(assetMoneyPlain(quote.prima) || quote.prima || '')}" placeholder="$0">
+                        <input data-quote-field="fuente" value="${assetEscape(quote.fuente || '')}" placeholder="Caratula, anexo, correo">
+                    </div>
+                `;
+            }).join('')}
+        </div>
+    `;
+};
+
+const syncInsuranceQuoteMatrix = (card) => {
+    if (!(card instanceof HTMLElement)) {
+        return;
+    }
+    const hidden = card.querySelector('[name$="[cotizacion_matriz]"]');
+    if (!(hidden instanceof HTMLInputElement)) {
+        return;
+    }
+    const rows = [...card.querySelectorAll('[data-asset-insurance-quote-matrix-row]')].map((row) => {
+        const valueFor = (field) => {
+            const input = row.querySelector(`[data-quote-field="${field}"]`);
+            if (input instanceof HTMLInputElement) {
+                return input.type === 'checkbox' ? (input.checked ? 'Si' : '') : input.value;
+            }
+            return '';
+        };
+        return {
+            ramo: row.dataset.ramo || '',
+            cobertura: row.dataset.cobertura || '',
+            cotiza: valueFor('cotiza'),
+            valor_asegurado: valueFor('valor_asegurado'),
+            limite_evento: valueFor('limite_evento'),
+            sublimite: valueFor('sublimite'),
+            deducible: valueFor('deducible'),
+            indice: valueFor('indice'),
+            tasa: valueFor('tasa'),
+            prima: valueFor('prima'),
+            fuente: valueFor('fuente'),
+        };
+    });
+    hidden.value = JSON.stringify(rows);
+};
+
+const insuranceQuoteRecommendationHtml = (form) => {
+    const targetCoverages = insuranceRequestedCoverages(form);
+    const targetCount = targetCoverages.length;
+    const policies = assetFormRows(form, '[data-asset-insurance-policy-row]', assetInsurancePolicyFields);
+    if (!targetCount || !policies.length) {
+        return '';
+    }
+    const evaluated = policies.map((policy, index) => {
+        const matrix = parseInsuranceQuoteMatrix(policy.cotizacion_matriz);
+        const quoted = matrix.filter((row) => row.cotiza === 'Si');
+        const premium = assetNumber(policy.prima_total) || matrix.reduce((sum, row) => sum + assetNumber(row.prima), 0);
+        const missing = targetCount - quoted.length;
+        const missingDetails = quoted.filter((row) => !row.deducible || !row.tasa || !row.prima).length;
+        return {
+            index,
+            insurer: policy.aseguradora || `Oferta ${index + 1}`,
+            full: targetCount > 0 && missing <= 0,
+            quotedCount: quoted.length,
+            targetCount,
+            premium,
+            missing,
+            missingDetails,
+        };
+    });
+    const eligible = evaluated.filter((row) => row.full && row.premium > 0).sort((a, b) => a.premium - b.premium);
+    const best = eligible[0] || null;
+    const message = best
+        ? `Recomendacion preliminar: ${best.insurer}, porque cotiza todas las coberturas solicitadas y registra la menor prima comparable.`
+        : 'Recomendacion preliminar pendiente: falta una oferta con todas las coberturas marcadas y prima total registrada.';
+    const comparisonRows = policies.flatMap((policy, index) => {
+        const insurer = policy.aseguradora || `Oferta ${index + 1}`;
+        return parseInsuranceQuoteMatrix(policy.cotizacion_matriz).map((row) => ({
+            insurer,
+            ...row,
+        }));
+    });
+    return `
+        <div class="asset-insurance-analysis-card">
+            <strong>${assetEscape(message)}</strong>
+            <div>
+                ${evaluated.map((row) => `
+                    <span class="${best && best.index === row.index ? 'is-best' : ''}">
+                        ${assetEscape(row.insurer)}: ${row.quotedCount}/${row.targetCount} coberturas${row.premium > 0 ? ` / ${assetEscape(assetMoney(row.premium))}` : ' / prima pendiente'}${row.missingDetails ? ` / faltan datos tecnicos` : ''}
+                    </span>
+                `).join('')}
+            </div>
+            ${comparisonRows.length ? `
+                <details class="asset-insurance-comparison">
+                    <summary>Comparativo tecnico tipo tabla</summary>
+                    <div class="asset-insurance-comparison-table">
+                        <div>
+                            <strong>Aseguradora</strong>
+                            <strong>Cobertura</strong>
+                            <strong>Cotiza</strong>
+                            <strong>Valor asegurado</strong>
+                            <strong>Limite evento</strong>
+                            <strong>Sublimite</strong>
+                            <strong>Deducible</strong>
+                            <strong>Indice</strong>
+                            <strong>Tasa</strong>
+                            <strong>Prima</strong>
+                        </div>
+                        ${comparisonRows.map((row) => `
+                            <div>
+                                <span>${assetEscape(row.insurer)}</span>
+                                <span>${assetEscape([row.ramo, row.cobertura].filter(Boolean).join(' / '))}</span>
+                                <span>${row.cotiza === 'Si' ? 'Si' : 'No'}</span>
+                                <span>${assetEscape(assetMoney(assetNumber(row.valor_asegurado)) || row.valor_asegurado || '')}</span>
+                                <span>${assetEscape(row.limite_evento || '')}</span>
+                                <span>${assetEscape(row.sublimite || '')}</span>
+                                <span>${assetEscape(row.deducible || '')}</span>
+                                <span>${assetEscape(row.indice || '')}</span>
+                                <span>${assetEscape(row.tasa || '')}</span>
+                                <span>${assetEscape(assetMoney(assetNumber(row.prima)) || row.prima || '')}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </details>
+            ` : ''}
+        </div>
+    `;
+};
+
+const renderInsuranceQuoteAnalysis = (form) => {
+    const target = form.querySelector('[data-asset-insurance-quote-analysis]');
+    if (target instanceof HTMLElement) {
+        target.innerHTML = insuranceQuoteRecommendationHtml(form);
+    }
+};
+
 const insuranceQuotePackageHtml = (form, policy = {}) => {
     const products = splitInsuranceSelection(policy.ramo || joinInsuranceSelection(selectedInsuranceProductsFromForm(form)));
     const coverages = insuranceRequestedCoverages(form);
@@ -2930,6 +3125,7 @@ const renderAssetInsurancePolicyRows = (form, rows = []) => {
                     <button type="button" data-adopt-asset-insurance-policy>${adopted ? 'Opcion adoptada' : 'Adoptar cotizacion'}</button>
                 </div>
                 ${insuranceQuotePackageHtml(form, row)}
+                ${insuranceQuoteMatrixHtml(form, row, index)}
                 <div class="asset-insurance-policy-row asset-insurance-quote-contact">
                     <input type="hidden" name="seguro_polizas[${index}][ano]" value="${assetEscape(row.ano ?? '')}">
                     <input type="hidden" name="seguro_polizas[${index}][tipo_documento]" value="${assetEscape(row.tipo_documento ?? '')}">
@@ -2982,6 +3178,7 @@ const renderAssetInsurancePolicyRows = (form, rows = []) => {
             </details>
         `;
     }).join('');
+    renderInsuranceQuoteAnalysis(form);
 };
 
 const renderAssetInsuranceCoverageRows = (form, rows = []) => {
@@ -4100,7 +4297,7 @@ if (assetForm instanceof HTMLFormElement) {
         saveAssetDraft(assetForm);
     });
 
-    const assetInsurancePolicyFields = ['ano', 'tipo_documento', 'ramo', 'aseguradora', 'contacto_nombre', 'contacto_correo', 'contacto_celular', 'intermediario', 'agencia_expedidora', 'codigo_agencia', 'numero_poliza', 'numero_emision', 'numero_pago_electronico', 'modalidad_facturacion', 'coaseguro', 'tomador', 'asegurado', 'beneficiario', 'direccion_riesgo', 'ciudad_riesgo', 'actividad_riesgo', 'tipo_riesgo', 'fecha_inicio', 'fecha_fin', 'fecha_renovacion', 'prima_neta', 'iva', 'gastos_expedicion', 'prima_total', 'valor_asegurado_total', 'deducible_general', 'forma_pago', 'numero_cuotas', 'clausulado', 'anexos_endosos', 'exclusiones_relevantes', 'texto_aclaratorio', 'asistencias', 'estado', 'adoptada', 'fecha_adopcion', 'criterio_adopcion', 'soporte', 'observaciones'];
+    const assetInsurancePolicyFields = ['ano', 'tipo_documento', 'ramo', 'aseguradora', 'contacto_nombre', 'contacto_correo', 'contacto_celular', 'intermediario', 'agencia_expedidora', 'codigo_agencia', 'numero_poliza', 'numero_emision', 'numero_pago_electronico', 'modalidad_facturacion', 'coaseguro', 'tomador', 'asegurado', 'beneficiario', 'direccion_riesgo', 'ciudad_riesgo', 'actividad_riesgo', 'tipo_riesgo', 'fecha_inicio', 'fecha_fin', 'fecha_renovacion', 'prima_neta', 'iva', 'gastos_expedicion', 'prima_total', 'valor_asegurado_total', 'deducible_general', 'forma_pago', 'numero_cuotas', 'clausulado', 'anexos_endosos', 'exclusiones_relevantes', 'texto_aclaratorio', 'asistencias', 'estado', 'adoptada', 'fecha_adopcion', 'criterio_adopcion', 'cotizacion_matriz', 'soporte', 'observaciones'];
     const assetInsuranceCoverageFields = ['ano', 'numero_poliza', 'ramo', 'cobertura', 'riesgo_cubierto', 'valor_asegurado', 'limite_evento', 'porcentaje_invar', 'indice_variable', 'sublimite', 'tasa', 'prima', 'deducible', 'fuente_valor_asegurado', 'fecha_inicio', 'fecha_fin', 'fecha_renovacion', 'observaciones'];
     const assetInsuranceMovementFields = ['ano', 'fecha', 'tipo_movimiento', 'numero_poliza', 'ramo', 'cobertura', 'item', 'valor_variacion', 'estado_reporte', 'fecha_reporte_aseguradora', 'soporte', 'observaciones'];
 
@@ -4137,6 +4334,7 @@ if (assetForm instanceof HTMLFormElement) {
             const printButton = target instanceof Element ? target.closest('[data-print-asset-insurance-quote]') : null;
             if (printButton instanceof HTMLElement) {
                 const card = printButton.closest('[data-asset-insurance-policy-row]');
+                syncInsuranceQuoteMatrix(card);
                 const fields = {};
                 assetInsurancePolicyFields.forEach((field) => {
                     fields[field] = card?.querySelector(`[name$="[${field}]"]`)?.value ?? '';
@@ -4146,6 +4344,7 @@ if (assetForm instanceof HTMLFormElement) {
             }
             const adoptButton = target instanceof Element ? target.closest('[data-adopt-asset-insurance-policy]') : null;
             if (adoptButton instanceof HTMLElement) {
+                syncInsuranceQuoteMatrix(adoptButton.closest('[data-asset-insurance-policy-row]'));
                 let rows = historyRowsForType(assetForm, '[data-asset-insurance-policy-row]', assetInsurancePolicyFields);
                 const card = adoptButton.closest('[data-asset-insurance-policy-row]');
                 const index = [...assetForm.querySelectorAll('[data-asset-insurance-policy-row]')].indexOf(card);
@@ -4182,6 +4381,14 @@ if (assetForm instanceof HTMLFormElement) {
     });
     assetForm.querySelector('[data-asset-insurance-policy-rows]')?.addEventListener('change', (event) => {
         const target = event.target;
+        if (target instanceof HTMLInputElement && target.matches('[data-quote-field]')) {
+            syncInsuranceQuoteMatrix(target.closest('[data-asset-insurance-policy-row]'));
+            renderInsuranceQuoteAnalysis(assetForm);
+            renderAssetCurrentPolicy(assetForm);
+            renderAssetInsuranceHistory(assetForm);
+            saveAssetDraft(assetForm);
+            return;
+        }
         if (target instanceof HTMLInputElement && target.matches('[data-asset-policy-ramo-toggle]')) {
             target.closest('.asset-coverage-chip')?.classList.toggle('is-selected', target.checked);
             updatePolicyRamoSelection(target.closest('[data-asset-insurance-policy-row]'));
@@ -4197,7 +4404,12 @@ if (assetForm instanceof HTMLFormElement) {
             saveAssetDraft(assetForm);
         }
     });
-    assetForm.querySelector('[data-asset-insurance-policy-rows]')?.addEventListener('input', () => {
+    assetForm.querySelector('[data-asset-insurance-policy-rows]')?.addEventListener('input', (event) => {
+        const target = event.target;
+        if (target instanceof HTMLInputElement && target.matches('[data-quote-field]')) {
+            syncInsuranceQuoteMatrix(target.closest('[data-asset-insurance-policy-row]'));
+            renderInsuranceQuoteAnalysis(assetForm);
+        }
         renderAssetCurrentPolicy(assetForm);
         renderAssetInsuranceHistory(assetForm);
         saveAssetDraft(assetForm);
@@ -4207,6 +4419,11 @@ if (assetForm instanceof HTMLFormElement) {
         const target = event.target;
         if (target instanceof HTMLInputElement && target.matches('[data-money-format]')) {
             formatAssetMoneyInput(target);
+            if (target.matches('[data-quote-field]')) {
+                syncInsuranceQuoteMatrix(target.closest('[data-asset-insurance-policy-row]'));
+                renderInsuranceQuoteAnalysis(assetForm);
+                saveAssetDraft(assetForm);
+            }
             if (target.matches('[data-insurance-request-field]')) {
                 syncInsuranceRequestField(assetForm, target);
                 saveAssetDraft(assetForm);
