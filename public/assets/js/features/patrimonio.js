@@ -3464,7 +3464,6 @@ const renderAssetInsurancePolicyRows = (form, rows = []) => {
 
 const renderAssetInsuranceCoverageRows = (form, rows = []) => {
     const container = form.querySelector('[data-asset-insurance-coverage-rows]');
-    const options = parseAssetJson(form, 'assetOptions');
     const type = form.elements.tipo_activo.value;
     updateAssetInsuranceSections(form, type);
     if (!(container instanceof HTMLElement)) {
@@ -3474,28 +3473,17 @@ const renderAssetInsuranceCoverageRows = (form, rows = []) => {
         container.innerHTML = '';
         return;
     }
-    const allCoverageNames = [...new Set([
-        ...(options.tipo_cobertura_seguro || []),
-        ...insuranceAcademyData(form).coverages.map((row) => row.Cobertura).filter(Boolean),
-    ])];
     const existingRows = rows.filter((row) => row && Object.values(row).some((value) => String(value ?? '').trim() !== ''));
-    const selected = new Set(existingRows
+    const selectedProducts = selectedInsuranceProductsFromForm(form);
+    const selectedProductSet = new Set(selectedProducts);
+    const visibleExistingRows = existingRows.filter((row) => !row.ramo || selectedProductSet.has(row.ramo));
+    const selected = new Set(visibleExistingRows
         .filter((row) => row.cobertura)
         .map((row) => coverageToggleValue(row.ramo || '', row.cobertura || '')));
-    const selectedProducts = selectedInsuranceProductsFromForm(form);
     const activeProduct = activeInsuranceProduct(form, selectedProducts, 'assetCoverageActiveProduct');
     const visibleProducts = activeProduct ? [activeProduct] : selectedProducts;
     const selectedRiskProfile = joinInsuranceSelection(selectedProducts);
-    const profileCoverageNames = coverageOptionsForPolicy(selectedRiskProfile, allCoverageNames, form);
-    const selectedCoverageNames = [...selected].map((item) => parseCoverageToggleValue(item).coverage).filter(Boolean);
-    const extraSelected = selectedCoverageNames.filter((item) => !profileCoverageNames.includes(item));
     const sourceRows = existingRows;
-    const extraChecklist = extraSelected.map((item) => `
-        <label class="asset-coverage-chip ${selectedCoverageNames.includes(item) ? 'is-selected' : ''}">
-            <input type="checkbox" data-asset-coverage-toggle value="${assetEscape(coverageToggleValue('', item))}" ${selectedCoverageNames.includes(item) ? 'checked' : ''}>
-            <span>${assetEscape(item)}</span>
-        </label>
-    `).join('');
     container.innerHTML = `
         ${selectedInsuranceStripHtml(form)}
         <div class="asset-coverage-selector" data-asset-coverage-selector>
@@ -3505,7 +3493,6 @@ const renderAssetInsuranceCoverageRows = (form, rows = []) => {
             </div>
             ${insuranceProductTabsHtml(selectedProducts, activeProduct, 'coverage')}
             ${insuranceCoverageMatrixHtml(visibleProducts, selected, form)}
-            ${extraChecklist ? `<div class="asset-coverage-extra"><strong>Amparos agregados manualmente</strong><div class="asset-coverage-chips">${extraChecklist}</div></div>` : ''}
         </div>
         <div class="asset-coverage-hidden-rows" hidden>
             ${sourceRows.map((row, index) => `
@@ -3623,14 +3610,7 @@ const insuranceRequestRowsForSelectedProducts = (form) => {
     const selectedProducts = selectedInsuranceProductsFromForm(form);
     const existingRows = historyRowsForType(form, '[data-asset-insurance-coverage-row]', assetInsuranceCoverageFields)
         .filter((row) => row.ramo || row.cobertura || row.valor_asegurado || row.fuente_valor_asegurado || row.observaciones);
-    const selectedRows = selectedProducts.flatMap((product) => insuranceRequestRowsForProduct(form, product, existingRows));
-    const selectedKeys = new Set(selectedRows.map(coverageRowKey));
-    const selectedProductSet = new Set(selectedProducts);
-    const orphanRows = existingRows.filter((row) => {
-        const key = coverageRowKey(row);
-        return key && !selectedKeys.has(key) && (!row.ramo || !selectedProductSet.has(row.ramo));
-    });
-    return [...selectedRows, ...orphanRows];
+    return selectedProducts.flatMap((product) => insuranceRequestRowsForProduct(form, product, existingRows));
 };
 
 const renderAssetInsuranceEquipmentRows = (form, rows = []) => {
