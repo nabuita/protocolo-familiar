@@ -881,8 +881,8 @@
                           "Ramo":  "Incendio",
                           "Tipo":  "Complementaria / opcional",
                           "Cobertura":  "Pérdida de arrendamiento por siniestro",
-                          "Descripción práctica":  "Amparo adicional para indemnizar cánones dejados de percibir cuando un incendio u otro evento cubierto impide usar o arrendar el inmueble durante su reparación.",
-                          "Fuente":  "Contrato de arrendamiento, canon mensual, porcentaje de participación, periodo máximo de indemnización y clausulado de la póliza."
+                          "Descripción práctica":  "Amparo adicional para indemnizar cánones dejados de percibir cuando un incendio u otro evento cubierto impide usar o arrendar el inmueble durante su reparación. El valor a asegurar se estima sumando canon mensual por unidad por los meses de indemnización solicitados, ajustado por porcentaje de participación si aplica.",
+                          "Fuente":  "Contrato de arrendamiento, canon mensual por unidad, porcentaje de participación, meses solicitados, historial de ingresos, cláusula de índice variable/IPC si se pacta y clausulado de la póliza."
                       },
                       {
                           "Macro-ramo":  "Daños patrimoniales",
@@ -962,8 +962,8 @@
                           "Ramo":  "Terremoto",
                           "Tipo":  "Complementaria / opcional",
                           "Cobertura":  "Pérdida de arrendamiento por siniestro",
-                          "Descripción práctica":  "Amparo adicional para indemnizar cánones dejados de percibir cuando un terremoto, temblor u otro evento cubierto impide usar o arrendar el inmueble durante su reparación.",
-                          "Fuente":  "Contrato de arrendamiento, canon mensual, porcentaje de participación, periodo máximo de indemnización y clausulado de la póliza."
+                          "Descripción práctica":  "Amparo adicional para indemnizar cánones dejados de percibir cuando un terremoto, temblor u otro evento cubierto impide usar o arrendar el inmueble durante su reparación. El valor a asegurar se estima sumando canon mensual por unidad por los meses de indemnización solicitados, ajustado por porcentaje de participación si aplica.",
+                          "Fuente":  "Contrato de arrendamiento, canon mensual por unidad, porcentaje de participación, meses solicitados, historial de ingresos, cláusula de índice variable/IPC si se pacta y clausulado de la póliza."
                       },
                       {
                           "Macro-ramo":  "Daños patrimoniales",
@@ -1466,8 +1466,8 @@
                           "Ramo":  "Lucro Cesante",
                           "Tipo":  "Complementaria / opcional",
                           "Cobertura":  "Pérdida de arrendamiento por siniestro",
-                          "Descripción práctica":  "Indemniza la pérdida de cánones que deja de recibir el propietario cuando un siniestro cubierto impide usar o arrendar el inmueble durante el periodo de reparación. No equivale al seguro de arrendamiento por mora del arrendatario ni a gastos de alojamiento temporal.",
-                          "Fuente":  "Contrato de arrendamiento, canon mensual, porcentaje de participación, periodo máximo de indemnización y clausulado de la póliza."
+                          "Descripción práctica":  "Indemniza la pérdida de cánones que deja de recibir el propietario cuando un siniestro cubierto impide usar o arrendar el inmueble durante el periodo de reparación. No equivale al seguro de arrendamiento por mora del arrendatario ni a gastos de alojamiento temporal. El valor a asegurar se estima sumando canon mensual por unidad por los meses de indemnización solicitados, ajustado por porcentaje de participación si aplica.",
+                          "Fuente":  "Contrato de arrendamiento, canon mensual por unidad, porcentaje de participación, meses solicitados, historial de ingresos, cláusula de índice variable/IPC si se pacta y clausulado de la póliza."
                       },
                       {
                           "Macro-ramo":  "Daños patrimoniales",
@@ -2303,8 +2303,8 @@
                           "Ramo":  "Hogar",
                           "Tipo":  "Complementaria / opcional",
                           "Cobertura":  "Pérdida de arrendamiento por siniestro",
-                          "Descripción práctica":  "Amparo adicional para indemnizar al propietario por cánones dejados de percibir cuando un siniestro cubierto vuelve inhabitable o no arrendable el inmueble. No equivale a alojamiento temporal ni a seguro de arrendamiento por mora.",
-                          "Fuente":  "Contrato de arrendamiento, canon mensual, porcentaje de participación, periodo máximo de indemnización y clausulado de la póliza."
+                          "Descripción práctica":  "Amparo adicional para indemnizar al propietario por cánones dejados de percibir cuando un siniestro cubierto vuelve inhabitable o no arrendable el inmueble. No equivale a alojamiento temporal ni a seguro de arrendamiento por mora. El valor a asegurar se estima sumando canon mensual por unidad por los meses de indemnización solicitados, ajustado por porcentaje de participación si aplica.",
+                          "Fuente":  "Contrato de arrendamiento, canon mensual por unidad, porcentaje de participación, meses solicitados, historial de ingresos, cláusula de índice variable/IPC si se pacta y clausulado de la póliza."
                       },
                       {
                           "Macro-ramo":  "Daños patrimoniales",

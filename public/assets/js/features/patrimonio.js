@@ -734,7 +734,7 @@ const insuranceCoverageAcademy = {
     'Equipo electronico / corriente debil': { kind: 'Equipo electronico', assets: ['Equipo electronico / corriente debil'], basis: 'Inventario por item: UPS, CCTV, red, telefonia, computadores, controles, fuente y fecha.', review: 'Protecciones electricas, mantenimiento, portabilidad, software y datos excluidos.' },
     'Lucro cesante': { kind: 'Perdida financiera', assets: ['Construccion', 'Maquinaria y equipo', 'Equipo electronico / corriente debil', 'Mercancias / inventario'], basis: 'Ingresos, canon, utilidad bruta o gastos permanentes soportados.', review: 'Periodo de indemnizacion, evento detonante, base contable y deducible temporal.' },
     'Arrendamiento dejado de percibir': { kind: 'Perdida financiera', assets: ['Construccion'], basis: 'Canon mensual, contrato, porcentaje de participacion y meses cubiertos.', review: 'Si aplica por imposibilidad fisica del inmueble y periodo maximo.' },
-    'Perdida de arrendamiento por siniestro': { kind: 'Perdida financiera', assets: ['Construccion'], basis: 'Canon mensual dejado de percibir por meses cubiertos, contrato y porcentaje de participacion.', review: 'Debe depender de un siniestro cubierto; confirmar periodo maximo, limite asegurado, deducible y que no sea seguro de arrendamiento por mora.' },
+    'Perdida de arrendamiento por siniestro': { kind: 'Perdida financiera', assets: ['Construccion'], basis: 'Suma canon mensual por unidad x meses de indemnizacion solicitados x porcentaje de participacion si aplica.', review: 'Debe depender de un siniestro cubierto; confirmar periodo maximo, limite asegurado, deducible, indice variable/IPC pactado y que no sea seguro de arrendamiento por mora.' },
     'Responsabilidad civil extracontractual': { kind: 'Responsabilidad', assets: ['Exposicion frente a terceros'], basis: 'Limite por evento/vigencia definido por actividad, visitantes, contratos y capacidad de perdida.', review: 'RC predios, labores, operaciones, patronal, cruzada, parqueaderos, contratistas y exclusiones.' },
     'RC predios labores y operaciones': { kind: 'Responsabilidad', assets: ['Exposicion frente a terceros'], basis: 'Limite por evento/vigencia.', review: 'Que cubra danos a terceros por uso del predio y operacion normal.' },
     'RC patronal': { kind: 'Responsabilidad', assets: ['Trabajadores y contratistas'], basis: 'Sublimite por trabajador/evento.', review: 'Compatibilidad con seguridad social y exclusiones laborales.' },
@@ -993,7 +993,7 @@ const insuranceProductAcademy = {
         what: 'Cubre perdida de utilidad o ingresos por interrupcion de la actividad a causa de un evento material amparado.',
         includes: 'Utilidad bruta, gastos permanentes, perdida de ingresos, perdida de arrendamiento por siniestro, gastos extra o periodo de indemnizacion segun poliza.',
         assets: 'Actividad economica dependiente del inmueble, maquinaria, equipo o proceso asegurado.',
-        value: 'Debe salir de estados financieros, ingresos historicos, canon o utilidad bruta soportada.',
+        value: 'Debe salir de estados financieros, ingresos historicos, canon o utilidad bruta soportada. Para perdida de arrendamiento: canon mensual por unidad por meses solicitados, ajustado por participacion.',
         analyst: 'Confirmar evento disparador, periodo de indemnizacion, base contable y que no haya doble conteo con seguro de arrendamiento o alojamiento temporal.',
         supports: 'Estados financieros, contratos, canon, ingresos historicos, gastos fijos, caratula y clausulado.',
     },
@@ -1450,9 +1450,9 @@ const insuranceValueGuidanceFor = (coverage) => {
     }
     if (text.includes('lucro') || text.includes('arrendamiento dejado') || text.includes('perdida de arrendamiento') || text.includes('canon') || text.includes('canones')) {
         title = 'Perdida financiera o canon';
-        basis = 'Define ingreso, canon mensual dejado de percibir, utilidad bruta o gastos permanentes y el periodo de indemnizacion solicitado.';
-        source = 'Fuente: contrato de arrendamiento, estados financieros, canon mensual, participacion e historico de ingresos.';
-        alert = 'Alerta: normalmente exige dano material amparado como evento detonante; no confundir con seguro de arrendamiento por mora ni alojamiento temporal.';
+        basis = 'Para perdida de arrendamiento: suma canon mensual por unidad x meses de indemnizacion solicitados x porcentaje de participacion si aplica. Para negocio: utilidad bruta, ingresos o gastos permanentes por el periodo solicitado.';
+        source = 'Fuente: contrato de arrendamiento, canon mensual por unidad, participacion, historico de ingresos, estados financieros y fecha de vigencia/renovacion.';
+        alert = 'Alerta: normalmente exige dano material amparado como evento detonante; pide a la aseguradora confirmar meses maximos, deducible temporal e indice variable/IPC si se pacta.';
     }
     if (text.includes('vehiculo') || text.includes('auto') || text.includes('perdida total') || text.includes('perdida parcial')) {
         title = 'Valor comercial del vehiculo';
