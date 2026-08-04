@@ -547,6 +547,37 @@
     font-weight: 850;
 }
 
+.asset-insurance-quote-contact {
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+}
+
+.asset-insurance-response-fields {
+    grid-column: 1 / -1;
+    border: 1px dashed var(--line);
+    border-radius: 10px;
+    background: #fff;
+}
+
+.asset-insurance-response-fields > summary {
+    padding: 10px 12px;
+    cursor: pointer;
+    color: var(--primary);
+    font-size: 13px;
+    font-weight: 850;
+    list-style: none;
+}
+
+.asset-insurance-response-fields > summary::-webkit-details-marker {
+    display: none;
+}
+
+.asset-insurance-response-fields > div {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 10px;
+    padding: 0 12px 12px;
+}
+
 .asset-coverage-selector {
     display: grid;
     gap: 10px;

@@ -467,7 +467,7 @@ const collectAssetDraft = (form) => {
         valoraciones_anuales: assetFormRows(form, '[data-asset-value-year-row]', ['ano', 'valor_catastral', 'valor_comercial', 'fecha_corte', 'fuente', 'observaciones']),
         ingresos_anuales: assetFormRows(form, '[data-asset-income-year-row]', ['ano', 'fecha_inicio_vigencia', 'fecha_fin_vigencia', 'meses_vigencia', 'canon_mensual', 'porcentaje_participacion', 'incremento_porcentaje', 'incremento_valor', 'nuevo_canon_mensual', 'fecha_renovacion', 'observaciones']),
         gastos_anuales: assetFormRows(form, '[data-asset-expense-year-row]', ['ano', 'predial', 'administracion', 'seguros', 'mantenimiento', 'reparaciones', 'servicios_publicos', 'valorizacion', 'impuestos', 'honorarios_administracion', 'comisiones', 'juridicos_notariales', 'financieros_hipoteca', 'adecuaciones', 'otros', 'observaciones']),
-        seguro_polizas: assetFormRows(form, '[data-asset-insurance-policy-row]', ['ano', 'tipo_documento', 'ramo', 'aseguradora', 'intermediario', 'agencia_expedidora', 'codigo_agencia', 'numero_poliza', 'numero_emision', 'numero_pago_electronico', 'modalidad_facturacion', 'coaseguro', 'tomador', 'asegurado', 'beneficiario', 'direccion_riesgo', 'ciudad_riesgo', 'actividad_riesgo', 'tipo_riesgo', 'fecha_inicio', 'fecha_fin', 'fecha_renovacion', 'prima_neta', 'iva', 'gastos_expedicion', 'prima_total', 'valor_asegurado_total', 'deducible_general', 'forma_pago', 'numero_cuotas', 'clausulado', 'anexos_endosos', 'exclusiones_relevantes', 'texto_aclaratorio', 'asistencias', 'estado', 'adoptada', 'fecha_adopcion', 'criterio_adopcion', 'soporte', 'observaciones']),
+        seguro_polizas: assetFormRows(form, '[data-asset-insurance-policy-row]', ['ano', 'tipo_documento', 'ramo', 'aseguradora', 'contacto_nombre', 'contacto_correo', 'contacto_celular', 'intermediario', 'agencia_expedidora', 'codigo_agencia', 'numero_poliza', 'numero_emision', 'numero_pago_electronico', 'modalidad_facturacion', 'coaseguro', 'tomador', 'asegurado', 'beneficiario', 'direccion_riesgo', 'ciudad_riesgo', 'actividad_riesgo', 'tipo_riesgo', 'fecha_inicio', 'fecha_fin', 'fecha_renovacion', 'prima_neta', 'iva', 'gastos_expedicion', 'prima_total', 'valor_asegurado_total', 'deducible_general', 'forma_pago', 'numero_cuotas', 'clausulado', 'anexos_endosos', 'exclusiones_relevantes', 'texto_aclaratorio', 'asistencias', 'estado', 'adoptada', 'fecha_adopcion', 'criterio_adopcion', 'soporte', 'observaciones']),
         seguro_coberturas: assetFormRows(form, '[data-asset-insurance-coverage-row]', ['ano', 'numero_poliza', 'ramo', 'cobertura', 'riesgo_cubierto', 'valor_asegurado', 'limite_evento', 'porcentaje_invar', 'indice_variable', 'sublimite', 'tasa', 'prima', 'deducible', 'fuente_valor_asegurado', 'fecha_inicio', 'fecha_fin', 'fecha_renovacion', 'observaciones']),
         seguro_equipos: assetFormRows(form, '[data-asset-insurance-equipment-row]', ['ano', 'numero_poliza', 'ramo', 'cobertura_asociada', 'categoria_item', 'item', 'descripcion', 'unidad', 'cantidad', 'ubicacion', 'serial_referencia', 'valor_compra', 'fecha_adquisicion', 'valor_reposicion_unitario', 'valor_reposicion', 'fuente_consulta', 'fecha_consulta', 'ano_adquisicion', 'edad_anos', 'vida_util_anos', 'regla_demerito', 'depreciacion_porcentaje', 'depreciacion_valor', 'valor_asegurable_sugerido', 'incluye_terreno', 'fecha_inicio', 'fecha_fin', 'fecha_renovacion', 'observaciones']),
         seguro_movimientos: assetFormRows(form, '[data-asset-insurance-movement-row]', ['ano', 'fecha', 'tipo_movimiento', 'numero_poliza', 'ramo', 'cobertura', 'item', 'valor_variacion', 'estado_reporte', 'fecha_reporte_aseguradora', 'soporte', 'observaciones']),
@@ -2814,7 +2814,7 @@ const printableInsuranceQuoteHtml = (form, policy = {}) => {
             <div class="meta">
                 <div><strong>Aseguradora:</strong><br>${assetEscape(insurer)}</div>
                 <div><strong>Activo:</strong><br>${assetEscape(assetName)} ${assetId ? ` / ${assetEscape(assetId)}` : ''}</div>
-                <div><strong>Tomador:</strong><br>${assetEscape(policy.tomador || form.elements.titular?.value || 'Por definir')}</div>
+                <div><strong>Contacto:</strong><br>${assetEscape([policy.contacto_nombre, policy.contacto_correo, policy.contacto_celular].filter(Boolean).join(' / ') || 'Por definir')}</div>
                 <div><strong>Fecha:</strong><br>${assetDate(new Date().toISOString().slice(0, 10))}</div>
             </div>
             <h2>Ramos, coberturas y valores solicitados</h2>
@@ -2930,46 +2930,54 @@ const renderAssetInsurancePolicyRows = (form, rows = []) => {
                     <button type="button" data-adopt-asset-insurance-policy>${adopted ? 'Opcion adoptada' : 'Adoptar cotizacion'}</button>
                 </div>
                 ${insuranceQuotePackageHtml(form, row)}
-                <div class="asset-insurance-policy-row">
-                <label>Ano<input name="seguro_polizas[${index}][ano]" inputmode="numeric" value="${assetEscape(row.ano ?? '')}" placeholder="2026"></label>
-                <label>Tipo documento<select name="seguro_polizas[${index}][tipo_documento]">${assetPlaceholderOption(row.tipo_documento ?? '')}${documentTypeOptions}</select></label>
-                <label>Ramos solicitados<input name="seguro_polizas[${index}][ramo]" data-asset-policy-ramo value="${assetEscape(row.ramo ?? '')}" readonly></label>
-                <label>Aseguradora<input name="seguro_polizas[${index}][aseguradora]" value="${assetEscape(row.aseguradora ?? '')}" placeholder="Aseguradora"></label>
-                <label>Intermediario<input name="seguro_polizas[${index}][intermediario]" value="${assetEscape(row.intermediario ?? '')}" placeholder="Corredor / agencia"></label>
-                <label>Agencia expedidora<input name="seguro_polizas[${index}][agencia_expedidora]" value="${assetEscape(row.agencia_expedidora ?? '')}" placeholder="Cartagena, Bogota..."></label>
-                <label>Codigo agencia<input name="seguro_polizas[${index}][codigo_agencia]" value="${assetEscape(row.codigo_agencia ?? '')}" placeholder="Cod. agencia"></label>
-                <label>Numero poliza<input name="seguro_polizas[${index}][numero_poliza]" value="${assetEscape(row.numero_poliza ?? '')}" placeholder="JWS797, LWY154..."></label>
-                <label>Numero emision<input name="seguro_polizas[${index}][numero_emision]" value="${assetEscape(row.numero_emision ?? '')}" placeholder="Emision / certificado"></label>
-                <label>Numero pago electronico<input name="seguro_polizas[${index}][numero_pago_electronico]" value="${assetEscape(row.numero_pago_electronico ?? '')}" placeholder="PAP / referencia pago"></label>
-                <label>Modalidad facturacion<input name="seguro_polizas[${index}][modalidad_facturacion]" value="${assetEscape(row.modalidad_facturacion ?? '')}" placeholder="Anual, contado, financiada..."></label>
-                <label>Coaseguro<input name="seguro_polizas[${index}][coaseguro]" value="${assetEscape(row.coaseguro ?? '')}" placeholder="% participacion y companias"></label>
-                <label>Tomador<input name="seguro_polizas[${index}][tomador]" value="${assetEscape(row.tomador ?? '')}"></label>
-                <label>Asegurado<input name="seguro_polizas[${index}][asegurado]" value="${assetEscape(row.asegurado ?? '')}"></label>
-                <label>Beneficiario<input name="seguro_polizas[${index}][beneficiario]" value="${assetEscape(row.beneficiario ?? '')}"></label>
-                <label>Direccion riesgo<input name="seguro_polizas[${index}][direccion_riesgo]" value="${assetEscape(row.direccion_riesgo ?? '')}" placeholder="Predio asegurado"></label>
-                <label>Ciudad riesgo<input name="seguro_polizas[${index}][ciudad_riesgo]" value="${assetEscape(row.ciudad_riesgo ?? '')}" placeholder="Ciudad del predio"></label>
-                <label>Actividad riesgo<input name="seguro_polizas[${index}][actividad_riesgo]" value="${assetEscape(row.actividad_riesgo ?? '')}" placeholder="Oficina privada, comercio..."></label>
-                <label>Tipo riesgo<input name="seguro_polizas[${index}][tipo_riesgo]" value="${assetEscape(row.tipo_riesgo ?? '')}" placeholder="Servicios, industrial..."></label>
-                <label>Inicio vigencia<input name="seguro_polizas[${index}][fecha_inicio]" type="date" value="${assetEscape(row.fecha_inicio ?? '')}"></label>
-                <label>Fin vigencia<input name="seguro_polizas[${index}][fecha_fin]" type="date" value="${assetEscape(row.fecha_fin ?? '')}"></label>
-                <label>Renovacion<input name="seguro_polizas[${index}][fecha_renovacion]" type="date" value="${assetEscape(row.fecha_renovacion ?? '')}"></label>
-                <label>Prima neta<input name="seguro_polizas[${index}][prima_neta]" inputmode="decimal" value="${assetEscape(row.prima_neta ?? '')}" placeholder="$0"></label>
-                <label>IVA<input name="seguro_polizas[${index}][iva]" inputmode="decimal" value="${assetEscape(row.iva ?? '')}" placeholder="$0"></label>
-                <label>Gastos expedicion<input name="seguro_polizas[${index}][gastos_expedicion]" inputmode="decimal" value="${assetEscape(row.gastos_expedicion ?? '')}" placeholder="$0"></label>
-                <label>Prima total<input name="seguro_polizas[${index}][prima_total]" inputmode="decimal" value="${assetEscape(row.prima_total ?? '')}" placeholder="$0"></label>
-                <label>Valor asegurado total<input name="seguro_polizas[${index}][valor_asegurado_total]" inputmode="decimal" value="${assetEscape(row.valor_asegurado_total ?? '')}" placeholder="$0"></label>
-                <label>Deducible general<input name="seguro_polizas[${index}][deducible_general]" value="${assetEscape(row.deducible_general ?? '')}" placeholder="% o valor"></label>
-                <label>Forma pago<select name="seguro_polizas[${index}][forma_pago]">${assetPlaceholderOption(row.forma_pago ?? '')}${paymentOptions}</select></label>
-                <label>Cuotas<input name="seguro_polizas[${index}][numero_cuotas]" inputmode="numeric" value="${assetEscape(row.numero_cuotas ?? '')}" placeholder="1"></label>
-                <label>Clausulado<input name="seguro_polizas[${index}][clausulado]" value="${assetEscape(row.clausulado ?? '')}" placeholder="General, SoliPyme, version..."></label>
-                <label>Anexos / endosos<input name="seguro_polizas[${index}][anexos_endosos]" value="${assetEscape(row.anexos_endosos ?? '')}" placeholder="Endosos, certificados, anexos"></label>
-                <label>Exclusiones relevantes<input name="seguro_polizas[${index}][exclusiones_relevantes]" value="${assetEscape(row.exclusiones_relevantes ?? '')}" placeholder="Exclusiones criticas"></label>
-                <label>Texto aclaratorio<input name="seguro_polizas[${index}][texto_aclaratorio]" value="${assetEscape(row.texto_aclaratorio ?? '')}" placeholder="Condiciones particulares relevantes"></label>
-                <label>Asistencias<input name="seguro_polizas[${index}][asistencias]" value="${assetEscape(row.asistencias ?? '')}" placeholder="Grua, hogar, juridica..."></label>
-                <label>Estado<select name="seguro_polizas[${index}][estado]">${assetPlaceholderOption(row.estado ?? '')}${stateOptions}</select></label>
-                <label>Soporte<input name="seguro_polizas[${index}][soporte]" value="${assetEscape(row.soporte ?? '')}" placeholder="Caratula, PDF, documento"></label>
-                <label>Observaciones<input name="seguro_polizas[${index}][observaciones]" value="${assetEscape(row.observaciones ?? '')}" placeholder="Cambios de renovacion, exclusiones..."></label>
-                <button type="button" class="asset-remove-insurance" aria-label="Quitar poliza" data-remove-asset-insurance-policy>&times;</button>
+                <div class="asset-insurance-policy-row asset-insurance-quote-contact">
+                    <input type="hidden" name="seguro_polizas[${index}][ano]" value="${assetEscape(row.ano ?? '')}">
+                    <input type="hidden" name="seguro_polizas[${index}][tipo_documento]" value="${assetEscape(row.tipo_documento ?? '')}">
+                    <input type="hidden" name="seguro_polizas[${index}][ramo]" data-asset-policy-ramo value="${assetEscape(row.ramo ?? '')}">
+                    <input type="hidden" name="seguro_polizas[${index}][agencia_expedidora]" value="${assetEscape(row.agencia_expedidora ?? '')}">
+                    <input type="hidden" name="seguro_polizas[${index}][codigo_agencia]" value="${assetEscape(row.codigo_agencia ?? '')}">
+                    <input type="hidden" name="seguro_polizas[${index}][numero_emision]" value="${assetEscape(row.numero_emision ?? '')}">
+                    <input type="hidden" name="seguro_polizas[${index}][numero_pago_electronico]" value="${assetEscape(row.numero_pago_electronico ?? '')}">
+                    <input type="hidden" name="seguro_polizas[${index}][modalidad_facturacion]" value="${assetEscape(row.modalidad_facturacion ?? '')}">
+                    <input type="hidden" name="seguro_polizas[${index}][coaseguro]" value="${assetEscape(row.coaseguro ?? '')}">
+                    <input type="hidden" name="seguro_polizas[${index}][tomador]" value="${assetEscape(row.tomador ?? '')}">
+                    <input type="hidden" name="seguro_polizas[${index}][asegurado]" value="${assetEscape(row.asegurado ?? '')}">
+                    <input type="hidden" name="seguro_polizas[${index}][beneficiario]" value="${assetEscape(row.beneficiario ?? '')}">
+                    <input type="hidden" name="seguro_polizas[${index}][direccion_riesgo]" value="${assetEscape(row.direccion_riesgo ?? '')}">
+                    <input type="hidden" name="seguro_polizas[${index}][ciudad_riesgo]" value="${assetEscape(row.ciudad_riesgo ?? '')}">
+                    <input type="hidden" name="seguro_polizas[${index}][actividad_riesgo]" value="${assetEscape(row.actividad_riesgo ?? '')}">
+                    <input type="hidden" name="seguro_polizas[${index}][tipo_riesgo]" value="${assetEscape(row.tipo_riesgo ?? '')}">
+                    <input type="hidden" name="seguro_polizas[${index}][prima_neta]" value="${assetEscape(row.prima_neta ?? '')}">
+                    <input type="hidden" name="seguro_polizas[${index}][iva]" value="${assetEscape(row.iva ?? '')}">
+                    <input type="hidden" name="seguro_polizas[${index}][gastos_expedicion]" value="${assetEscape(row.gastos_expedicion ?? '')}">
+                    <input type="hidden" name="seguro_polizas[${index}][numero_cuotas]" value="${assetEscape(row.numero_cuotas ?? '')}">
+                    <input type="hidden" name="seguro_polizas[${index}][anexos_endosos]" value="${assetEscape(row.anexos_endosos ?? '')}">
+                    <input type="hidden" name="seguro_polizas[${index}][texto_aclaratorio]" value="${assetEscape(row.texto_aclaratorio ?? '')}">
+                    <input type="hidden" name="seguro_polizas[${index}][asistencias]" value="${assetEscape(row.asistencias ?? '')}">
+                    <label>Aseguradora<input name="seguro_polizas[${index}][aseguradora]" value="${assetEscape(row.aseguradora ?? '')}" placeholder="Nombre de la empresa"></label>
+                    <label>Persona que atiende<input name="seguro_polizas[${index}][contacto_nombre]" value="${assetEscape(row.contacto_nombre ?? '')}" placeholder="Nombre del contacto"></label>
+                    <label>Correo contacto<input name="seguro_polizas[${index}][contacto_correo]" type="email" value="${assetEscape(row.contacto_correo ?? '')}" placeholder="correo@aseguradora.com"></label>
+                    <label>Celular contacto<input name="seguro_polizas[${index}][contacto_celular]" inputmode="tel" value="${assetEscape(row.contacto_celular ?? '')}" placeholder="300 000 0000"></label>
+                    <label>Intermediario<input name="seguro_polizas[${index}][intermediario]" value="${assetEscape(row.intermediario ?? '')}" placeholder="Corredor / agencia si aplica"></label>
+                    <label>Estado<select name="seguro_polizas[${index}][estado]">${assetPlaceholderOption(row.estado ?? '')}${stateOptions}</select></label>
+                    <details class="asset-insurance-response-fields">
+                        <summary>Datos de respuesta de la aseguradora</summary>
+                        <div>
+                            <label>Numero poliza/cotizacion<input name="seguro_polizas[${index}][numero_poliza]" value="${assetEscape(row.numero_poliza ?? '')}" placeholder="Numero de cotizacion o poliza"></label>
+                            <label>Prima total<input name="seguro_polizas[${index}][prima_total]" inputmode="decimal" data-money-format value="${assetEscape(assetMoneyPlain(row.prima_total) || row.prima_total || '')}" placeholder="$0"></label>
+                            <label>Valor asegurado total<input name="seguro_polizas[${index}][valor_asegurado_total]" inputmode="decimal" data-money-format value="${assetEscape(assetMoneyPlain(row.valor_asegurado_total) || row.valor_asegurado_total || '')}" placeholder="$0"></label>
+                            <label>Deducible general<input name="seguro_polizas[${index}][deducible_general]" value="${assetEscape(row.deducible_general ?? '')}" placeholder="% o valor"></label>
+                            <label>Inicio vigencia<input name="seguro_polizas[${index}][fecha_inicio]" type="date" value="${assetEscape(row.fecha_inicio ?? '')}"></label>
+                            <label>Fin vigencia<input name="seguro_polizas[${index}][fecha_fin]" type="date" value="${assetEscape(row.fecha_fin ?? '')}"></label>
+                            <label>Renovacion<input name="seguro_polizas[${index}][fecha_renovacion]" type="date" value="${assetEscape(row.fecha_renovacion ?? '')}"></label>
+                            <label>Forma pago<select name="seguro_polizas[${index}][forma_pago]">${assetPlaceholderOption(row.forma_pago ?? '')}${paymentOptions}</select></label>
+                            <label>Clausulado<input name="seguro_polizas[${index}][clausulado]" value="${assetEscape(row.clausulado ?? '')}" placeholder="Clausulado / version"></label>
+                            <label>Exclusiones relevantes<input name="seguro_polizas[${index}][exclusiones_relevantes]" value="${assetEscape(row.exclusiones_relevantes ?? '')}" placeholder="Exclusiones criticas"></label>
+                            <label>Soporte<input name="seguro_polizas[${index}][soporte]" value="${assetEscape(row.soporte ?? '')}" placeholder="PDF, caratula, correo, anexo"></label>
+                            <label>Observaciones<input name="seguro_polizas[${index}][observaciones]" value="${assetEscape(row.observaciones ?? '')}" placeholder="Notas de la oferta"></label>
+                        </div>
+                    </details>
+                    <button type="button" class="asset-remove-insurance" aria-label="Quitar oferta" data-remove-asset-insurance-policy>&times;</button>
                 </div>
             </details>
         `;
@@ -4092,7 +4100,7 @@ if (assetForm instanceof HTMLFormElement) {
         saveAssetDraft(assetForm);
     });
 
-    const assetInsurancePolicyFields = ['ano', 'tipo_documento', 'ramo', 'aseguradora', 'intermediario', 'agencia_expedidora', 'codigo_agencia', 'numero_poliza', 'numero_emision', 'numero_pago_electronico', 'modalidad_facturacion', 'coaseguro', 'tomador', 'asegurado', 'beneficiario', 'direccion_riesgo', 'ciudad_riesgo', 'actividad_riesgo', 'tipo_riesgo', 'fecha_inicio', 'fecha_fin', 'fecha_renovacion', 'prima_neta', 'iva', 'gastos_expedicion', 'prima_total', 'valor_asegurado_total', 'deducible_general', 'forma_pago', 'numero_cuotas', 'clausulado', 'anexos_endosos', 'exclusiones_relevantes', 'texto_aclaratorio', 'asistencias', 'estado', 'adoptada', 'fecha_adopcion', 'criterio_adopcion', 'soporte', 'observaciones'];
+    const assetInsurancePolicyFields = ['ano', 'tipo_documento', 'ramo', 'aseguradora', 'contacto_nombre', 'contacto_correo', 'contacto_celular', 'intermediario', 'agencia_expedidora', 'codigo_agencia', 'numero_poliza', 'numero_emision', 'numero_pago_electronico', 'modalidad_facturacion', 'coaseguro', 'tomador', 'asegurado', 'beneficiario', 'direccion_riesgo', 'ciudad_riesgo', 'actividad_riesgo', 'tipo_riesgo', 'fecha_inicio', 'fecha_fin', 'fecha_renovacion', 'prima_neta', 'iva', 'gastos_expedicion', 'prima_total', 'valor_asegurado_total', 'deducible_general', 'forma_pago', 'numero_cuotas', 'clausulado', 'anexos_endosos', 'exclusiones_relevantes', 'texto_aclaratorio', 'asistencias', 'estado', 'adoptada', 'fecha_adopcion', 'criterio_adopcion', 'soporte', 'observaciones'];
     const assetInsuranceCoverageFields = ['ano', 'numero_poliza', 'ramo', 'cobertura', 'riesgo_cubierto', 'valor_asegurado', 'limite_evento', 'porcentaje_invar', 'indice_variable', 'sublimite', 'tasa', 'prima', 'deducible', 'fuente_valor_asegurado', 'fecha_inicio', 'fecha_fin', 'fecha_renovacion', 'observaciones'];
     const assetInsuranceMovementFields = ['ano', 'fecha', 'tipo_movimiento', 'numero_poliza', 'ramo', 'cobertura', 'item', 'valor_variacion', 'estado_reporte', 'fecha_reporte_aseguradora', 'soporte', 'observaciones'];
 
