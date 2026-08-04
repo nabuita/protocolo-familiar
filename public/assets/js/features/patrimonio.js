@@ -505,6 +505,55 @@ const readAssetDraft = (form, id = null) => {
     }
 };
 
+const nonEmptyDraftValues = (values = {}) => Object.entries(values || {}).reduce((carry, [key, value]) => {
+    if (String(value ?? '').trim() !== '') {
+        carry[key] = value;
+    }
+    return carry;
+}, {});
+
+const mergeAssetDraft = (row, draft) => {
+    if (!draft) {
+        return row;
+    }
+    if (!row) {
+        return {
+            ...(draft.fields || {}),
+            detalle: draft.detalle || {},
+            participaciones: draft.participaciones || [],
+            fiducia_beneficiarios: draft.fiducia_beneficiarios || [],
+            subunidades: draft.subunidades || [],
+            valoraciones_anuales: draft.valoraciones_anuales || [],
+            ingresos_anuales: draft.ingresos_anuales || [],
+            gastos_anuales: draft.gastos_anuales || [],
+            seguro_polizas: draft.seguro_polizas || [],
+            seguro_coberturas: draft.seguro_coberturas || [],
+            seguro_equipos: draft.seguro_equipos || [],
+            seguro_movimientos: draft.seguro_movimientos || [],
+        };
+    }
+    const draftFields = nonEmptyDraftValues(draft.fields || {});
+    delete draftFields.tipo_activo;
+    return {
+        ...row,
+        ...draftFields,
+        detalle: {
+            ...(row.detalle || {}),
+            ...nonEmptyDraftValues(draft.detalle || {}),
+        },
+        participaciones: Array.isArray(draft.participaciones) && draft.participaciones.length > 0 ? draft.participaciones : row.participaciones || [],
+        fiducia_beneficiarios: Array.isArray(draft.fiducia_beneficiarios) && draft.fiducia_beneficiarios.length > 0 ? draft.fiducia_beneficiarios : row.fiducia_beneficiarios || [],
+        subunidades: Array.isArray(draft.subunidades) && draft.subunidades.length > 0 ? draft.subunidades : row.subunidades || [],
+        valoraciones_anuales: Array.isArray(draft.valoraciones_anuales) && draft.valoraciones_anuales.length > 0 ? draft.valoraciones_anuales : row.valoraciones_anuales || [],
+        ingresos_anuales: Array.isArray(draft.ingresos_anuales) && draft.ingresos_anuales.length > 0 ? draft.ingresos_anuales : row.ingresos_anuales || [],
+        gastos_anuales: Array.isArray(draft.gastos_anuales) && draft.gastos_anuales.length > 0 ? draft.gastos_anuales : row.gastos_anuales || [],
+        seguro_polizas: Array.isArray(draft.seguro_polizas) && draft.seguro_polizas.length > 0 ? draft.seguro_polizas : row.seguro_polizas || [],
+        seguro_coberturas: Array.isArray(draft.seguro_coberturas) && draft.seguro_coberturas.length > 0 ? draft.seguro_coberturas : row.seguro_coberturas || [],
+        seguro_equipos: Array.isArray(draft.seguro_equipos) && draft.seguro_equipos.length > 0 ? draft.seguro_equipos : row.seguro_equipos || [],
+        seguro_movimientos: Array.isArray(draft.seguro_movimientos) && draft.seguro_movimientos.length > 0 ? draft.seguro_movimientos : row.seguro_movimientos || [],
+    };
+};
+
 const clearAssetDraft = (form, id = null) => {
     try {
         window.localStorage.removeItem(assetDraftKey(form, id));
@@ -4133,7 +4182,7 @@ const renderAssetRow = (row) => {
 const fillAssetForm = (form, row = null, { restoreDraft = false } = {}) => {
     form.reset();
     const draft = restoreDraft ? readAssetDraft(form, row?.id || 'nuevo') : null;
-    const source = draft ? { ...(row || {}), ...(draft.fields || {}), detalle: draft.detalle || {}, participaciones: draft.participaciones || [], fiducia_beneficiarios: draft.fiducia_beneficiarios || [], subunidades: draft.subunidades || [], valoraciones_anuales: draft.valoraciones_anuales || [], ingresos_anuales: draft.ingresos_anuales || [], gastos_anuales: draft.gastos_anuales || [], seguro_polizas: draft.seguro_polizas || [], seguro_coberturas: draft.seguro_coberturas || [], seguro_equipos: draft.seguro_equipos || [], seguro_movimientos: draft.seguro_movimientos || [] } : row;
+    const source = mergeAssetDraft(row, draft);
     assetLoadedRows.set(form, source || null);
     form.elements.id.value = row?.id ?? '';
     form.elements.codigo.value = row?.codigo ?? 'Automatico';
