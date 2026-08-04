@@ -2939,58 +2939,14 @@ const renderAssetInsuranceEquipmentRows = (form, rows = []) => {
     const selectedCoverageRows = historyRowsForType(form, '[data-asset-insurance-coverage-row]', assetInsuranceCoverageFields)
         .filter((item) => item.cobertura || item.ramo);
     const activeCoverageRows = selectedCoverageRows.filter((item) => (item.ramo || '') === activeProduct || (!activeProduct && item.ramo === ''));
-    const activeSupportCategories = coverageSupportCategories(activeCoverageRows);
-    const needsInsuredItems = activeSupportCategories.length > 0;
-    const productOptions = [...new Set([...(options.ramo_seguro || []), ...selectedProducts])]
-        .filter(Boolean)
-        .map((item) => `<option value="${assetEscape(item)}">${assetEscape(item)}</option>`)
-        .join('');
-    const coverageOptions = selectedCoverageRows
-        .map((item) => {
-            const value = [item.ramo, item.cobertura].filter(Boolean).join(' / ');
-            return `<option value="${assetEscape(value)}">${assetEscape(value)}</option>`;
-        })
-        .join('');
     container.innerHTML = `
         ${selectedInsuranceStripHtml(form)}
         ${insuranceProductTabsHtml(selectedProducts, activeProduct, 'values')}
         ${insuranceCoverageRequestTableHtml(activeCoverageRows)}
         ${sourceRows.map((row, index) => {
-        const isActiveRow = needsInsuredItems && ((row.ramo || '') === activeProduct || (!activeProduct && row.ramo === ''));
-        const rowRamoOptions = productOptions.replace(`value="${assetEscape(row.ramo ?? '')}"`, `value="${assetEscape(row.ramo ?? '')}" selected`);
-        const rowCoverageOptions = coverageOptions.replace(`value="${assetEscape(row.cobertura_asociada ?? '')}"`, `value="${assetEscape(row.cobertura_asociada ?? '')}" selected`);
         return `
-            <div class="asset-insurance-equipment-row" data-asset-insurance-equipment-row ${isActiveRow ? '' : 'hidden'}>
-                <label>Ano<input name="seguro_equipos[${index}][ano]" inputmode="numeric" value="${assetEscape(row.ano ?? '')}" placeholder="2026"></label>
-                <label>Numero poliza<input name="seguro_equipos[${index}][numero_poliza]" value="${assetEscape(row.numero_poliza ?? '')}" placeholder="JWS797, LWY154..."></label>
-                <label>Ramo<select name="seguro_equipos[${index}][ramo]">${assetPlaceholderOption(row.ramo ?? '')}${rowRamoOptions}</select></label>
-                <label>Cobertura asociada<select name="seguro_equipos[${index}][cobertura_asociada]">${assetPlaceholderOption(row.cobertura_asociada ?? '')}${rowCoverageOptions}</select></label>
-                <label>Categoria item<input name="seguro_equipos[${index}][categoria_item]" value="${assetEscape(row.categoria_item ?? '')}" placeholder="Construccion, maquinaria, muebles..."></label>
-                <label>Item asegurado<input name="seguro_equipos[${index}][item]" value="${assetEscape(row.item ?? row.equipo ?? '')}" placeholder="Equipo, mueble, maquinaria, construccion..."></label>
-                <label>Descripcion<input name="seguro_equipos[${index}][descripcion]" value="${assetEscape(row.descripcion ?? '')}" placeholder="Marca, modelo, material, area..."></label>
-                <label>Unidad<input name="seguro_equipos[${index}][unidad]" value="${assetEscape(row.unidad ?? '')}" placeholder="Und, m2, gl, juego"></label>
-                <label>Cantidad<input name="seguro_equipos[${index}][cantidad]" inputmode="decimal" data-insured-item-calc value="${assetEscape(row.cantidad ?? '')}" placeholder="1"></label>
-                <label>Ubicacion<input name="seguro_equipos[${index}][ubicacion]" value="${assetEscape(row.ubicacion ?? '')}" placeholder="Inmueble, piso, zona"></label>
-                <label>Serial / referencia<input name="seguro_equipos[${index}][serial_referencia]" value="${assetEscape(row.serial_referencia ?? '')}"></label>
-                <label>Valor compra<input name="seguro_equipos[${index}][valor_compra]" inputmode="decimal" value="${assetEscape(row.valor_compra ?? '')}" placeholder="$0"></label>
-                <label>Fecha adquisicion<input name="seguro_equipos[${index}][fecha_adquisicion]" type="date" value="${assetEscape(row.fecha_adquisicion ?? '')}"></label>
-                <label>Vr reposicion unitario<input name="seguro_equipos[${index}][valor_reposicion_unitario]" inputmode="decimal" data-insured-item-calc value="${assetEscape(row.valor_reposicion_unitario ?? '')}" placeholder="$0"></label>
-                <label>Vr reposicion total<input name="seguro_equipos[${index}][valor_reposicion]" inputmode="decimal" data-insured-item-total value="${assetEscape(row.valor_reposicion ?? '')}" placeholder="$0"></label>
-                <label>Fuente consulta<input name="seguro_equipos[${index}][fuente_consulta]" value="${assetEscape(row.fuente_consulta ?? '')}" placeholder="Cotizacion, factura, avaluo, mercado..."></label>
-                <label>Fecha consulta<input name="seguro_equipos[${index}][fecha_consulta]" type="date" value="${assetEscape(row.fecha_consulta ?? '')}"></label>
-                <label>Ano adquisicion<input name="seguro_equipos[${index}][ano_adquisicion]" inputmode="numeric" value="${assetEscape(row.ano_adquisicion ?? '')}" placeholder="2020"></label>
-                <label>Edad anos<input name="seguro_equipos[${index}][edad_anos]" inputmode="decimal" value="${assetEscape(row.edad_anos ?? '')}" placeholder="Auto/manual"></label>
-                <label>Vida util anos<input name="seguro_equipos[${index}][vida_util_anos]" inputmode="decimal" value="${assetEscape(row.vida_util_anos ?? '')}" placeholder="10"></label>
-                <label>Regla demerito<input name="seguro_equipos[${index}][regla_demerito]" value="${assetEscape(row.regla_demerito ?? '')}" placeholder="Elect./maq. segun poliza"></label>
-                <label>Depreciacion %<input name="seguro_equipos[${index}][depreciacion_porcentaje]" inputmode="decimal" data-insured-item-calc value="${assetEscape(row.depreciacion_porcentaje ?? '')}" placeholder="0%"></label>
-                <label>Depreciacion valor<input name="seguro_equipos[${index}][depreciacion_valor]" inputmode="decimal" data-insured-item-depreciation value="${assetEscape(row.depreciacion_valor ?? '')}" placeholder="$0"></label>
-                <label>Vr asegurable sugerido<input name="seguro_equipos[${index}][valor_asegurable_sugerido]" inputmode="decimal" data-insured-item-suggested value="${assetEscape(row.valor_asegurable_sugerido ?? '')}" placeholder="$0"></label>
-                <label>Incluye terreno<select name="seguro_equipos[${index}][incluye_terreno]">${assetPlaceholderOption(row.incluye_terreno ?? '')}<option value="No" ${row.incluye_terreno === 'No' ? 'selected' : ''}>No</option><option value="Si" ${row.incluye_terreno === 'Si' ? 'selected' : ''}>Si</option><option value="No aplica" ${row.incluye_terreno === 'No aplica' ? 'selected' : ''}>No aplica</option></select></label>
-                <label>Inicio cobertura<input name="seguro_equipos[${index}][fecha_inicio]" type="date" value="${assetEscape(row.fecha_inicio ?? '')}"></label>
-                <label>Fin cobertura<input name="seguro_equipos[${index}][fecha_fin]" type="date" value="${assetEscape(row.fecha_fin ?? '')}"></label>
-                <label>Renovacion<input name="seguro_equipos[${index}][fecha_renovacion]" type="date" value="${assetEscape(row.fecha_renovacion ?? '')}"></label>
-                <label>Observaciones<input name="seguro_equipos[${index}][observaciones]" value="${assetEscape(row.observaciones ?? '')}" placeholder="Sublimite, exclusion, soporte..."></label>
-                <button type="button" class="asset-remove-insurance" aria-label="Quitar item asegurado" data-remove-asset-insurance-equipment>&times;</button>
+            <div data-asset-insurance-equipment-row hidden>
+                ${insuredItemFields.map((field) => `<input type="hidden" name="seguro_equipos[${index}][${field}]" value="${assetEscape(row[field] ?? '')}">`).join('')}
             </div>
         `;
     }).join('')}
