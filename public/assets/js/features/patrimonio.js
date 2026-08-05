@@ -2010,6 +2010,8 @@ const assetHelpText = {
     valor_contable_total: 'Suma informativa de terreno y construccion. Sirve para conciliacion contable, pero no es la base de depreciacion del inmueble.',
     depreciacion_acumulada: 'Depreciacion acumulada de la construccion. El terreno se excluye porque no se deprecia.',
     valor_neto_contable: 'Valor contable neto de la construccion: valor contable construccion menos depreciacion acumulada.',
+    indice_reajuste: 'Define la regla pactada para actualizar el canon: IPC, IPC mas puntos, porcentaje fijo, UVR, SMMLV u otra.',
+    puntos_sobre_ipc: 'Si el contrato dice IPC mas puntos, escribe solo los puntos adicionales. Ejemplo: 2 significa IPC + 2 puntos.',
     subcategoria: 'Clasifica el intangible para mostrar solo los campos que aplican a su naturaleza.',
     nombre_aplicacion: 'Nombre comercial, tecnico o interno con el que se reconoce el activo.',
     codigo_interno: 'Codigo usado por la empresa para ubicar el activo, proyecto, repositorio, dominio o registro.',
@@ -3358,10 +3360,10 @@ const renderAssetSubunitRows = (form, rows = []) => {
                     <label>Area<input name="subunidades[${index}][area]" value="${assetEscape(row.area ?? '')}" placeholder="m2 / medida"></label>
                     <label>Uso<select name="subunidades[${index}][uso]">${assetPlaceholderOption(row.uso ?? '')}${usoOptions}</select></label>
                     <label>Arrendatario<input name="subunidades[${index}][arrendatario]" value="${assetEscape(row.arrendatario ?? '')}" placeholder="Cliente o vacante"></label>
-                    <label>Canon mensual<input name="subunidades[${index}][canon_mensual]" inputmode="decimal" value="${assetEscape(row.canon_mensual ?? '')}" placeholder="$0"></label>
-                    <label>Administracion mensual<input name="subunidades[${index}][administracion_mensual]" inputmode="decimal" value="${assetEscape(row.administracion_mensual ?? '')}" placeholder="$0"></label>
-                    <label>IVA<input name="subunidades[${index}][iva]" inputmode="decimal" value="${assetEscape(row.iva ?? '')}" placeholder="$0"></label>
-                    <label>Retencion<input name="subunidades[${index}][retencion]" inputmode="decimal" value="${assetEscape(row.retencion ?? '')}" placeholder="$0"></label>
+                    <label>Canon mensual<input name="subunidades[${index}][canon_mensual]" inputmode="decimal" data-money-format value="${assetEscape(assetMoneyPlain(row.canon_mensual) || row.canon_mensual || '')}" placeholder="$0"></label>
+                    <label>Administracion mensual<input name="subunidades[${index}][administracion_mensual]" inputmode="decimal" data-money-format value="${assetEscape(assetMoneyPlain(row.administracion_mensual) || row.administracion_mensual || '')}" placeholder="$0"></label>
+                    <label>IVA<input name="subunidades[${index}][iva]" inputmode="decimal" data-money-format value="${assetEscape(assetMoneyPlain(row.iva) || row.iva || '')}" placeholder="$0"></label>
+                    <label>Retencion<input name="subunidades[${index}][retencion]" inputmode="decimal" data-money-format value="${assetEscape(assetMoneyPlain(row.retencion) || row.retencion || '')}" placeholder="$0"></label>
                     <label>Contrato soporte <span class="asset-document-marker">*Control Documental*</span><input name="subunidades[${index}][contrato_soporte]" value="${assetEscape(row.contrato_soporte ?? '')}" placeholder="Contrato, otrosi, pendiente"></label>
                     <label>Inicio contrato<input name="subunidades[${index}][fecha_inicio]" type="date" value="${assetEscape(row.fecha_inicio ?? '')}"></label>
                     <label>Fin contrato<input name="subunidades[${index}][fecha_fin]" type="date" value="${assetEscape(row.fecha_fin ?? '')}"></label>
@@ -4787,8 +4789,8 @@ const renderAssetValueYearRows = (form, rows = []) => {
         return `
         <div class="asset-history-row asset-value-year-row${historyMissingClass(missing)}" data-asset-value-year-row title="${missing.length ? `Falta: ${assetEscape(missing.join(', '))}` : ''}">
             <label>Ano<input name="valoraciones_anuales[${index}][ano]" inputmode="numeric" value="${assetEscape(row.ano ?? '')}" placeholder="2026"></label>
-            <label>Valor catastral<input name="valoraciones_anuales[${index}][valor_catastral]" inputmode="decimal" value="${assetEscape(row.valor_catastral ?? '')}" placeholder="$0"></label>
-            <label>Valor comercial<input name="valoraciones_anuales[${index}][valor_comercial]" inputmode="decimal" value="${assetEscape(row.valor_comercial ?? '')}" placeholder="$0"></label>
+            <label>Valor catastral<input name="valoraciones_anuales[${index}][valor_catastral]" inputmode="decimal" data-money-format value="${assetEscape(assetMoneyPlain(row.valor_catastral) || row.valor_catastral || '')}" placeholder="$0"></label>
+            <label>Valor comercial<input name="valoraciones_anuales[${index}][valor_comercial]" inputmode="decimal" data-money-format value="${assetEscape(assetMoneyPlain(row.valor_comercial) || row.valor_comercial || '')}" placeholder="$0"></label>
             <label>Fecha corte<input name="valoraciones_anuales[${index}][fecha_corte]" type="date" value="${assetEscape(row.fecha_corte ?? '')}"></label>
             <label>Fuente<input name="valoraciones_anuales[${index}][fuente]" value="${assetEscape(row.fuente ?? '')}" placeholder="Catastro, avaluo..."></label>
             <label>Observaciones<input name="valoraciones_anuales[${index}][observaciones]" value="${assetEscape(row.observaciones ?? '')}"></label>
@@ -4831,12 +4833,12 @@ const renderAssetIncomeYearRows = (form, rows = []) => {
             <label>Vigencia desde<input name="ingresos_anuales[${index}][fecha_inicio_vigencia]" type="date" value="${assetEscape(row.fecha_inicio_vigencia ?? '')}"></label>
             <label>Vigencia hasta<input name="ingresos_anuales[${index}][fecha_fin_vigencia]" type="date" value="${assetEscape(row.fecha_fin_vigencia ?? '')}"></label>
             <label>Meses a dic. 31<input name="ingresos_anuales[${index}][meses_vigencia]" inputmode="decimal" value="${assetEscape(row.meses_vigencia ?? '')}" placeholder="Auto"></label>
-            <label>Canon mensual total<input name="ingresos_anuales[${index}][canon_mensual]" inputmode="decimal" value="${assetEscape(row.canon_mensual ?? '')}" placeholder="$0"></label>
+            <label>Canon mensual total<input name="ingresos_anuales[${index}][canon_mensual]" inputmode="decimal" data-money-format value="${assetEscape(assetMoneyPlain(row.canon_mensual) || row.canon_mensual || '')}" placeholder="$0"></label>
             <output data-asset-annual-canon-preview>${assetEscape(assetMoney(assetAnnualCanonForRow(row)))}</output>
             <label>% participacion<input name="ingresos_anuales[${index}][porcentaje_participacion]" inputmode="decimal" value="${assetEscape(row.porcentaje_participacion ?? '')}" placeholder="${assetEscape(assetParticipationShare(form) * 100)}%"></label>
             <label>Incremento %<input name="ingresos_anuales[${index}][incremento_porcentaje]" inputmode="decimal" value="${assetEscape(row.incremento_porcentaje ?? '')}" placeholder="0%"></label>
-            <label>Incremento valor<input name="ingresos_anuales[${index}][incremento_valor]" inputmode="decimal" value="${assetEscape(row.incremento_valor ?? '')}" placeholder="$0"></label>
-            <label>Nuevo canon mensual<input name="ingresos_anuales[${index}][nuevo_canon_mensual]" inputmode="decimal" value="${assetEscape(row.nuevo_canon_mensual ?? '')}" placeholder="$0"></label>
+            <label>Incremento valor<input name="ingresos_anuales[${index}][incremento_valor]" inputmode="decimal" data-money-format value="${assetEscape(assetMoneyPlain(row.incremento_valor) || row.incremento_valor || '')}" placeholder="$0"></label>
+            <label>Nuevo canon mensual<input name="ingresos_anuales[${index}][nuevo_canon_mensual]" inputmode="decimal" data-money-format value="${assetEscape(assetMoneyPlain(row.nuevo_canon_mensual) || row.nuevo_canon_mensual || '')}" placeholder="$0"></label>
             <label>Fecha renovacion<input name="ingresos_anuales[${index}][fecha_renovacion]" type="date" value="${assetEscape(row.fecha_renovacion ?? '')}"></label>
             <label>Observaciones<input name="ingresos_anuales[${index}][observaciones]" value="${assetEscape(row.observaciones ?? '')}"></label>
             <output data-asset-income-preview>${assetEscape(assetHistoryIncomePreview(form, row))}</output>
@@ -4858,7 +4860,7 @@ const renderAssetExpenseYearRows = (form, rows = []) => {
         return `
         <div class="asset-history-row asset-expense-year-row${historyMissingClass(missing)}" data-asset-expense-year-row title="${missing.length ? `Falta: ${assetEscape(missing.join(', '))}` : ''}">
             <label>Ano<input name="gastos_anuales[${index}][ano]" inputmode="numeric" value="${assetEscape(row.ano ?? '')}" placeholder="2026"></label>
-            ${expenseHistoryFields.map((field) => `<label>${assetEscape(assetExpenseLabel(field))}<input name="gastos_anuales[${index}][${field}]" inputmode="decimal" value="${assetEscape(row[field] ?? '')}" placeholder="$0"></label>`).join('')}
+            ${expenseHistoryFields.map((field) => `<label>${assetEscape(assetExpenseLabel(field))}<input name="gastos_anuales[${index}][${field}]" inputmode="decimal" data-money-format value="${assetEscape(assetMoneyPlain(row[field]) || row[field] || '')}" placeholder="$0"></label>`).join('')}
             <label>Observaciones<input name="gastos_anuales[${index}][observaciones]" value="${assetEscape(row.observaciones ?? '')}"></label>
             <output data-asset-expense-preview>Total ${assetEscape(assetMoney(assetExpenseRowTotal(row)))}</output>
             <button type="button" class="asset-remove-history" aria-label="Quitar ano" data-remove-asset-expense-year>&times;</button>

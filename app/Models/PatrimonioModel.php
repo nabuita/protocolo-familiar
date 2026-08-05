@@ -848,10 +848,14 @@ final readonly class PatrimonioModel
 
     private function money(mixed $value): ?float
     {
-        if ($value === null || trim((string) $value) === '') {
+        $raw = trim((string) $value);
+        if ($value === null || $raw === '') {
             return null;
         }
-        $clean = str_replace(['$', ' ', "\xc2\xa0"], '', (string) $value);
+        $clean = str_replace(['$', ' ', "\xc2\xa0"], '', $raw);
+        if (preg_match('/\d/', $clean) !== 1) {
+            return null;
+        }
         if (str_contains($clean, ',')) {
             $clean = str_replace('.', '', $clean);
             $clean = str_replace(',', '.', $clean);
@@ -859,7 +863,7 @@ final readonly class PatrimonioModel
             $clean = str_replace('.', '', $clean);
         }
         if (!is_numeric($clean)) {
-            throw new RuntimeException('Valor monetario invalido.');
+            return null;
         }
         return (float) $clean;
     }

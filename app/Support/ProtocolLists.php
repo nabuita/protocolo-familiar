@@ -86,7 +86,7 @@ final class ProtocolLists
             'forma_lote' => ['Regular', 'Irregular', 'Rectangular', 'Esquinero', 'Medianero', 'Poligonal', 'No aplica', 'Por confirmar'],
             'topografia' => ['Plana', 'Inclinada', 'Irregular', 'Por encima del nivel de via', 'Por debajo del nivel de via', 'No aplica', 'No verificada'],
             'si_no_parcial_na' => ['Si', 'No', 'Parcial', 'No aplica', 'Por confirmar'],
-            'indice_reajuste' => ['IPC', 'Porcentaje fijo', 'UVR', 'SMMLV', 'Canon libre pactado', 'Otro', 'Por confirmar'],
+            'indice_reajuste' => ['IPC', 'IPC mas puntos', 'Porcentaje fijo', 'UVR', 'SMMLV', 'Canon libre pactado', 'Otro', 'Por confirmar'],
             'liquidez' => ['Alta', 'Media', 'Baja', 'Nula', 'No aplica', 'Por confirmar'],
             'metodo_depreciacion' => ['Linea recta', 'Unidades de produccion', 'Saldos decrecientes', 'No depreciable', 'No aplica', 'Por confirmar'],
             'subcategoria_intangible' => ['Aplicaciones y plataformas', 'Software y codigo fuente', 'Modulos independientes', 'Bases de datos', 'Paginas web corporativas', 'Portales inmobiliarios', 'Dominios de internet', 'Plataformas de firma electronica', 'Productos digitales', 'Membresias web / SaaS', 'Membresias de inteligencia artificial', 'Marcas y nombres comerciales', 'Derechos de autor', 'Disenos, metodologias y modelos', 'Licencias tecnologicas', 'APIs e integraciones', 'Documentacion tecnica', 'Secretos empresariales y conocimiento interno', 'Logos e identidad visual', 'Revistas y publicaciones corporativas', 'Proyectos internos de empresa'],
@@ -250,6 +250,7 @@ final class ProtocolLists
                     ['name' => 'otros_ingresos_mensuales', 'label' => 'Otros ingresos mensuales', 'type' => 'money', 'group' => '11. Arrendamiento y explotacion economica'],
                     ['name' => 'fecha_ultimo_reajuste', 'label' => 'Fecha ultimo reajuste', 'type' => 'date', 'group' => '11. Arrendamiento y explotacion economica', 'evidence' => true],
                     ['name' => 'indice_reajuste', 'label' => 'Indice de reajuste', 'type' => 'select', 'options' => 'indice_reajuste', 'group' => '11. Arrendamiento y explotacion economica', 'evidence' => true],
+                    ['name' => 'puntos_sobre_ipc', 'label' => 'Puntos adicionales sobre IPC', 'type' => 'decimal', 'group' => '11. Arrendamiento y explotacion economica', 'help' => 'Diligenciar solo cuando el indice pactado sea IPC mas puntos. Ejemplo: 2 equivale a IPC + 2 puntos.'],
                     ['name' => 'proxima_fecha_reajuste', 'label' => 'Proxima fecha de reajuste', 'type' => 'date', 'group' => '11. Arrendamiento y explotacion economica'],
                     ['name' => 'vigencia_contrato_arrendamiento', 'label' => 'Vigencia contrato arrendamiento matriz', 'type' => 'text', 'group' => '11. Arrendamiento y explotacion economica', 'evidence' => true],
 
