@@ -201,9 +201,9 @@ foreach (($documentoRows ?? []) as $documento) {
                 <label>Ambito titular<?php $options('ambito_titular', $patrimonioOptions['ambito_titular']); ?></label>
                 <label>Empresa relacionada, si aplica<select name="empresa_relacionada"><option value="" disabled selected hidden>Seleccione...</option><?php foreach ($empresaRows as $empresa): ?><option value="<?= $e($empresa['razon_social']) ?>"><?= $e($empresa['razon_social']) ?></option><?php endforeach; ?></select></label>
                 <label>Moneda<?php $options('moneda', $patrimonioOptions['moneda'], 'COP'); ?></label>
-                <label data-asset-common-field="adquisicion">Valor de adquisicion/escritura <span class="asset-document-marker">*Control Documental*</span><input name="valor_adquisicion" inputmode="decimal" placeholder="$0"></label>
+                <label data-asset-common-field="adquisicion">Valor de adquisicion/escritura <span class="asset-document-marker">*Control Documental*</span><input name="valor_adquisicion" inputmode="decimal" data-money-format placeholder="$0"></label>
                 <label data-asset-common-field="adquisicion">Fecha de adquisicion <span class="asset-document-marker">*Control Documental*</span><input name="fecha_adquisicion" type="date"></label>
-                <label data-asset-current-value-label data-asset-common-field="valor_actual">Valor actual <span class="asset-document-marker">*Control Documental*</span><input name="valor_actual" inputmode="decimal" placeholder="$0"></label>
+                <label data-asset-current-value-label data-asset-common-field="valor_actual">Valor actual <span class="asset-document-marker">*Control Documental*</span><input name="valor_actual" inputmode="decimal" data-money-format placeholder="$0"></label>
                 <label data-asset-common-field="valor_actual">Fecha de corte valor actual<input name="fecha_corte_valor" type="date"></label>
                 <label data-asset-common-field="metodo_valoracion">Metodo/fuente de valoracion <span class="asset-document-marker">*Control Documental*</span><?php $options('metodo_valoracion', $patrimonioOptions['metodo_valoracion']); ?></label>
                 <label>Estado soporte<?php $options('estado_soporte', $patrimonioOptions['estado_soporte']); ?></label>

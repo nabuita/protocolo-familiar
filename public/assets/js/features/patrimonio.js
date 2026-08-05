@@ -34,8 +34,21 @@ const assetMoney = (value) => {
 };
 
 const assetMoneyPlain = (value) => {
-    const number = assetNumber(value);
-    return number > 0 ? new Intl.NumberFormat('es-CO', { maximumFractionDigits: 0 }).format(number) : '';
+    if (value === null || value === undefined || String(value).trim() === '') {
+        return '';
+    }
+    const raw = String(value);
+    let clean = raw.replace(/[$\s\u00a0]/g, '');
+    if (clean.includes(',')) {
+        clean = clean.replace(/\./g, '').replace(',', '.');
+    } else if ((clean.match(/\./g) || []).length > 1 || /\.\d{3}$/.test(clean)) {
+        clean = clean.replace(/\./g, '');
+    }
+    if (!/^-?\d+(\.\d+)?$/.test(clean)) {
+        return raw;
+    }
+    const number = Number(clean);
+    return Number.isFinite(number) ? new Intl.NumberFormat('es-CO', { maximumFractionDigits: 0 }).format(number) : '';
 };
 
 const assetPercent = (value) => {
@@ -63,6 +76,14 @@ const formatAssetMoneyInput = (input) => {
     }
     const formatted = assetMoneyPlain(input.value);
     input.value = formatted || '';
+};
+
+const formatAssetMoneyInputs = (root) => {
+    root.querySelectorAll('[data-money-format]').forEach((input) => {
+        if (input instanceof HTMLInputElement) {
+            formatAssetMoneyInput(input);
+        }
+    });
 };
 
 const assetDate = (value) => {
@@ -3006,7 +3027,9 @@ const renderAssetSpecificFields = (form, row = null) => {
         }
         const inputType = field.type === 'date' ? 'date' : 'text';
         const inputMode = ['money', 'decimal', 'number'].includes(field.type) ? ' inputmode="decimal"' : '';
-        return `<label${applies}>${assetFieldLabel(field)}<input name="${assetEscape(name)}" type="${inputType}"${inputMode} value="${assetEscape(value)}"></label>${academy}`;
+        const moneyFormat = field.type === 'money' ? ' data-money-format' : '';
+        const displayValue = field.type === 'money' ? (assetMoneyPlain(value) || value) : value;
+        return `<label${applies}>${assetFieldLabel(field)}<input name="${assetEscape(name)}" type="${inputType}"${inputMode}${moneyFormat} value="${assetEscape(displayValue)}"></label>${academy}`;
     };
     const grouped = schema.fields.reduce((carry, field) => {
         const group = field.group || 'Datos del activo';
@@ -5130,6 +5153,7 @@ const fillAssetForm = (form, row = null, { restoreDraft = false } = {}) => {
     renderAssetInsuranceHistory(form);
     renderAssetParticipationRows(form, source?.participaciones || []);
     renderAssetModalDocuments(form, row, parseAssetJson(form, 'assetDocuments'), form.closest('[data-workspace]')?.dataset.basePath ?? '');
+    formatAssetMoneyInputs(form);
     return Boolean(draft);
 };
 
@@ -5248,6 +5272,14 @@ if (assetForm instanceof HTMLFormElement) {
         }, 450);
     };
 
+    const flushAssetDraft = () => {
+        window.clearTimeout(assetDraftTimer);
+        if (assetDirty) {
+            saveAssetDraft(assetForm);
+            status && (status.textContent = 'Borrador guardado en este navegador.');
+        }
+    };
+
     assetForm.elements.tipo_activo?.addEventListener('change', () => {
         const selectedType = assetForm.elements.tipo_activo?.value || '';
         const loadedSource = assetLoadedRows.get(assetForm);
@@ -5286,6 +5318,12 @@ if (assetForm instanceof HTMLFormElement) {
 
     assetForm.addEventListener('input', scheduleAssetDraft);
     assetForm.addEventListener('change', scheduleAssetDraft);
+    window.addEventListener('beforeunload', flushAssetDraft);
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'hidden') {
+            flushAssetDraft();
+        }
+    });
     assetForm.addEventListener('change', (event) => {
         const target = event.target;
         if (target instanceof HTMLSelectElement && target.name === 'detalle[tipo_derecho]') {
@@ -5716,6 +5754,7 @@ if (assetForm instanceof HTMLFormElement) {
         const target = event.target;
         if (target instanceof HTMLInputElement && target.matches('[data-money-format]')) {
             formatAssetMoneyInput(target);
+            saveAssetDraft(assetForm);
             if (target.matches('[data-quote-field]')) {
                 syncAllInsuranceQuoteMatrices(assetForm);
                 renderInsuranceQuoteAnalysis(assetForm);
