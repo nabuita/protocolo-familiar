@@ -279,17 +279,17 @@ foreach (($documentoRows ?? []) as $documento) {
             <nav class="asset-insurance-flow" data-asset-insurance-flow hidden aria-label="Flujo de seguros">
                 <button type="button" data-asset-insurance-tab="coberturas">2. Coberturas requeridas</button>
                 <button type="button" data-asset-insurance-tab="modelo" class="is-active">3. Valores asegurados</button>
-                <button type="button" data-asset-insurance-tab="matriz">4. Poliza global / matriz</button>
-                <button type="button" data-asset-insurance-tab="cotizaciones">5. Cotizaciones y decision</button>
-                <button type="button" data-asset-insurance-tab="vigente">6. Resumen poliza vigente</button>
+                <button type="button" data-asset-insurance-tab="cotizaciones">4. Cotizaciones y decision</button>
+                <button type="button" data-asset-insurance-tab="vigente">5. Resumen poliza vigente</button>
+                <button type="button" data-asset-insurance-tab="matriz">6. Poliza matriz/global</button>
                 <button type="button" data-asset-insurance-tab="movimientos">7. Cambios / endosos</button>
                 <button type="button" data-asset-insurance-tab="historial">8. Historial</button>
             </nav>
             <section class="asset-insurance" data-asset-insurance-matrix data-asset-insurance-panel="matriz" hidden>
                 <div class="asset-participation-header">
                     <div>
-                        <h2>4. Poliza global / matriz <span class="asset-document-marker">*Control Documental*</span></h2>
-                        <p>Registra una sola poliza cuando cubre varios inmuebles, unidades o todo un edificio. El sistema conserva la poliza una vez y asigna a este activo solo su costo proporcional.</p>
+                        <h2>6. Poliza matriz/global <span class="asset-document-marker">*Control Documental*</span></h2>
+                        <p>Usa esta opcion solo si una misma poliza cubre varios inmuebles, unidades o todo un edificio. No reemplaza las cotizaciones; sirve para guardar una sola poliza y asignar a este activo su prima proporcional.</p>
                     </div>
                     <button type="button" data-add-asset-insurance-matrix>Registrar poliza matriz</button>
                 </div>
@@ -298,11 +298,10 @@ foreach (($documentoRows ?? []) as $documento) {
             <section class="asset-insurance" data-asset-insurance data-asset-insurance-panel="cotizaciones" hidden>
                 <div class="asset-participation-header">
                     <div>
-                        <h2>Cotizaciones y decision <span class="asset-document-marker">*Control Documental*</span></h2>
+                        <h2>4. Cotizaciones y decision <span class="asset-document-marker">*Control Documental*</span></h2>
                         <p>Registra las aseguradoras que cotizan la misma solicitud. Aqui se decide cual se toma; al seleccionar una opcion, pasa automaticamente al resumen de poliza vigente.</p>
                     </div>
                     <div class="asset-header-actions">
-                        <button type="button" data-add-asset-insurance-matrix>Registrar poliza matriz</button>
                         <button type="button" data-add-asset-insurance-previous>Registrar poliza anterior</button>
                         <button type="button" data-add-asset-insurance-policy>Agregar oferta</button>
                     </div>
@@ -323,8 +322,8 @@ foreach (($documentoRows ?? []) as $documento) {
             <section class="asset-insurance" data-asset-insurance-current data-asset-insurance-panel="vigente" hidden>
                 <div class="asset-participation-header">
                     <div>
-                        <h2>Resumen poliza vigente</h2>
-                        <p>Aqui no se diligencia manualmente. El resumen aparece cuando tomas una cotizacion, registras una poliza anterior o registras una poliza matriz/global vigente.</p>
+                        <h2>5. Resumen poliza vigente</h2>
+                        <p>Aqui no se diligencia manualmente. El resumen aparece cuando tomas una cotizacion o registras una poliza anterior. Si la poliza cubre varios activos, usa la pestana de poliza matriz/global.</p>
                     </div>
                 </div>
                 <div class="asset-insurance-history" data-asset-insurance-current-summary></div>
