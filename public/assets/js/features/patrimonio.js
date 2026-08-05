@@ -1937,14 +1937,18 @@ const insuranceCoverageMatrixHtml = (products = [], selected = new Set(), form =
 const syncDepreciationValues = (form) => {
     const monthly = form.elements['detalle[depreciacion_mensual]'];
     const annual = form.elements['detalle[depreciacion_anual]'];
+    const building = form.elements['detalle[valor_contable_construccion]'];
     const total = form.elements['detalle[valor_contable_total]'] || form.elements['detalle[valor_contable_inicial]'];
     const accumulated = form.elements['detalle[depreciacion_acumulada]'];
     const net = form.elements['detalle[valor_neto_contable]'];
     if (monthly instanceof HTMLInputElement && annual instanceof HTMLInputElement) {
         setAutoMoney(annual, assetNumeric(monthly.value) * 12);
     }
-    if (total instanceof HTMLInputElement && accumulated instanceof HTMLInputElement && net instanceof HTMLInputElement) {
-        const value = assetNumeric(total.value) - assetNumeric(accumulated.value);
+    if (accumulated instanceof HTMLInputElement && net instanceof HTMLInputElement) {
+        const buildingBase = building instanceof HTMLInputElement ? assetNumeric(building.value) : 0;
+        const fallbackBase = total instanceof HTMLInputElement ? assetNumeric(total.value) : 0;
+        const depreciableBase = buildingBase > 0 ? buildingBase : fallbackBase;
+        const value = depreciableBase - assetNumeric(accumulated.value);
         setAutoMoney(net, value);
     }
 };
@@ -1980,6 +1984,11 @@ const assetHelpText = {
     metodo_valoracion: 'Fuente usada para estimar el valor actual: avaluo, extracto, certificacion, mercado, costo u otra.',
     estado_soporte: 'Estado de disponibilidad documental: completo, pendiente, vencido, por confirmar u otro.',
     nivel_riesgo: 'Alerta preliminar sobre titularidad, soportes, vencimientos, valoracion o continuidad del activo.',
+    valor_contable_terreno: 'Valor contable separado del terreno. En inmuebles se informa, pero no se toma como base depreciable.',
+    valor_contable_construccion: 'Base contable depreciable del inmueble. La depreciacion debe calcularse sobre la construccion, no sobre terreno mas construccion.',
+    valor_contable_total: 'Suma informativa de terreno y construccion. Sirve para conciliacion contable, pero no es la base de depreciacion del inmueble.',
+    depreciacion_acumulada: 'Depreciacion acumulada de la construccion. El terreno se excluye porque no se deprecia.',
+    valor_neto_contable: 'Valor contable neto de la construccion: valor contable construccion menos depreciacion acumulada.',
     subcategoria: 'Clasifica el intangible para mostrar solo los campos que aplican a su naturaleza.',
     nombre_aplicacion: 'Nombre comercial, tecnico o interno con el que se reconoce el activo.',
     codigo_interno: 'Codigo usado por la empresa para ubicar el activo, proyecto, repositorio, dominio o registro.',

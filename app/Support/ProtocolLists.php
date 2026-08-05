@@ -208,8 +208,8 @@ final class ProtocolLists
                     ['name' => 'vida_util_anios', 'label' => 'Vida util remanente (anos)', 'type' => 'decimal', 'group' => '7. Conservacion y depreciacion'],
                     ['name' => 'depreciacion_mensual', 'label' => 'Depreciacion mensual', 'type' => 'money', 'group' => '7. Conservacion y depreciacion', 'evidence' => true],
                     ['name' => 'depreciacion_anual', 'label' => 'Depreciacion anual', 'type' => 'money', 'group' => '7. Conservacion y depreciacion', 'evidence' => true],
-                    ['name' => 'depreciacion_acumulada', 'label' => 'Depreciacion acumulada', 'type' => 'money', 'group' => '7. Conservacion y depreciacion', 'evidence' => true],
-                    ['name' => 'valor_neto_contable', 'label' => 'Valor neto contable', 'type' => 'money', 'group' => '7. Conservacion y depreciacion', 'evidence' => true],
+                    ['name' => 'depreciacion_acumulada', 'label' => 'Depreciacion acumulada construccion', 'type' => 'money', 'group' => '7. Conservacion y depreciacion', 'evidence' => true],
+                    ['name' => 'valor_neto_contable', 'label' => 'Valor neto contable construccion', 'type' => 'money', 'group' => '7. Conservacion y depreciacion', 'evidence' => true],
 
                     ['name' => 'gravamenes', 'label' => 'Gravamenes o limitaciones', 'type' => 'textarea', 'group' => '8. Situacion juridica y afectaciones', 'evidence' => true],
                     ['name' => 'afectacion_vivienda_familiar', 'label' => 'Afectacion a vivienda familiar', 'type' => 'select', 'options' => 'si_no', 'group' => '8. Situacion juridica y afectaciones', 'evidence' => true],
