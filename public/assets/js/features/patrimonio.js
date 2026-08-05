@@ -1568,7 +1568,7 @@ const selectedInsuranceCategoriesFromForm = (form) => {
         if (!(input instanceof HTMLInputElement)) {
             return;
         }
-        const option = insuranceAssetOptions.find((item) => item.key === input.value);
+        const option = insuranceAssetOptionByKey(input.value);
         if (option) {
             selected.add(option.category);
         }
@@ -1739,6 +1739,29 @@ const coverageSupportTabsHtml = (categories = []) => {
             `).join('')}
         </div>
     `;
+};
+
+const liabilityExposureOptions = [
+    { key: 'predios_labores', label: 'Predios, labores y operaciones', category: 'Exposicion RCE', coverage: 'Responsabilidad civil extracontractual', unit: 'limite' },
+    { key: 'visitantes_terceros', label: 'Visitantes y terceros', category: 'Exposicion RCE', coverage: 'Lesiones o muerte de terceros', unit: 'limite' },
+    { key: 'danos_terceros', label: 'Danos materiales a terceros', category: 'Exposicion RCE', coverage: 'Danos materiales a terceros', unit: 'limite' },
+    { key: 'empleados_patronal', label: 'Empleados / RC patronal', category: 'Exposicion RCE', coverage: 'Responsabilidad civil patronal', unit: 'limite' },
+    { key: 'contratistas_cruzada', label: 'Contratistas / RC cruzada', category: 'Exposicion RCE', coverage: 'Responsabilidad cruzada', unit: 'limite' },
+    { key: 'parqueaderos', label: 'Parqueaderos', category: 'Exposicion RCE', coverage: 'RC parqueaderos', unit: 'limite' },
+    { key: 'gastos_defensa', label: 'Gastos de defensa', category: 'Exposicion RCE', coverage: 'Gastos de defensa', unit: 'limite' },
+    { key: 'actividad_profesional', label: 'Actividad profesional', category: 'Exposicion RCE', coverage: 'Responsabilidad profesional', unit: 'limite' },
+];
+
+const insuranceAssetOptionByKey = (key) => [...insuranceAssetOptions, ...liabilityExposureOptions].find((item) => item.key === key);
+
+const insuranceExposureOptionsForProduct = (product, coverageRows = []) => {
+    const text = normalizeInsuranceText(product);
+    if (text.includes('responsabilidad')) {
+        return liabilityExposureOptions;
+    }
+    const categories = coverageSupportCategories(coverageRows);
+    const selectedCategories = categories.length > 0 ? categories : insuranceAssetOptions.map((item) => item.category);
+    return insuranceAssetOptions.filter((item) => selectedCategories.includes(item.category));
 };
 
 const insuranceCoverageRequestTableHtml = (rows = []) => {
@@ -2921,7 +2944,7 @@ const updateAssetContextSections = (form) => {
         subunits.style.display = visible ? '' : 'none';
     }
     const insuranceVisible = supportsInsurance && tabTitle.includes('Seguros');
-    const activeInsuranceTab = form.dataset.assetInsuranceTab || 'modelo';
+    const activeInsuranceTab = form.dataset.assetInsuranceTab || 'actual';
     if (insuranceFlow instanceof HTMLElement) {
         insuranceFlow.hidden = !insuranceVisible;
         insuranceFlow.style.display = insuranceVisible ? '' : 'none';
@@ -2987,17 +3010,11 @@ const renderAssetSpecificFields = (form, row = null) => {
             </label>
         `;
         }).join('');
-        const chips = insuranceAssetOptions.map((item) => `
-            <label class="asset-coverage-chip ${selectedCategories.has(item.category) ? 'is-selected' : ''}">
-                <input type="checkbox" data-asset-insurable-toggle value="${assetEscape(item.key)}" ${selectedCategories.has(item.category) ? 'checked' : ''}>
-                <span>${assetEscape(item.label)}</span>
-            </label>
-        `).join('');
         return `
             <div class="asset-insurance-builder">
                 <div class="asset-insurance-route">
                     <strong>Flujo de proteccion del activo</strong>
-                    <span>1. Define los seguros a incorporar. 2. Marca sus coberturas. 3. Determina los valores asegurados con soporte.</span>
+                    <span>1. Define los seguros a incorporar. 2. Revisa la poliza actual. 3. Marca coberturas. 4. Define bienes o exposiciones. 5. Determina valores asegurados. 6. Solicita cotizaciones comparables.</span>
                 </div>
                 <div>
                     <strong>1. Seguros a incorporar al activo</strong>
@@ -3014,12 +3031,6 @@ const renderAssetSpecificFields = (form, row = null) => {
                 <div class="asset-insurance-product-academy" data-insurance-product-academy>${insuranceProductAcademyHtml([...selectedInsuranceTypes], form)}</div>
                 <textarea name="detalle[que_se_asegura]" data-insurance-assets-summary hidden>${assetEscape(detail.que_se_asegura ?? '')}</textarea>
                 <textarea name="detalle[riesgos_cubiertos]" data-insurance-risks-summary hidden>${assetEscape(detail.riesgos_cubiertos ?? '')}</textarea>
-                <div>
-                    <strong>Bienes o exposiciones asegurables</strong>
-                    <span>Marca los elementos que pueden alimentar valores asegurados. Luego se detallan en la pestana 3 con fuente, fecha y valor.</span>
-                </div>
-                <div class="asset-coverage-chips">${chips}</div>
-                <div class="asset-insurance-derived-summary" data-insurance-derived-summary>Sin bienes asegurables seleccionados.</div>
             </div>
         `;
     };
@@ -3391,7 +3402,7 @@ const renderAssetSubunitRows = (form, rows = []) => {
 
 const updateAssetInsuranceSections = (form, type) => {
     const visible = assetSupportsInsurance(type);
-    const activeTab = form.dataset.assetInsuranceTab || 'modelo';
+    const activeTab = form.dataset.assetInsuranceTab || 'actual';
     const flow = form.querySelector('[data-asset-insurance-flow]');
     if (flow instanceof HTMLElement) {
         flow.hidden = !visible;
@@ -4182,6 +4193,105 @@ const renderAssetInsuranceCoverageRows = (form, rows = []) => {
         </div>
     `;
     syncCoveragePremiumRows(form);
+};
+
+const renderAssetInsuranceAssetExposureRows = (form) => {
+    const container = form.querySelector('[data-asset-insurance-assets-rows]');
+    const type = form.elements.tipo_activo.value;
+    updateAssetInsuranceSections(form, type);
+    if (!(container instanceof HTMLElement)) {
+        return;
+    }
+    if (!assetSupportsInsurance(type)) {
+        container.innerHTML = '';
+        return;
+    }
+    const selectedProducts = selectedInsuranceProductsFromForm(form);
+    const activeProduct = activeInsuranceProduct(form, selectedProducts, 'assetAssetsActiveProduct');
+    const activeCoverageRows = selectedInsuranceRequestRowsForProduct(form, activeProduct);
+    const options = insuranceExposureOptionsForProduct(activeProduct, activeCoverageRows);
+    const selectedCategories = selectedInsuranceCategoriesFromForm(form);
+    const isLiability = normalizeInsuranceText(activeProduct).includes('responsabilidad');
+    container.innerHTML = `
+        ${selectedInsuranceStripHtml(form)}
+        ${insuranceProductTabsHtml(selectedProducts, activeProduct, 'assets')}
+        <div class="asset-insurance-item-list">
+            <div class="asset-insurance-item-list-head">
+                <strong>${isLiability ? 'Exposiciones que se trasladan a la aseguradora' : 'Bienes que alimentan el valor asegurado'}</strong>
+                <span>${isLiability ? 'Marca solo las exposiciones de responsabilidad civil que quieres cubrir o cotizar. No es inventario de muebles.' : 'Marca las categorias que luego valoraras con fuente, fecha y valor de reposicion.'}</span>
+            </div>
+            <div class="asset-coverage-chips">
+                ${options.map((item) => `
+                    <label class="asset-coverage-chip ${selectedCategories.has(item.category) ? 'is-selected' : ''}" title="${assetEscape(insurableAssetTooltip(item.category))}">
+                        <input type="checkbox" data-asset-insurable-toggle value="${assetEscape(item.key)}" ${selectedCategories.has(item.category) ? 'checked' : ''}>
+                        <span>${assetEscape(item.label)}</span>
+                    </label>
+                `).join('') || '<p class="muted">Este ramo no requiere relacion de bienes; define limites por cobertura en valores asegurados.</p>'}
+            </div>
+        </div>
+        ${insuranceCoverageRequestTableHtml(activeCoverageRows)}
+    `;
+};
+
+const renderAssetInsuranceCurrentPolicyRows = (form) => {
+    const container = form.querySelector('[data-asset-insurance-current-policy-rows]');
+    const type = form.elements.tipo_activo.value;
+    updateAssetInsuranceSections(form, type);
+    if (!(container instanceof HTMLElement)) {
+        return;
+    }
+    if (!assetSupportsInsurance(type)) {
+        container.innerHTML = '';
+        return;
+    }
+    const policies = assetFormRows(form, '[data-asset-insurance-policy-row]', assetInsurancePolicyFields)
+        .filter((row) => row.adoptada === 'Si' || row.estado === 'Vigente' || row.estado === 'Vencida' || row.numero_poliza || row.alcance_poliza === 'Matriz/global');
+    const coverages = insuranceRequestedCoverages(form);
+    container.innerHTML = `
+        <div class="asset-insurance-guide">
+            <strong>Linea base para renovar</strong>
+            <p>Lo contratado hoy queda aqui por cobertura. Estos datos se copian como guia para la solicitud nueva y el analista puede pedir mejores valores, deducibles, sublimites o indice variable.</p>
+        </div>
+        ${policies.length ? `
+            <div class="asset-insurance-current-policy-list">
+                ${policies.map((row) => `
+                    <article>
+                        <strong>${assetEscape([row.aseguradora, row.numero_poliza].filter(Boolean).join(' / ') || 'Poliza registrada')}</strong>
+                        <span>${assetEscape([row.ramo, row.estado, row.fecha_inicio && row.fecha_fin ? `${row.fecha_inicio} a ${row.fecha_fin}` : 'Sin vigencia'].filter(Boolean).join(' / '))}</span>
+                        <b>${assetEscape(assetMoney(assetNumber(row.prima_total || row.prima_asignada)) || 'Prima pendiente')}</b>
+                    </article>
+                `).join('')}
+            </div>
+        ` : '<p class="muted">Registra una poliza actual o anterior para dejar evidencia de lo que se tiene contratado.</p>'}
+        ${coverages.length ? `
+            <div class="asset-insurance-request-table asset-insurance-current-coverage-table" role="table" aria-label="Cobertura actual contratada">
+                <div class="asset-insurance-request-head" role="row">
+                    <span>Ramo / cobertura</span>
+                    <span>Valor asegurado</span>
+                    <span>Limite evento</span>
+                    <span>Sublimite</span>
+                    <span>Deducible</span>
+                    <span>Indice variable</span>
+                    <span>Tasa</span>
+                    <span>Prima</span>
+                    <span>Fuente / mejora</span>
+                </div>
+                ${coverages.map((row) => `
+                    <div class="asset-insurance-request-row" role="row">
+                        <strong>${assetEscape(row.ramo || 'Ramo')}<small>${assetEscape(row.cobertura || 'Cobertura')}</small></strong>
+                        <input data-money-format inputmode="decimal" data-insurance-request-field="valor_asegurado" data-product="${assetEscape(row.ramo || '')}" data-coverage="${assetEscape(row.cobertura || '')}" value="${assetEscape(assetMoneyPlain(row.valor_asegurado) || row.valor_asegurado || '')}" placeholder="$0">
+                        <input data-insurance-request-field="limite_evento" data-product="${assetEscape(row.ramo || '')}" data-coverage="${assetEscape(row.cobertura || '')}" value="${assetEscape(row.limite_evento || '')}" placeholder="Por evento">
+                        <input data-insurance-request-field="sublimite" data-product="${assetEscape(row.ramo || '')}" data-coverage="${assetEscape(row.cobertura || '')}" value="${assetEscape(row.sublimite || '')}" placeholder="Si aplica">
+                        <input data-insurance-request-field="deducible" data-product="${assetEscape(row.ramo || '')}" data-coverage="${assetEscape(row.cobertura || '')}" value="${assetEscape(row.deducible || '')}" placeholder="% o valor">
+                        <input data-insurance-request-field="indice_variable" data-product="${assetEscape(row.ramo || '')}" data-coverage="${assetEscape(row.cobertura || '')}" value="${assetEscape(row.indice_variable || '')}" placeholder="IPC, fijo, pactado">
+                        <input data-insurance-request-field="tasa" inputmode="decimal" data-product="${assetEscape(row.ramo || '')}" data-coverage="${assetEscape(row.cobertura || '')}" value="${assetEscape(row.tasa || '')}" placeholder="Tasa">
+                        <input data-money-format inputmode="decimal" data-insurance-request-field="prima" data-product="${assetEscape(row.ramo || '')}" data-coverage="${assetEscape(row.cobertura || '')}" value="${assetEscape(assetMoneyPlain(row.prima) || row.prima || '')}" placeholder="$0">
+                        <input data-insurance-request-field="observaciones" data-product="${assetEscape(row.ramo || '')}" data-coverage="${assetEscape(row.cobertura || '')}" value="${assetEscape(row.observaciones || row.fuente_valor_asegurado || '')}" placeholder="Fuente, exclusion o mejora solicitada">
+                    </div>
+                `).join('')}
+            </div>
+        ` : '<p class="muted">Marca coberturas requeridas para completar la linea base por cobertura.</p>'}
+    `;
 };
 
 const insuredItemFields = [
@@ -5193,6 +5303,8 @@ const fillAssetForm = (form, row = null, { restoreDraft = false } = {}) => {
     renderAssetInsurancePolicyRows(form, source?.seguro_polizas || []);
     renderAssetInsuranceCoverageRows(form, source?.seguro_coberturas || []);
     renderAssetInsuranceEquipmentRows(form, source?.seguro_equipos || []);
+    renderAssetInsuranceCurrentPolicyRows(form);
+    renderAssetInsuranceAssetExposureRows(form);
     renderAssetInsuranceMovementRows(form, source?.seguro_movimientos || []);
     renderAssetCurrentPolicy(form);
     renderAssetInsuranceHistory(form);
@@ -5342,8 +5454,9 @@ if (assetForm instanceof HTMLFormElement) {
         if (!source?.moneda && assetForm.elements.moneda) {
             assetForm.elements.moneda.value = 'COP';
         }
-        assetForm.dataset.assetInsuranceTab = 'modelo';
+        assetForm.dataset.assetInsuranceTab = 'actual';
         assetForm.dataset.assetCoverageActiveProduct = '';
+        assetForm.dataset.assetAssetsActiveProduct = '';
         assetForm.dataset.assetValueActiveProduct = '';
         assetForm.dataset.assetCoveragePolicyIndex = '0';
         renderAssetSpecificFields(assetForm, source);
@@ -5353,6 +5466,8 @@ if (assetForm instanceof HTMLFormElement) {
         renderAssetInsurancePolicyRows(assetForm, sameLoadedType ? source?.seguro_polizas || [] : []);
         renderAssetInsuranceCoverageRows(assetForm, sameLoadedType ? source?.seguro_coberturas || [] : []);
         renderAssetInsuranceEquipmentRows(assetForm, sameLoadedType ? source?.seguro_equipos || [] : []);
+        renderAssetInsuranceCurrentPolicyRows(assetForm);
+        renderAssetInsuranceAssetExposureRows(assetForm);
         renderAssetInsuranceMovementRows(assetForm, sameLoadedType ? source?.seguro_movimientos || [] : []);
         renderAssetCurrentPolicy(assetForm);
         renderAssetInsuranceHistory(assetForm);
@@ -5403,9 +5518,15 @@ if (assetForm instanceof HTMLFormElement) {
             target.closest('.asset-coverage-chip')?.classList.toggle('is-selected', target.checked);
             updateInsuranceTypeSelection(assetForm);
             updateInsuranceProductAcademy(assetForm);
+            renderAssetInsuranceCoverageRows(assetForm, historyRowsForType(assetForm, '[data-asset-insurance-coverage-row]', assetInsuranceCoverageFields));
+            renderAssetInsuranceAssetExposureRows(assetForm);
+            renderAssetInsuranceEquipmentRows(assetForm, assetInsuranceEquipmentRows(assetForm));
+            renderAssetInsuranceCurrentPolicyRows(assetForm);
+            renderAssetInsurancePolicyRows(assetForm, historyRowsForType(assetForm, '[data-asset-insurance-policy-row]', assetInsurancePolicyFields));
+            renderInsuranceQuoteAnalysis(assetForm);
         }
         if (target instanceof HTMLInputElement && target.matches('[data-asset-insurable-toggle]')) {
-            const option = insuranceAssetOptions.find((item) => item.key === target.value);
+            const option = insuranceAssetOptionByKey(target.value);
             if (option) {
                 if (target.checked) {
                     upsertInsuredAssetFromOption(assetForm, option);
@@ -5414,6 +5535,8 @@ if (assetForm instanceof HTMLFormElement) {
                 }
             }
             updateInsuranceProductVisibility(assetForm);
+            renderAssetInsuranceAssetExposureRows(assetForm);
+            renderAssetInsuranceEquipmentRows(assetForm, assetInsuranceEquipmentRows(assetForm));
         }
         if (target instanceof HTMLSelectElement && [
             'detalle[uso]',
@@ -5426,6 +5549,9 @@ if (assetForm instanceof HTMLFormElement) {
         ].includes(target.name)) {
             updateInsuranceProductVisibility(assetForm);
             renderAssetInsurancePolicyRows(assetForm);
+            renderAssetInsuranceCoverageRows(assetForm, historyRowsForType(assetForm, '[data-asset-insurance-coverage-row]', assetInsuranceCoverageFields));
+            renderAssetInsuranceAssetExposureRows(assetForm);
+            renderAssetInsuranceEquipmentRows(assetForm, assetInsuranceEquipmentRows(assetForm));
         }
         syncInmuebleCommonFields(assetForm);
         syncInsuranceConstructionValue(assetForm);
@@ -5605,8 +5731,10 @@ if (assetForm instanceof HTMLFormElement) {
         if (!(button instanceof HTMLButtonElement)) {
             return;
         }
-        assetForm.dataset.assetInsuranceTab = button.dataset.assetInsuranceTab || 'modelo';
+        assetForm.dataset.assetInsuranceTab = button.dataset.assetInsuranceTab || 'actual';
         updateAssetInsuranceSections(assetForm, assetForm.elements.tipo_activo?.value || '');
+        renderAssetInsuranceCurrentPolicyRows(assetForm);
+        renderAssetInsuranceAssetExposureRows(assetForm);
         if (assetForm.dataset.assetInsuranceTab === 'cotizaciones') {
             renderAssetInsurancePolicyRows(assetForm, historyRowsForType(assetForm, '[data-asset-insurance-policy-row]', assetInsurancePolicyFields));
             renderInsuranceQuoteAnalysis(assetForm);
@@ -5675,7 +5803,20 @@ if (assetForm instanceof HTMLFormElement) {
         }
     });
 
-    assetForm.querySelector('[data-add-asset-insurance-previous]')?.addEventListener('click', () => {
+    assetForm.querySelector('[data-asset-insurance-current-policy-rows]')?.addEventListener('input', (event) => {
+        const target = event.target;
+        if (!(target instanceof HTMLInputElement) || !target.matches('[data-insurance-request-field]')) {
+            return;
+        }
+        syncInsuranceRequestField(assetForm, target);
+        renderAssetInsurancePolicyRows(assetForm, historyRowsForType(assetForm, '[data-asset-insurance-policy-row]', assetInsurancePolicyFields));
+        renderInsuranceQuoteAnalysis(assetForm);
+        renderAssetCurrentPolicy(assetForm);
+        renderAssetInsuranceHistory(assetForm);
+        saveAssetDraft(assetForm);
+    });
+
+    assetForm.querySelectorAll('[data-add-asset-insurance-previous]').forEach((previousButton) => previousButton.addEventListener('click', () => {
         const rows = historyRowsForType(assetForm, '[data-asset-insurance-policy-row]', assetInsurancePolicyFields);
         rows.push({
             ano: String(new Date().getFullYear() - 1),
@@ -5686,9 +5827,10 @@ if (assetForm instanceof HTMLFormElement) {
             observaciones: 'Poliza de vigencia anterior registrada como evidencia historica. No reemplaza la poliza vigente.',
         });
         renderAssetInsurancePolicyRows(assetForm, rows);
+        renderAssetInsuranceCurrentPolicyRows(assetForm);
         renderAssetInsuranceHistory(assetForm);
         saveAssetDraft(assetForm);
-    });
+    }));
 
     assetForm.querySelector('[data-asset-insurance-policy-rows]')?.addEventListener('click', (event) => {
         const target = event.target;
@@ -5811,6 +5953,7 @@ if (assetForm instanceof HTMLFormElement) {
             }
             if (target.matches('[data-insurance-request-field]')) {
                 syncInsuranceRequestField(assetForm, target);
+                renderAssetInsuranceCurrentPolicyRows(assetForm);
                 renderAssetInsurancePolicyRows(assetForm, historyRowsForType(assetForm, '[data-asset-insurance-policy-row]', assetInsurancePolicyFields));
                 renderInsuranceQuoteAnalysis(assetForm);
                 saveAssetDraft(assetForm);
@@ -5844,6 +5987,8 @@ if (assetForm instanceof HTMLFormElement) {
         if (target instanceof HTMLSelectElement && target.matches('[data-asset-coverage-policy-source]')) {
             assetForm.dataset.assetCoveragePolicyIndex = target.value || '0';
             renderAssetInsuranceCoverageRows(assetForm, historyRowsForType(assetForm, '[data-asset-insurance-coverage-row]', assetInsuranceCoverageFields));
+            renderAssetInsuranceCurrentPolicyRows(assetForm);
+            renderAssetInsuranceAssetExposureRows(assetForm);
             return;
         }
         if (!(target instanceof HTMLInputElement) || !target.matches('[data-asset-coverage-toggle]')) {
@@ -5883,6 +6028,11 @@ if (assetForm instanceof HTMLFormElement) {
             rows = rows.filter((row) => product ? normalizedCoverageRowKey(row) !== targetKey : normalizeInsuranceText(row.cobertura) !== normalizeInsuranceText(coverage));
         }
         renderAssetInsuranceCoverageRows(assetForm, rows);
+        renderAssetInsuranceCurrentPolicyRows(assetForm);
+        renderAssetInsuranceAssetExposureRows(assetForm);
+        renderAssetInsuranceEquipmentRows(assetForm, assetInsuranceEquipmentRows(assetForm));
+        renderAssetInsurancePolicyRows(assetForm, historyRowsForType(assetForm, '[data-asset-insurance-policy-row]', assetInsurancePolicyFields));
+        renderInsuranceQuoteAnalysis(assetForm);
         renderAssetInsuranceHistory(assetForm);
         saveAssetDraft(assetForm);
     });
@@ -5893,6 +6043,7 @@ if (assetForm instanceof HTMLFormElement) {
             return;
         }
         syncCoveragePremiumRow(target.closest('[data-asset-insurance-coverage-row]'));
+        renderAssetInsuranceCurrentPolicyRows(assetForm);
         renderAssetCurrentPolicy(assetForm);
         renderAssetInsuranceHistory(assetForm);
         saveAssetDraft(assetForm);
@@ -5913,8 +6064,21 @@ if (assetForm instanceof HTMLFormElement) {
         target.closest('[data-asset-insurance-coverage-row]')?.remove();
         const rows = historyRowsForType(assetForm, '[data-asset-insurance-coverage-row]', assetInsuranceCoverageFields);
         renderAssetInsuranceCoverageRows(assetForm, rows);
+        renderAssetInsuranceCurrentPolicyRows(assetForm);
+        renderAssetInsuranceAssetExposureRows(assetForm);
         renderAssetCurrentPolicy(assetForm);
         renderAssetInsuranceHistory(assetForm);
+        saveAssetDraft(assetForm);
+    });
+
+    assetForm.querySelector('[data-asset-insurance-assets-rows]')?.addEventListener('click', (event) => {
+        const target = event.target;
+        const productTab = target instanceof Element ? target.closest('[data-asset-insurance-product-tab="assets"]') : null;
+        if (!(productTab instanceof HTMLButtonElement)) {
+            return;
+        }
+        assetForm.dataset.assetAssetsActiveProduct = productTab.dataset.product || '';
+        renderAssetInsuranceAssetExposureRows(assetForm);
         saveAssetDraft(assetForm);
     });
 
@@ -5977,6 +6141,7 @@ if (assetForm instanceof HTMLFormElement) {
         if (target instanceof HTMLInputElement && target.matches('[data-insurance-request-field]')) {
             syncInsuranceRequestField(assetForm, target);
             updateInsuranceDerivedSummary(assetForm);
+            renderAssetInsuranceCurrentPolicyRows(assetForm);
             renderAssetInsurancePolicyRows(assetForm, historyRowsForType(assetForm, '[data-asset-insurance-policy-row]', assetInsurancePolicyFields));
             renderInsuranceQuoteAnalysis(assetForm);
             renderAssetInsuranceHistory(assetForm);
@@ -5997,6 +6162,9 @@ if (assetForm instanceof HTMLFormElement) {
             refreshCoverageSuggestedValues(assetForm);
             updateInsuranceItemTotalsDisplay(assetForm);
             updateInsuranceDerivedSummary(assetForm);
+            renderAssetInsuranceCurrentPolicyRows(assetForm);
+            renderAssetInsurancePolicyRows(assetForm, historyRowsForType(assetForm, '[data-asset-insurance-policy-row]', assetInsurancePolicyFields));
+            renderInsuranceQuoteAnalysis(assetForm);
             renderAssetInsuranceHistory(assetForm);
             saveAssetDraft(assetForm);
         }
@@ -6017,6 +6185,9 @@ if (assetForm instanceof HTMLFormElement) {
             refreshCoverageSuggestedValues(assetForm);
             updateInsuranceItemTotalsDisplay(assetForm);
             updateInsuranceDerivedSummary(assetForm);
+            renderAssetInsuranceCurrentPolicyRows(assetForm);
+            renderAssetInsurancePolicyRows(assetForm, historyRowsForType(assetForm, '[data-asset-insurance-policy-row]', assetInsurancePolicyFields));
+            renderInsuranceQuoteAnalysis(assetForm);
             renderAssetInsuranceHistory(assetForm);
             saveAssetDraft(assetForm);
         }
@@ -6085,6 +6256,10 @@ if (assetForm instanceof HTMLFormElement) {
 
     const openAssetModal = (row = null, trigger = null) => {
         lastAssetTrigger = trigger;
+        assetForm.dataset.assetInsuranceTab = 'actual';
+        assetForm.dataset.assetCoverageActiveProduct = '';
+        assetForm.dataset.assetAssetsActiveProduct = '';
+        assetForm.dataset.assetValueActiveProduct = '';
         const restoredDraft = fillAssetForm(assetForm, row, { restoreDraft: true });
         if (modalTitle) {
             modalTitle.textContent = row ? 'Editar activo' : 'Nuevo activo';
