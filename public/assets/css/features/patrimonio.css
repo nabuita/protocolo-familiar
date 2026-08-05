@@ -156,7 +156,7 @@
 
 .asset-modal-panel .asset-form {
     display: grid;
-    grid-template-rows: auto auto auto auto auto auto minmax(80px, auto) auto;
+    grid-auto-rows: max-content;
     max-height: calc(100dvh - 16px);
     min-width: 0;
     overflow: auto;
@@ -301,6 +301,11 @@
     border: 1px solid var(--line);
     border-radius: 14px;
     background: #fff;
+}
+
+.asset-subunits {
+    align-self: start;
+    margin-bottom: 14px;
 }
 
 .asset-fiducia[hidden],
@@ -2359,11 +2364,12 @@
 .asset-observations-field {
     grid-column: 1 / -1;
     position: relative;
-    z-index: 1;
+    z-index: 0;
     display: grid;
     gap: 0;
-    margin-top: 14px;
+    margin-top: 18px;
     background: #fff;
+    clear: both;
 }
 
 .asset-observations-help {
