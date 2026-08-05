@@ -186,7 +186,7 @@ const addAssetExpiryItem = (items, row, dateValue, label, category, extra = {}) 
         fecha_vencimiento: dateValue || '',
         responsable: extra.responsable || row.detalle?.vencimiento_responsable || row.detalle?.responsable_seguimiento || row.detalle?.suscripcion_responsable || row.detalle?.ia_responsable_cuenta || row.detalle?.portal_responsable_operacion || '',
         estado: extra.estado || row.detalle?.vencimiento_estado || row.detalle?.estado_poliza || row.detalle?.suscripcion_estado || '',
-        costo: extra.costo || row.detalle?.costos_mantenimiento || row.detalle?.portal_costo_periodico || row.detalle?.firma_costo_periodico || row.detalle?.suscripcion_costo_periodico || row.detalle?.ia_costo_periodico || '',
+        costo: extra.costo || row.detalle?.vencimiento_costo_periodico || row.detalle?.costos_mantenimiento || row.detalle?.portal_costo_periodico || row.detalle?.firma_costo_periodico || row.detalle?.suscripcion_costo_periodico || row.detalle?.ia_costo_periodico || '',
     });
 };
 
@@ -196,10 +196,14 @@ const assetRenewalItemsFromRow = (row) => {
     assetExpiryFieldMap.forEach(([key, label, category]) => {
         addAssetExpiryItem(items, row, detail[key], label, category);
     });
-    const digitalDueDate = detail.vencimiento_fecha || detail.portal_fecha_renovacion || detail.firma_fecha_renovacion || detail.suscripcion_fecha_renovacion || detail.ia_fecha_renovacion || '';
-    const digitalSubcategories = new Set(['Paginas web corporativas', 'Portales inmobiliarios', 'Dominios de internet', 'Plataformas de firma electronica', 'Membresias web / SaaS', 'Membresias de inteligencia artificial', 'Licencias tecnologicas', 'APIs e integraciones']);
-    if (row?.tipo_activo === 'Activo intangible/tecnologico/PI' && digitalSubcategories.has(detail.subcategoria || '') && !digitalDueDate) {
-        addAssetExpiryItem(items, row, '', 'Vencimiento digital sin fecha', 'Digital', { allowMissing: true });
+    const intangibleDueDate = detail.vencimiento_fecha || detail.portal_fecha_renovacion || detail.firma_fecha_renovacion || detail.suscripcion_fecha_renovacion || detail.ia_fecha_renovacion || '';
+    if (['Activo intangible/tecnologico/PI', 'Marca/Intangible'].includes(row?.tipo_activo || '') && !intangibleDueDate) {
+        addAssetExpiryItem(items, row, '', 'Intangible sin fecha de vencimiento', 'Intangible', {
+            allowMissing: true,
+            responsable: detail.vencimiento_responsable || detail.area_responsable || '',
+            costo: detail.vencimiento_costo_periodico || detail.costos_mantenimiento || '',
+            estado: detail.vencimiento_estado || detail.estado_tecnologico || '',
+        });
     }
     if (detail.poliza_seguro === 'Si' && !detail.fecha_fin_poliza && !detail.fecha_renovacion_poliza) {
         addAssetExpiryItem(items, row, '', 'Poliza sin fecha de vencimiento', 'Poliza', { allowMissing: true });
@@ -2056,6 +2060,8 @@ const assetHelpText = {
     plan_contingencia: 'Acciones previstas si falla el proveedor, se pierde acceso o vence el servicio.',
     fecha_ultima_revision: 'Ultima fecha en la que se verifico vigencia, accesos, costos, soporte o riesgos.',
     vencimiento_fecha: 'Fecha critica para renovar, pagar, actualizar o decidir continuidad.',
+    vencimiento_frecuencia_pago: 'Periodicidad del pago o renovacion: mensual, trimestral, anual, por consumo o pago unico.',
+    vencimiento_costo_periodico: 'Valor que se paga en cada periodo. Este costo alimenta el calendario y ayuda a medir el riesgo de suspension.',
     vencimiento_responsable: 'Persona encargada de revisar y ejecutar la renovacion antes del vencimiento.',
     vencimiento_metodo_pago: 'Medio usado para pagar o renovar; evita que un servicio se suspenda por tarjeta vencida.',
     portal_proveedor: 'Proveedor del portal inmobiliario, por ejemplo Finca Raiz, Metrocuadrado u otro.',

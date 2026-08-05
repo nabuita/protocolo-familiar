@@ -757,6 +757,7 @@ final class ProtocolLists
         $renewableDigital = array_merge($websites, $domains, $digitalSubscriptions, $licenses, $apis);
         $technicalDocs = ['Documentacion tecnica'];
         $secrets = ['Secretos empresariales y conocimiento interno'];
+        $allIntangibleSubcategories = array_merge($technologySubcategories, ['Logos e identidad visual', 'Revistas y publicaciones corporativas', 'Proyectos internos de empresa']);
         $commercializable = array_merge($apps, $software, $modules, $webPages, $realEstatePortals, $digitalProducts, $brands, $copyright, $designs, $licenses, $apis, ['Logos e identidad visual', 'Revistas y publicaciones corporativas']);
         $developmentBased = array_merge($apps, $software, $modules, $databases, $webPages, $apis);
         $sourceControlled = array_merge($apps, $software, $modules, $webPages, $apis);
@@ -867,16 +868,18 @@ final class ProtocolLists
             ['name' => 'periodicidad_respaldos', 'label' => 'Periodicidad de respaldos', 'type' => 'select', 'options' => 'periodicidad_respaldos', 'group' => 'Riesgos y continuidad'],
             ['name' => 'fecha_ultima_revision', 'label' => 'Fecha de ultima revision', 'type' => 'date', 'group' => 'Riesgos y continuidad'],
 
-            ['name' => 'vencimiento_fecha_inicio', 'label' => 'Fecha de inicio de vigencia', 'type' => 'date', 'group' => 'Control de vencimientos y renovaciones', 'applies_to' => $renewableDigital],
-            ['name' => 'vencimiento_fecha', 'label' => 'Fecha de vencimiento / proxima renovacion', 'type' => 'date', 'group' => 'Control de vencimientos y renovaciones', 'applies_to' => $renewableDigital],
-            ['name' => 'vencimiento_alerta_previa', 'label' => 'Alerta previa', 'type' => 'select', 'options' => 'alerta_vencimiento_digital', 'group' => 'Control de vencimientos y renovaciones', 'applies_to' => $renewableDigital],
-            ['name' => 'vencimiento_responsable', 'label' => 'Responsable de renovar', 'type' => 'text', 'group' => 'Control de vencimientos y renovaciones', 'applies_to' => $renewableDigital],
-            ['name' => 'vencimiento_correo_alerta', 'label' => 'Correo para alerta', 'type' => 'text', 'group' => 'Control de vencimientos y renovaciones', 'applies_to' => $renewableDigital],
-            ['name' => 'vencimiento_renovacion_automatica', 'label' => 'Renovacion automatica', 'type' => 'select', 'options' => 'si_no', 'group' => 'Control de vencimientos y renovaciones', 'applies_to' => $renewableDigital],
-            ['name' => 'vencimiento_estado', 'label' => 'Estado del vencimiento', 'type' => 'select', 'options' => 'estado_vencimiento_digital', 'group' => 'Control de vencimientos y renovaciones', 'applies_to' => $renewableDigital],
-            ['name' => 'vencimiento_metodo_pago', 'label' => 'Metodo de pago / tarjeta / cuenta', 'type' => 'text', 'group' => 'Control de vencimientos y renovaciones', 'applies_to' => $renewableDigital],
-            ['name' => 'vencimiento_factura_soporte', 'label' => 'Factura, contrato o soporte de renovacion', 'type' => 'text', 'group' => 'Control de vencimientos y renovaciones', 'applies_to' => $renewableDigital],
-            ['name' => 'vencimiento_observaciones', 'label' => 'Observaciones de renovacion', 'type' => 'textarea', 'group' => 'Control de vencimientos y renovaciones', 'applies_to' => $renewableDigital],
+            ['name' => 'vencimiento_fecha_inicio', 'label' => 'Fecha de inicio de vigencia', 'type' => 'date', 'group' => 'Control de vencimientos y renovaciones', 'applies_to' => $allIntangibleSubcategories],
+            ['name' => 'vencimiento_fecha', 'label' => 'Fecha de vencimiento / proxima renovacion', 'type' => 'date', 'group' => 'Control de vencimientos y renovaciones', 'applies_to' => $allIntangibleSubcategories],
+            ['name' => 'vencimiento_frecuencia_pago', 'label' => 'Frecuencia de pago', 'type' => 'select', 'options' => 'frecuencia_facturacion_digital', 'group' => 'Control de vencimientos y renovaciones', 'applies_to' => $allIntangibleSubcategories],
+            ['name' => 'vencimiento_costo_periodico', 'label' => 'Costo periodico', 'type' => 'money', 'group' => 'Control de vencimientos y renovaciones', 'applies_to' => $allIntangibleSubcategories],
+            ['name' => 'vencimiento_alerta_previa', 'label' => 'Alerta previa', 'type' => 'select', 'options' => 'alerta_vencimiento_digital', 'group' => 'Control de vencimientos y renovaciones', 'applies_to' => $allIntangibleSubcategories],
+            ['name' => 'vencimiento_responsable', 'label' => 'Responsable de renovar', 'type' => 'text', 'group' => 'Control de vencimientos y renovaciones', 'applies_to' => $allIntangibleSubcategories],
+            ['name' => 'vencimiento_correo_alerta', 'label' => 'Correo para alerta', 'type' => 'text', 'group' => 'Control de vencimientos y renovaciones', 'applies_to' => $allIntangibleSubcategories],
+            ['name' => 'vencimiento_renovacion_automatica', 'label' => 'Renovacion automatica', 'type' => 'select', 'options' => 'si_no', 'group' => 'Control de vencimientos y renovaciones', 'applies_to' => $allIntangibleSubcategories],
+            ['name' => 'vencimiento_estado', 'label' => 'Estado del vencimiento', 'type' => 'select', 'options' => 'estado_vencimiento_digital', 'group' => 'Control de vencimientos y renovaciones', 'applies_to' => $allIntangibleSubcategories],
+            ['name' => 'vencimiento_metodo_pago', 'label' => 'Metodo de pago / tarjeta / cuenta', 'type' => 'text', 'group' => 'Control de vencimientos y renovaciones', 'applies_to' => $allIntangibleSubcategories],
+            ['name' => 'vencimiento_factura_soporte', 'label' => 'Factura, contrato o soporte de renovacion', 'type' => 'text', 'group' => 'Control de vencimientos y renovaciones', 'applies_to' => $allIntangibleSubcategories],
+            ['name' => 'vencimiento_observaciones', 'label' => 'Observaciones de renovacion', 'type' => 'textarea', 'group' => 'Control de vencimientos y renovaciones', 'applies_to' => $allIntangibleSubcategories],
 
             ['name' => 'portal_url', 'label' => 'URL o acceso del portal', 'type' => 'text', 'group' => 'Portal inmobiliario', 'applies_to' => ['Portales inmobiliarios']],
             ['name' => 'portal_proveedor', 'label' => 'Proveedor / portal', 'type' => 'text', 'group' => 'Portal inmobiliario', 'applies_to' => ['Portales inmobiliarios']],
@@ -1013,6 +1016,8 @@ final class ProtocolLists
             'periodicidad_respaldos',
             'vencimiento_fecha_inicio',
             'vencimiento_fecha',
+            'vencimiento_frecuencia_pago',
+            'vencimiento_costo_periodico',
             'vencimiento_responsable',
             'vencimiento_correo_alerta',
             'vencimiento_renovacion_automatica',
