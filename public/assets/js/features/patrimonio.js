@@ -642,18 +642,21 @@ const insuranceAssetOptions = [
     { key: 'dinero_efectivo', label: 'Dinero en efectivo', category: 'Dinero en efectivo', coverage: 'Hurto', unit: 'gl' },
 ];
 
+const propertyDamageAssetCategories = ['Construccion', 'Vidrios', 'Muebles y enseres', 'Maquinaria y equipo', 'Equipo electronico / corriente debil', 'Mercancias / inventario', 'Obras de arte'];
+const propertyDamageCoreCategories = propertyDamageAssetCategories.filter((category) => category !== 'Obras de arte');
+
 const assetCoverageValueRules = {
-    Incendio: ['Construccion', 'Vidrios', 'Muebles y enseres', 'Maquinaria y equipo', 'Equipo electronico / corriente debil', 'Mercancias / inventario', 'Obras de arte'],
-    Rayo: ['Construccion', 'Vidrios', 'Muebles y enseres', 'Maquinaria y equipo', 'Equipo electronico / corriente debil', 'Mercancias / inventario'],
-    Explosion: ['Construccion', 'Vidrios', 'Muebles y enseres', 'Maquinaria y equipo', 'Equipo electronico / corriente debil', 'Mercancias / inventario'],
-    Humo: ['Construccion', 'Vidrios', 'Muebles y enseres', 'Maquinaria y equipo', 'Equipo electronico / corriente debil', 'Mercancias / inventario'],
-    'Danos por agua': ['Construccion', 'Vidrios', 'Muebles y enseres', 'Maquinaria y equipo', 'Equipo electronico / corriente debil', 'Mercancias / inventario'],
-    Anegacion: ['Construccion', 'Vidrios', 'Muebles y enseres', 'Maquinaria y equipo', 'Equipo electronico / corriente debil', 'Mercancias / inventario'],
-    Inundacion: ['Construccion', 'Vidrios', 'Muebles y enseres', 'Maquinaria y equipo', 'Equipo electronico / corriente debil', 'Mercancias / inventario'],
-    Terremoto: ['Construccion', 'Vidrios', 'Muebles y enseres', 'Maquinaria y equipo', 'Equipo electronico / corriente debil', 'Mercancias / inventario'],
-    'Temblor / erupcion volcanica': ['Construccion', 'Vidrios', 'Muebles y enseres', 'Maquinaria y equipo', 'Equipo electronico / corriente debil', 'Mercancias / inventario'],
-    'Actos mal intencionados de terceros': ['Construccion', 'Vidrios', 'Muebles y enseres', 'Maquinaria y equipo', 'Equipo electronico / corriente debil', 'Mercancias / inventario'],
-    Terrorismo: ['Construccion', 'Vidrios', 'Muebles y enseres', 'Maquinaria y equipo', 'Equipo electronico / corriente debil', 'Mercancias / inventario'],
+    Incendio: propertyDamageAssetCategories,
+    Rayo: propertyDamageCoreCategories,
+    Explosion: propertyDamageCoreCategories,
+    Humo: propertyDamageCoreCategories,
+    'Danos por agua': propertyDamageCoreCategories,
+    Anegacion: propertyDamageCoreCategories,
+    Inundacion: propertyDamageCoreCategories,
+    Terremoto: propertyDamageAssetCategories,
+    'Temblor / erupcion volcanica': propertyDamageAssetCategories,
+    'Actos mal intencionados de terceros': propertyDamageCoreCategories,
+    Terrorismo: propertyDamageCoreCategories,
     'Vidrios': ['Vidrios'],
     'Gastos de extincion': ['Construccion'],
     'Remocion de escombros': ['Construccion'],
@@ -684,10 +687,10 @@ const coverageValueCategoriesFor = (coverage) => {
         return [];
     }
     if (text.includes('terremoto') || text.includes('temblor') || text.includes('catastro')) {
-        return ['Construccion', 'Muebles y enseres', 'Maquinaria y equipo', 'Equipo electronico / corriente debil', 'Mercancias / inventario'];
+        return propertyDamageAssetCategories;
     }
     if (text.includes('incendio') || text.includes('rayo') || text.includes('explosion') || text.includes('humo') || text.includes('agua') || text.includes('inundacion') || text.includes('anegacion')) {
-        return ['Construccion', 'Vidrios', 'Muebles y enseres', 'Maquinaria y equipo', 'Equipo electronico / corriente debil', 'Mercancias / inventario'];
+        return propertyDamageCoreCategories;
     }
     if (text.includes('vidrio')) {
         return ['Vidrios'];
@@ -743,8 +746,8 @@ const insuranceCoverageAcademy = {
     'Danos por agua': { kind: 'Dano material', assets: ['Construccion', 'Muebles y enseres', 'Maquinaria y equipo', 'Equipo electronico / corriente debil', 'Mercancias / inventario'], basis: 'Valor de reposicion de bienes expuestos al agua.', review: 'Tuberias, cubiertas, mantenimiento, filtraciones y deducible.' },
     Anegacion: { kind: 'Dano material', assets: ['Construccion', 'Muebles y enseres', 'Mercancias / inventario', 'Equipo electronico / corriente debil'], basis: 'Valor de reposicion de bienes ubicados en zonas expuestas.', review: 'Altura del primer piso, drenajes, zonas inundables y exclusiones.' },
     Inundacion: { kind: 'Dano material', assets: ['Construccion', 'Muebles y enseres', 'Mercancias / inventario'], basis: 'Valor de reposicion soportado por avaluo o inventario.', review: 'Mapa de amenaza, antecedentes, obras de mitigacion y sublimites.' },
-    Terremoto: { kind: 'Catastrofico', assets: ['Construccion', 'Muebles y enseres', 'Maquinaria y equipo', 'Equipo electronico / corriente debil'], basis: 'Valor asegurable de reposicion, normalmente con deducible especial.', review: 'Deducible por evento, norma sismo resistente, PH y separacion de terreno.' },
-    'Temblor / erupcion volcanica': { kind: 'Catastrofico', assets: ['Construccion', 'Muebles y enseres', 'Maquinaria y equipo'], basis: 'Valor de reposicion de bienes declarados.', review: 'Zona geografica, sublimites y definicion del evento.' },
+    Terremoto: { kind: 'Catastrofico', assets: propertyDamageAssetCategories, basis: 'Valor asegurable de reposicion, normalmente con deducible especial.', review: 'Deducible por evento, norma sismo resistente, PH y separacion de terreno.' },
+    'Temblor / erupcion volcanica': { kind: 'Catastrofico', assets: propertyDamageAssetCategories, basis: 'Valor de reposicion de bienes declarados.', review: 'Zona geografica, sublimites y definicion del evento.' },
     Hurto: { kind: 'Sustraccion', assets: ['Muebles y enseres', 'Maquinaria y equipo', 'Equipo electronico / corriente debil', 'Mercancias / inventario', 'Obras de arte', 'Joyas', 'Dinero en efectivo'], basis: 'Relacion valorizada por item, con seriales, facturas o cotizaciones.', review: 'Tipo de hurto cubierto, protecciones exigidas, dinero y bienes excluidos.' },
     Sustraccion: { kind: 'Sustraccion', assets: ['Muebles y enseres', 'Maquinaria y equipo', 'Equipo electronico / corriente debil', 'Mercancias / inventario', 'Obras de arte', 'Joyas', 'Dinero en efectivo'], basis: 'Inventario detallado con valor de reposicion o limite pactado.', review: 'Si exige violencia, cerraduras, alarma, vigilancia o denuncia.' },
     'Actos mal intencionados de terceros': { kind: 'Dano material', assets: ['Construccion', 'Vidrios', 'Muebles y enseres', 'Maquinaria y equipo', 'Equipo electronico / corriente debil'], basis: 'Valor de reposicion de los bienes expuestos.', review: 'Exclusiones por terrorismo, asonada, motin o eventos politicos.' },
@@ -1528,6 +1531,14 @@ const insurableAssetGuidance = {
     'Exposicion frente a terceros': 'No sale de inventario; define limite por evento/vigencia segun actividad, contratos, visitantes y severidad.',
     'Contrato de arrendamiento': 'Usa canon, administracion, servicios o clausula pactada por los meses cubiertos.',
     'Contrato': 'Usa valor contractual, porcentaje exigido, vigencia y obligacion garantizada.',
+    'Predios, labores y operaciones': 'Define el limite por la operacion del predio: visitantes, circulacion, actividad, mantenimiento, accesos y severidad posible.',
+    'Visitantes y terceros': 'Define el limite por aforo, frecuencia de visitantes, tipo de actividad y posible severidad de lesiones.',
+    'Danos materiales a terceros': 'Define el limite por bienes de terceros expuestos: vecinos, arrendatarios, clientes, parqueaderos o predios colindantes.',
+    'Empleados / RC patronal': 'Define el limite segun nomina, labores, riesgo ocupacional y si la poliza cubre responsabilidad patronal.',
+    'Contratistas / RC cruzada': 'Define el limite por contratistas, obras, mantenimiento, administracion delegada y cruces de responsabilidad.',
+    Parqueaderos: 'Define el limite por numero de cupos, custodia, control de acceso, circulacion y valor probable de vehiculos expuestos.',
+    'Gastos de defensa': 'Define si opera dentro o adicional al limite principal y registra el sublimite ofrecido por la aseguradora.',
+    'Actividad profesional': 'Define el limite por errores u omisiones asociados al servicio profesional y contratos atendidos.',
 };
 
 const insurableAssetTooltip = (category) => insurableAssetGuidance[category] || 'Define el valor con fuente verificable, fecha de consulta y soporte documental.';
@@ -1660,6 +1671,22 @@ const selectedInsuranceCategoriesFromForm = (form) => {
         const category = row.querySelector('[name$="[categoria_item]"]')?.value || '';
         if (category) {
             selected.add(category);
+        }
+    });
+    return selected;
+};
+
+const selectedInsuranceOptionKeysFromForm = (form, options = [...insuranceAssetOptions, ...liabilityExposureOptions]) => {
+    const selected = new Set();
+    form.querySelectorAll('[data-asset-insurable-toggle]:checked').forEach((input) => {
+        if (input instanceof HTMLInputElement) {
+            selected.add(input.value);
+        }
+    });
+    const rows = insuranceEquipmentRowsForForm(form);
+    options.forEach((option) => {
+        if (rows.some((row) => row.categoria_item === option.category || row.cobertura_asociada === option.coverage || row.cobertura === option.coverage)) {
+            selected.add(option.key);
         }
     });
     return selected;
@@ -1886,14 +1913,14 @@ const coverageSupportTabsHtml = (categories = []) => {
 };
 
 const liabilityExposureOptions = [
-    { key: 'predios_labores', label: 'Predios, labores y operaciones', category: 'Exposicion RCE', coverage: 'Responsabilidad civil extracontractual', unit: 'limite' },
-    { key: 'visitantes_terceros', label: 'Visitantes y terceros', category: 'Exposicion RCE', coverage: 'Lesiones o muerte de terceros', unit: 'limite' },
-    { key: 'danos_terceros', label: 'Danos materiales a terceros', category: 'Exposicion RCE', coverage: 'Danos materiales a terceros', unit: 'limite' },
-    { key: 'empleados_patronal', label: 'Empleados / RC patronal', category: 'Exposicion RCE', coverage: 'Responsabilidad civil patronal', unit: 'limite' },
-    { key: 'contratistas_cruzada', label: 'Contratistas / RC cruzada', category: 'Exposicion RCE', coverage: 'Responsabilidad cruzada', unit: 'limite' },
-    { key: 'parqueaderos', label: 'Parqueaderos', category: 'Exposicion RCE', coverage: 'RC parqueaderos', unit: 'limite' },
-    { key: 'gastos_defensa', label: 'Gastos de defensa', category: 'Exposicion RCE', coverage: 'Gastos de defensa', unit: 'limite' },
-    { key: 'actividad_profesional', label: 'Actividad profesional', category: 'Exposicion RCE', coverage: 'Responsabilidad profesional', unit: 'limite' },
+    { key: 'predios_labores', label: 'Predios, labores y operaciones', category: 'Predios, labores y operaciones', coverage: 'Responsabilidad civil extracontractual', unit: 'limite' },
+    { key: 'visitantes_terceros', label: 'Visitantes y terceros', category: 'Visitantes y terceros', coverage: 'Lesiones o muerte de terceros', unit: 'limite' },
+    { key: 'danos_terceros', label: 'Danos materiales a terceros', category: 'Danos materiales a terceros', coverage: 'Danos materiales a terceros', unit: 'limite' },
+    { key: 'empleados_patronal', label: 'Empleados / RC patronal', category: 'Empleados / RC patronal', coverage: 'Responsabilidad civil patronal', unit: 'limite' },
+    { key: 'contratistas_cruzada', label: 'Contratistas / RC cruzada', category: 'Contratistas / RC cruzada', coverage: 'Responsabilidad cruzada', unit: 'limite' },
+    { key: 'parqueaderos', label: 'Parqueaderos', category: 'Parqueaderos', coverage: 'RC parqueaderos', unit: 'limite' },
+    { key: 'gastos_defensa', label: 'Gastos de defensa', category: 'Gastos de defensa', coverage: 'Gastos de defensa', unit: 'limite' },
+    { key: 'actividad_profesional', label: 'Actividad profesional', category: 'Actividad profesional', coverage: 'Responsabilidad profesional', unit: 'limite' },
 ];
 
 const insuranceAssetOptionByKey = (key) => [...insuranceAssetOptions, ...liabilityExposureOptions].find((item) => item.key === key);
@@ -4382,7 +4409,7 @@ const renderAssetInsuranceCoverageRows = (form, rows = []) => {
 const assetInsuranceAssetExposureContentHtml = (form, activeProduct) => {
     const activeCoverageRows = selectedInsuranceRequestRowsForProduct(form, activeProduct);
     const options = insuranceExposureOptionsForProduct(activeProduct, activeCoverageRows);
-    const selectedCategories = selectedInsuranceCategoriesFromForm(form);
+    const selectedKeys = selectedInsuranceOptionKeysFromForm(form, options);
     const isLiability = normalizeInsuranceText(activeProduct).includes('responsabilidad');
     return `
         <div class="asset-insurance-item-list">
@@ -4392,8 +4419,8 @@ const assetInsuranceAssetExposureContentHtml = (form, activeProduct) => {
             </div>
             <div class="asset-coverage-chips">
                 ${options.map((item) => `
-                    <label class="asset-coverage-chip ${selectedCategories.has(item.category) ? 'is-selected' : ''}" title="${assetEscape(insurableAssetTooltip(item.category))}">
-                        <input type="checkbox" data-asset-insurable-toggle value="${assetEscape(item.key)}" ${selectedCategories.has(item.category) ? 'checked' : ''}>
+                    <label class="asset-coverage-chip ${selectedKeys.has(item.key) ? 'is-selected' : ''}" title="${assetEscape(insurableAssetTooltip(item.category))}">
+                        <input type="checkbox" data-asset-insurable-toggle value="${assetEscape(item.key)}" ${selectedKeys.has(item.key) ? 'checked' : ''}>
                         <span>${assetEscape(item.label)}</span>
                     </label>
                 `).join('') || '<p class="muted">Este ramo no requiere relacion de bienes; define limites por cobertura en valores asegurados.</p>'}
