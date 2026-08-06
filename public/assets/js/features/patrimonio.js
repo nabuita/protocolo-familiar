@@ -1670,7 +1670,17 @@ const insuranceProductAcademyHtml = (products = [], form = null) => {
     if (selected.length === 0) {
         return '<div class="asset-insurance-academy-empty">Selecciona uno o varios seguros para ver su resumen tecnico y continuar con las coberturas requeridas.</div>';
     }
-    return selected.map((product, index) => {
+    const current = form?.dataset?.assetAcademyActiveProduct || selected[0];
+    const activeProduct = selected.includes(current) ? current : selected[0];
+    if (form) {
+        form.dataset.assetAcademyActiveProduct = activeProduct;
+    }
+    const tabs = selected.map((product) => `
+        <button type="button" class="${product === activeProduct ? 'is-active' : ''}" data-insurance-academy-tab="${assetEscape(product)}" aria-pressed="${product === activeProduct ? 'true' : 'false'}">
+            ${assetEscape(product)}
+        </button>
+    `).join('');
+    const activeCard = [activeProduct].map((product, index) => {
         const item = insuranceProductAcademy[product];
         const catalog = insuranceCatalogForProduct(form, product);
         if (!item && catalog) {
@@ -1702,6 +1712,7 @@ const insuranceProductAcademyHtml = (products = [], form = null) => {
             </details>
         `;
     }).join('');
+    return `<div class="asset-insurance-academy-tabs" role="tablist" aria-label="Ramos seleccionados">${tabs}</div>${activeCard}`;
 };
 
 const updateInsuranceProductAcademy = (form) => {
@@ -5804,6 +5815,9 @@ if (assetForm instanceof HTMLFormElement) {
         const target = event.target;
         if (target instanceof HTMLInputElement && target.matches('[data-asset-insurance-type-toggle]')) {
             target.closest('.asset-coverage-chip')?.classList.toggle('is-selected', target.checked);
+            if (target.checked) {
+                assetForm.dataset.assetAcademyActiveProduct = target.value;
+            }
             updateInsuranceTypeSelection(assetForm);
             updateInsuranceProductAcademy(assetForm);
             renderAssetInsuranceCoverageRows(assetForm, historyRowsForType(assetForm, '[data-asset-insurance-coverage-row]', assetInsuranceCoverageFields));
@@ -5853,6 +5867,13 @@ if (assetForm instanceof HTMLFormElement) {
     assetForm.querySelector('[data-asset-specific]')?.addEventListener('click', (event) => {
         const target = event.target;
         if (!(target instanceof Element)) {
+            return;
+        }
+        const academyTab = target.closest('[data-insurance-academy-tab]');
+        if (academyTab instanceof HTMLButtonElement) {
+            assetForm.dataset.assetAcademyActiveProduct = academyTab.dataset.insuranceAcademyTab || '';
+            updateInsuranceProductAcademy(assetForm);
+            saveAssetDraft(assetForm);
             return;
         }
         const button = target.closest('[data-asset-tab]');

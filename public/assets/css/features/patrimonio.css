@@ -1866,6 +1866,35 @@
     gap: 8px;
 }
 
+.asset-insurance-academy-tabs {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 0 0 2px;
+    scrollbar-width: thin;
+}
+
+.asset-insurance-academy-tabs button {
+    flex: 0 0 auto;
+    min-height: 38px;
+    padding: 8px 12px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: #fff;
+    color: var(--text);
+    font: inherit;
+    font-size: 12px;
+    font-weight: 850;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.asset-insurance-academy-tabs button.is-active {
+    border-color: var(--primary);
+    background: #eaf6f0;
+    color: var(--primary);
+}
+
 .asset-insurance-academy-empty {
     padding: 10px 12px;
     border: 1px dashed #cbded2;
@@ -1894,17 +1923,26 @@
     list-style: none;
 }
 
+.asset-insurance-academy-card > header {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    justify-content: space-between;
+}
+
 .asset-insurance-academy-card > summary::-webkit-details-marker {
     display: none;
 }
 
-.asset-insurance-academy-card > summary strong {
+.asset-insurance-academy-card > summary strong,
+.asset-insurance-academy-card > header strong {
     color: var(--primary);
     font-size: 13px;
     font-weight: 850;
 }
 
-.asset-insurance-academy-card > summary span {
+.asset-insurance-academy-card > summary span,
+.asset-insurance-academy-card > header span {
     max-width: 56ch;
     color: #5a6a60;
     font-size: 11px;
