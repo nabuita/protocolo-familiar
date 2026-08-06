@@ -507,7 +507,7 @@ const collectAssetDraft = (form) => {
         ingresos_anuales: assetFormRows(form, '[data-asset-income-year-row]', ['ano', 'fecha_inicio_vigencia', 'fecha_fin_vigencia', 'meses_vigencia', 'canon_mensual', 'porcentaje_participacion', 'incremento_porcentaje', 'incremento_valor', 'nuevo_canon_mensual', 'fecha_renovacion', 'observaciones']),
         gastos_anuales: assetFormRows(form, '[data-asset-expense-year-row]', ['ano', 'predial', 'administracion', 'seguros', 'mantenimiento', 'reparaciones', 'servicios_publicos', 'valorizacion', 'impuestos', 'honorarios_administracion', 'comisiones', 'juridicos_notariales', 'financieros_hipoteca', 'adecuaciones', 'otros', 'observaciones']),
         seguro_polizas: assetFormRows(form, '[data-asset-insurance-policy-row]', ['ano', 'tipo_documento', 'ramo', 'aseguradora', 'contacto_nombre', 'contacto_correo', 'contacto_celular', 'intermediario', 'agencia_expedidora', 'codigo_agencia', 'numero_poliza', 'numero_emision', 'numero_pago_electronico', 'modalidad_facturacion', 'coaseguro', 'tomador', 'asegurado', 'beneficiario', 'direccion_riesgo', 'ciudad_riesgo', 'actividad_riesgo', 'tipo_riesgo', 'fecha_inicio', 'fecha_fin', 'fecha_renovacion', 'prima_neta', 'iva', 'gastos_expedicion', 'prima_total', 'valor_asegurado_total', 'deducible_general', 'forma_pago', 'numero_cuotas', 'clausulado', 'anexos_endosos', 'exclusiones_relevantes', 'texto_aclaratorio', 'asistencias', 'estado', 'adoptada', 'fecha_adopcion', 'criterio_adopcion', 'cotizacion_matriz', 'alcance_poliza', 'grupo_poliza', 'metodo_distribucion', 'coeficiente_participacion', 'numero_unidades_cubiertas', 'prima_asignada', 'observaciones_distribucion', 'soporte', 'observaciones']),
-        seguro_coberturas: assetFormRows(form, '[data-asset-insurance-coverage-row]', ['ano', 'numero_poliza', 'ramo', 'cobertura', 'riesgo_cubierto', 'valor_asegurado', 'limite_evento', 'porcentaje_invar', 'indice_variable', 'sublimite', 'tasa', 'prima', 'deducible', 'fuente_valor_asegurado', 'fecha_inicio', 'fecha_fin', 'fecha_renovacion', 'observaciones']),
+        seguro_coberturas: assetFormRows(form, '[data-asset-insurance-coverage-row]', assetInsuranceCoverageFields),
         seguro_equipos: assetFormRows(form, '[data-asset-insurance-equipment-row]', ['ano', 'numero_poliza', 'ramo', 'cobertura_asociada', 'categoria_item', 'item', 'descripcion', 'unidad', 'cantidad', 'ubicacion', 'serial_referencia', 'valor_compra', 'fecha_adquisicion', 'valor_reposicion_unitario', 'valor_reposicion', 'fuente_consulta', 'fecha_consulta', 'ano_adquisicion', 'edad_anos', 'vida_util_anos', 'regla_demerito', 'depreciacion_porcentaje', 'depreciacion_valor', 'valor_asegurable_sugerido', 'incluye_terreno', 'fecha_inicio', 'fecha_fin', 'fecha_renovacion', 'observaciones']),
         seguro_movimientos: assetFormRows(form, '[data-asset-insurance-movement-row]', ['ano', 'fecha', 'tipo_movimiento', 'numero_poliza', 'ramo', 'cobertura', 'item', 'valor_variacion', 'estado_reporte', 'fecha_reporte_aseguradora', 'soporte', 'observaciones']),
     };
@@ -1665,7 +1665,8 @@ const joinInsuranceSelection = (values = []) => [...new Set(values.filter(Boolea
 
 const assetInsurancePolicyFields = ['ano', 'tipo_documento', 'ramo', 'aseguradora', 'contacto_nombre', 'contacto_correo', 'contacto_celular', 'intermediario', 'agencia_expedidora', 'codigo_agencia', 'numero_poliza', 'numero_emision', 'numero_pago_electronico', 'modalidad_facturacion', 'coaseguro', 'tomador', 'asegurado', 'beneficiario', 'direccion_riesgo', 'ciudad_riesgo', 'actividad_riesgo', 'tipo_riesgo', 'fecha_inicio', 'fecha_fin', 'fecha_renovacion', 'prima_neta', 'iva', 'gastos_expedicion', 'prima_total', 'valor_asegurado_total', 'deducible_general', 'forma_pago', 'numero_cuotas', 'clausulado', 'anexos_endosos', 'exclusiones_relevantes', 'texto_aclaratorio', 'asistencias', 'estado', 'adoptada', 'fecha_adopcion', 'criterio_adopcion', 'cotizacion_matriz', 'alcance_poliza', 'grupo_poliza', 'metodo_distribucion', 'coeficiente_participacion', 'numero_unidades_cubiertas', 'prima_asignada', 'observaciones_distribucion', 'soporte', 'observaciones'];
 
-const assetInsuranceCoverageFields = ['ano', 'numero_poliza', 'ramo', 'cobertura', 'riesgo_cubierto', 'valor_asegurado', 'limite_evento', 'porcentaje_invar', 'indice_variable', 'sublimite', 'tasa', 'prima', 'deducible', 'fuente_valor_asegurado', 'fecha_inicio', 'fecha_fin', 'fecha_renovacion', 'observaciones'];
+const assetInsuranceCoverageCurrentFields = ['contratado_actual', 'valor_actual', 'limite_evento_actual', 'sublimite_actual', 'deducible_actual', 'indice_variable_actual', 'tasa_actual', 'prima_actual', 'observaciones_actuales', 'renovacion_solicitada'];
+const assetInsuranceCoverageFields = ['ano', 'numero_poliza', 'ramo', 'cobertura', 'riesgo_cubierto', ...assetInsuranceCoverageCurrentFields, 'valor_asegurado', 'limite_evento', 'porcentaje_invar', 'indice_variable', 'sublimite', 'tasa', 'prima', 'deducible', 'fuente_valor_asegurado', 'fecha_inicio', 'fecha_fin', 'fecha_renovacion', 'observaciones'];
 
 const selectedInsuranceProductsFromForm = (form) => {
     const selected = [...form.querySelectorAll('[data-asset-insurance-type-toggle]:checked')]
@@ -2772,7 +2773,7 @@ const syncPolicyTypeFromDetail = (form) => {
     }
     renderAssetInsurancePolicyRows(form, rows);
     form.dataset.assetCoveragePolicyIndex = '0';
-    renderAssetInsuranceCoverageRows(form, assetFormRows(form, '[data-asset-insurance-coverage-row]', ['ano', 'numero_poliza', 'ramo', 'cobertura', 'riesgo_cubierto', 'valor_asegurado', 'limite_evento', 'porcentaje_invar', 'indice_variable', 'sublimite', 'tasa', 'prima', 'deducible', 'fuente_valor_asegurado', 'fecha_inicio', 'fecha_fin', 'fecha_renovacion', 'observaciones']));
+    renderAssetInsuranceCoverageRows(form, assetFormRows(form, '[data-asset-insurance-coverage-row]', assetInsuranceCoverageFields));
 };
 
 const updateInsuranceTypeSelection = (form) => {
@@ -4249,8 +4250,8 @@ const renderAssetInsuranceCurrentPolicyRows = (form) => {
     const coverages = insuranceRequestedCoverages(form);
     container.innerHTML = `
         <div class="asset-insurance-guide">
-            <strong>Linea base para renovar</strong>
-            <p>Lo contratado hoy queda aqui por cobertura. Estos datos se copian como guia para la solicitud nueva y el analista puede pedir mejores valores, deducibles, sublimites o indice variable.</p>
+            <strong>Comparativo: poliza actual vs renovacion solicitada</strong>
+            <p>Primero registra lo contratado hoy. Al estructurar la renovacion, el sistema conserva esa linea base y permite pedir mejoras de valor, deducible, sublimite, indice variable, tasa o prima.</p>
         </div>
         ${policies.length ? `
             <div class="asset-insurance-current-policy-list">
@@ -4264,29 +4265,63 @@ const renderAssetInsuranceCurrentPolicyRows = (form) => {
             </div>
         ` : '<p class="muted">Registra una poliza actual o anterior para dejar evidencia de lo que se tiene contratado.</p>'}
         ${coverages.length ? `
-            <div class="asset-insurance-request-table asset-insurance-current-coverage-table" role="table" aria-label="Cobertura actual contratada">
-                <div class="asset-insurance-request-head" role="row">
-                    <span>Ramo / cobertura</span>
-                    <span>Valor asegurado</span>
-                    <span>Limite evento</span>
-                    <span>Sublimite</span>
-                    <span>Deducible</span>
-                    <span>Indice variable</span>
-                    <span>Tasa</span>
-                    <span>Prima</span>
-                    <span>Fuente / mejora</span>
+            <div class="asset-insurance-comparison-table" role="table" aria-label="Comparativo poliza actual contra renovacion">
+                <div class="asset-insurance-comparison-head" role="row">
+                    <span>Cobertura</span>
+                    <span>Contratado actual</span>
+                    <span>Valor actual</span>
+                    <span>Deducible actual</span>
+                    <span>Limite / sublimite actual</span>
+                    <span>Indice / tasa actual</span>
+                    <span>Prima actual</span>
+                    <span>Solicitar renovacion</span>
+                    <span>Nuevo valor solicitado</span>
+                    <span>Fuente / observacion</span>
                 </div>
                 ${coverages.map((row) => `
-                    <div class="asset-insurance-request-row" role="row">
+                    <div class="asset-insurance-comparison-row" role="row">
                         <strong>${assetEscape(row.ramo || 'Ramo')}<small>${assetEscape(row.cobertura || 'Cobertura')}</small></strong>
-                        <input data-money-format inputmode="decimal" data-insurance-request-field="valor_asegurado" data-product="${assetEscape(row.ramo || '')}" data-coverage="${assetEscape(row.cobertura || '')}" value="${assetEscape(assetMoneyPlain(row.valor_asegurado) || row.valor_asegurado || '')}" placeholder="$0">
-                        <input data-insurance-request-field="limite_evento" data-product="${assetEscape(row.ramo || '')}" data-coverage="${assetEscape(row.cobertura || '')}" value="${assetEscape(row.limite_evento || '')}" placeholder="Por evento">
-                        <input data-insurance-request-field="sublimite" data-product="${assetEscape(row.ramo || '')}" data-coverage="${assetEscape(row.cobertura || '')}" value="${assetEscape(row.sublimite || '')}" placeholder="Si aplica">
-                        <input data-insurance-request-field="deducible" data-product="${assetEscape(row.ramo || '')}" data-coverage="${assetEscape(row.cobertura || '')}" value="${assetEscape(row.deducible || '')}" placeholder="% o valor">
-                        <input data-insurance-request-field="indice_variable" data-product="${assetEscape(row.ramo || '')}" data-coverage="${assetEscape(row.cobertura || '')}" value="${assetEscape(row.indice_variable || '')}" placeholder="IPC, fijo, pactado">
-                        <input data-insurance-request-field="tasa" inputmode="decimal" data-product="${assetEscape(row.ramo || '')}" data-coverage="${assetEscape(row.cobertura || '')}" value="${assetEscape(row.tasa || '')}" placeholder="Tasa">
-                        <input data-money-format inputmode="decimal" data-insurance-request-field="prima" data-product="${assetEscape(row.ramo || '')}" data-coverage="${assetEscape(row.cobertura || '')}" value="${assetEscape(assetMoneyPlain(row.prima) || row.prima || '')}" placeholder="$0">
-                        <input data-insurance-request-field="observaciones" data-product="${assetEscape(row.ramo || '')}" data-coverage="${assetEscape(row.cobertura || '')}" value="${assetEscape(row.observaciones || row.fuente_valor_asegurado || '')}" placeholder="Fuente, exclusion o mejora solicitada">
+                        <label>
+                            <span>Contratado</span>
+                            <select data-insurance-request-field="contratado_actual" data-product="${assetEscape(row.ramo || '')}" data-coverage="${assetEscape(row.cobertura || '')}">
+                                ${['', 'Si', 'No', 'Parcial', 'Por confirmar'].map((item) => `<option value="${assetEscape(item)}" ${item === (row.contratado_actual || '') ? 'selected' : ''}>${assetEscape(item || 'Seleccione')}</option>`).join('')}
+                            </select>
+                        </label>
+                        <label>
+                            <span>Valor actual</span>
+                            <input data-money-format inputmode="decimal" data-insurance-request-field="valor_actual" data-product="${assetEscape(row.ramo || '')}" data-coverage="${assetEscape(row.cobertura || '')}" value="${assetEscape(assetMoneyPlain(row.valor_actual) || row.valor_actual || '')}" placeholder="$0">
+                        </label>
+                        <label>
+                            <span>Deducible actual</span>
+                            <input data-insurance-request-field="deducible_actual" data-product="${assetEscape(row.ramo || '')}" data-coverage="${assetEscape(row.cobertura || '')}" value="${assetEscape(row.deducible_actual || '')}" placeholder="% o valor">
+                        </label>
+                        <label>
+                            <span>Limite / sublimite</span>
+                            <input data-insurance-request-field="limite_evento_actual" data-product="${assetEscape(row.ramo || '')}" data-coverage="${assetEscape(row.cobertura || '')}" value="${assetEscape(row.limite_evento_actual || '')}" placeholder="Limite evento">
+                            <input data-insurance-request-field="sublimite_actual" data-product="${assetEscape(row.ramo || '')}" data-coverage="${assetEscape(row.cobertura || '')}" value="${assetEscape(row.sublimite_actual || '')}" placeholder="Sublimite">
+                        </label>
+                        <label>
+                            <span>Indice / tasa</span>
+                            <input data-insurance-request-field="indice_variable_actual" data-product="${assetEscape(row.ramo || '')}" data-coverage="${assetEscape(row.cobertura || '')}" value="${assetEscape(row.indice_variable_actual || '')}" placeholder="IPC, fijo, pactado">
+                            <input data-insurance-request-field="tasa_actual" inputmode="decimal" data-product="${assetEscape(row.ramo || '')}" data-coverage="${assetEscape(row.cobertura || '')}" value="${assetEscape(row.tasa_actual || '')}" placeholder="Tasa">
+                        </label>
+                        <label>
+                            <span>Prima actual</span>
+                            <input data-money-format inputmode="decimal" data-insurance-request-field="prima_actual" data-product="${assetEscape(row.ramo || '')}" data-coverage="${assetEscape(row.cobertura || '')}" value="${assetEscape(assetMoneyPlain(row.prima_actual) || row.prima_actual || '')}" placeholder="$0">
+                        </label>
+                        <label>
+                            <span>Renovacion</span>
+                            <input data-insurance-request-field="renovacion_solicitada" data-product="${assetEscape(row.ramo || '')}" data-coverage="${assetEscape(row.cobertura || '')}" value="${assetEscape(row.renovacion_solicitada || '')}" placeholder="Mantener, subir, incluir, excluir">
+                        </label>
+                        <label>
+                            <span>Nuevo valor</span>
+                            <input data-money-format inputmode="decimal" data-insurance-request-field="valor_asegurado" data-product="${assetEscape(row.ramo || '')}" data-coverage="${assetEscape(row.cobertura || '')}" value="${assetEscape(assetMoneyPlain(row.valor_asegurado) || row.valor_asegurado || '')}" placeholder="$0">
+                        </label>
+                        <label>
+                            <span>Fuente / observacion</span>
+                            <input data-insurance-request-field="fuente_valor_asegurado" data-product="${assetEscape(row.ramo || '')}" data-coverage="${assetEscape(row.cobertura || '')}" value="${assetEscape(row.fuente_valor_asegurado || '')}" placeholder="Caratula, clausulado, cotizacion">
+                            <input data-insurance-request-field="observaciones" data-product="${assetEscape(row.ramo || '')}" data-coverage="${assetEscape(row.cobertura || '')}" value="${assetEscape(row.observaciones || '')}" placeholder="Mejora, exclusion o condicion">
+                        </label>
                     </div>
                 `).join('')}
             </div>
@@ -5718,8 +5753,6 @@ if (assetForm instanceof HTMLFormElement) {
         saveAssetDraft(assetForm);
     });
 
-    const assetInsurancePolicyFields = ['ano', 'tipo_documento', 'ramo', 'aseguradora', 'contacto_nombre', 'contacto_correo', 'contacto_celular', 'intermediario', 'agencia_expedidora', 'codigo_agencia', 'numero_poliza', 'numero_emision', 'numero_pago_electronico', 'modalidad_facturacion', 'coaseguro', 'tomador', 'asegurado', 'beneficiario', 'direccion_riesgo', 'ciudad_riesgo', 'actividad_riesgo', 'tipo_riesgo', 'fecha_inicio', 'fecha_fin', 'fecha_renovacion', 'prima_neta', 'iva', 'gastos_expedicion', 'prima_total', 'valor_asegurado_total', 'deducible_general', 'forma_pago', 'numero_cuotas', 'clausulado', 'anexos_endosos', 'exclusiones_relevantes', 'texto_aclaratorio', 'asistencias', 'estado', 'adoptada', 'fecha_adopcion', 'criterio_adopcion', 'cotizacion_matriz', 'alcance_poliza', 'grupo_poliza', 'metodo_distribucion', 'coeficiente_participacion', 'numero_unidades_cubiertas', 'prima_asignada', 'observaciones_distribucion', 'soporte', 'observaciones'];
-    const assetInsuranceCoverageFields = ['ano', 'numero_poliza', 'ramo', 'cobertura', 'riesgo_cubierto', 'valor_asegurado', 'limite_evento', 'porcentaje_invar', 'indice_variable', 'sublimite', 'tasa', 'prima', 'deducible', 'fuente_valor_asegurado', 'fecha_inicio', 'fecha_fin', 'fecha_renovacion', 'observaciones'];
     const assetInsuranceMovementFields = ['ano', 'fecha', 'tipo_movimiento', 'numero_poliza', 'ramo', 'cobertura', 'item', 'valor_variacion', 'estado_reporte', 'fecha_reporte_aseguradora', 'soporte', 'observaciones'];
 
     assetForm.querySelector('[data-asset-insurance-flow]')?.addEventListener('click', (event) => {
@@ -5806,6 +5839,18 @@ if (assetForm instanceof HTMLFormElement) {
     assetForm.querySelector('[data-asset-insurance-current-policy-rows]')?.addEventListener('input', (event) => {
         const target = event.target;
         if (!(target instanceof HTMLInputElement) || !target.matches('[data-insurance-request-field]')) {
+            return;
+        }
+        syncInsuranceRequestField(assetForm, target);
+        renderAssetInsurancePolicyRows(assetForm, historyRowsForType(assetForm, '[data-asset-insurance-policy-row]', assetInsurancePolicyFields));
+        renderInsuranceQuoteAnalysis(assetForm);
+        renderAssetCurrentPolicy(assetForm);
+        renderAssetInsuranceHistory(assetForm);
+        saveAssetDraft(assetForm);
+    });
+    assetForm.querySelector('[data-asset-insurance-current-policy-rows]')?.addEventListener('change', (event) => {
+        const target = event.target;
+        if (!((target instanceof HTMLInputElement || target instanceof HTMLSelectElement) && target.matches('[data-insurance-request-field]'))) {
             return;
         }
         syncInsuranceRequestField(assetForm, target);
