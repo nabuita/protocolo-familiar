@@ -789,6 +789,89 @@ const insuranceCoverageAcademy = {
     'Por confirmar': { kind: 'Pendiente', assets: ['Pendiente'], basis: 'Pendiente de definir con clausulado/cotizacion.', review: 'No contratar sin confirmar alcance.' },
 };
 
+const insurancePolicyPdfFieldMatrix = [
+    {
+        ramos: ['Incendio', 'Incendio y terremoto', 'Todo riesgo dano material', 'Danos materiales inmueble arrendado', 'Hogar', 'Copropiedad'],
+        cobertura: 'Incendio y coberturas aliadas',
+        objeto: 'Edificio(s), vidrios, maquinaria y equipo, muebles, enseres, contenidos o mercancias declaradas.',
+        campos: 'Objeto asegurable, suma asegurada, % indice variable, sublimite si existe y deducible (% perdida + minimo SMMLV).',
+        fuente: 'Caratula: AMPARO / OBJETO / SUMA ASEGURADA / % INVAR / SUBLIMITE / DEDUCIBLES.',
+        alerta: 'No incluir terreno. Separar construccion, vidrios, equipos y contenidos para evitar infra o supraseguro.',
+    },
+    {
+        ramos: ['Incendio', 'Todo riesgo dano material', 'Danos materiales inmueble arrendado', 'Copropiedad'],
+        cobertura: 'Asonada, motin, conmocion civil, huelga, AMIT y terrorismo',
+        objeto: 'Los mismos bienes declarados en incendio cuando la poliza extiende esos eventos.',
+        campos: 'Suma asegurada por objeto, % indice variable, sublimite, deducible y si opera como extension o cobertura separada.',
+        fuente: 'Caratula y clausulado de condiciones particulares.',
+        alerta: 'Validar si terrorismo/AMIT tiene deducible o sublimite distinto al incendio basico.',
+    },
+    {
+        ramos: ['Terremoto', 'Incendio y terremoto', 'Todo riesgo dano material', 'Hogar', 'Copropiedad'],
+        cobertura: 'Terremoto, temblor, erupcion volcanica y eventos de la naturaleza',
+        objeto: 'Construccion y contenidos expresamente asegurados frente a evento catastrofico.',
+        campos: 'Suma asegurada, % indice variable, deducible especial, minimo SMMLV y sublimite si aplica.',
+        fuente: 'Caratula, cuadro de amparos y clausulado de eventos de la naturaleza.',
+        alerta: 'Usar valor de reposicion sin terreno. Revisar si varios eventos dentro de 72 horas cuentan como un solo siniestro.',
+    },
+    {
+        ramos: ['Vidrios', 'Incendio', 'Todo riesgo dano material', 'Hogar', 'Copropiedad'],
+        cobertura: 'Vidrios',
+        objeto: 'Vidrios instalados, vitrinas, divisiones, fachadas o elementos equivalentes declarados.',
+        campos: 'Suma asegurada, % indice variable, deducible, medidas m2/ml y fuente del valor de reposicion.',
+        fuente: 'Caratula y relacion de vidrios valorizada.',
+        alerta: 'La suma debe salir de area/tipo de vidrio por valor de reposicion e instalacion, no de una cifra global.',
+    },
+    {
+        ramos: ['Responsabilidad Civil', 'Responsabilidad civil extracontractual', 'Todo riesgo dano material', 'Incendio'],
+        cobertura: 'Responsabilidad civil extracontractual',
+        objeto: 'Patrimonio del asegurado por danos materiales, lesiones, muerte o perjuicios causados a terceros.',
+        campos: 'Limite evento/vigencia, sublimitaciones, deducible, gastos medicos, defensa, patronal, cruzada y parqueaderos si aplican.',
+        fuente: 'Caratula: limite contratado; clausulado: amparos adicionales y sublimitados.',
+        alerta: 'No sale de inventario de bienes. Debe definirse por actividad, predio, visitantes, empleados, contratistas y contratos.',
+    },
+    {
+        ramos: ['Responsabilidad Civil', 'Responsabilidad civil extracontractual'],
+        cobertura: 'Gastos medicos / gastos de defensa / pagos suplementarios / patronal',
+        objeto: 'Sublimites dentro del basico de RCE, no necesariamente adicionales a la suma principal.',
+        campos: 'Porcentaje por evento, porcentaje por vigencia, limite principal afectado, deducible y condicion de procedencia.',
+        fuente: 'Clausulado de Responsabilidad Civil: amparos adicionales sublimitados.',
+        alerta: 'Registrar si el sublimite consume la suma de RCE o si opera en adicion; esa diferencia cambia la comparacion.',
+    },
+    {
+        ramos: ['Sustraccion', 'Todo riesgo dano material', 'Hogar', 'Manejo'],
+        cobertura: 'Hurto calificado / sustraccion',
+        objeto: 'Contenidos, maquinaria, equipo, mercancias, obras, joyas o dinero declarados.',
+        campos: 'Suma asegurada por categoria, deducible, protecciones exigidas, ubicacion y bienes excluidos.',
+        fuente: 'Caratula, clausulado y relacion valorizada de bienes.',
+        alerta: 'Confirmar modalidad cubierta: hurto simple, hurto calificado, violencia, cerraduras, alarma o vigilancia.',
+    },
+    {
+        ramos: ['Montaje y Rotura de Maquinaria', 'Rotura de maquinaria', 'Maquinaria y equipo', 'Todo riesgo dano material'],
+        cobertura: 'Rotura de maquinaria / dano interno',
+        objeto: 'Maquinas, motobombas, equipos mecanicos, equipos auxiliares y sistemas declarados.',
+        campos: 'Item, descripcion, serial, valor de reposicion, fuente, fecha de consulta, deducible y demerito si aplica.',
+        fuente: 'Caratula, clausulado, inventario valorizado, facturas, cotizaciones y mantenimiento.',
+        alerta: 'No aceptar suma global sin relacion. Revisar desgaste, mantenimiento, garantia, antiguedad y exclusiones.',
+    },
+    {
+        ramos: ['Corriente Debil', 'Equipo electronico / corriente debil', 'Todo riesgo dano material'],
+        cobertura: 'Equipo electronico / corriente debil',
+        objeto: 'UPS, CCTV, redes, servidores, computadores, controles de acceso, alarmas y equipos electronicos.',
+        campos: 'Inventario por grupo o item, valor de reposicion, serial si aplica, fuente, fecha, deducible y alcance de dano interno.',
+        fuente: 'Relacion de equipos, factura/cotizacion, clausulado y condiciones particulares.',
+        alerta: 'Separar hardware, software, datos, portabilidad y dano electrico; no todo queda cubierto automaticamente.',
+    },
+    {
+        ramos: ['Lucro Cesante', 'Lucro cesante', 'Incendio', 'Todo riesgo dano material', 'Hogar'],
+        cobertura: 'Perdida de arrendamiento por siniestro',
+        objeto: 'Canones que el propietario deja de recibir cuando un siniestro cubierto impide arrendar o usar el inmueble.',
+        campos: 'Canon mensual por unidad, numero de meses, porcentaje de participacion, limite asegurado, deducible temporal e indice pactado.',
+        fuente: 'Contratos de arrendamiento, historial de canon, subunidades, clausulado y caratula.',
+        alerta: 'No confundir con seguro de arrendamiento por mora ni con gastos de alojamiento temporal.',
+    },
+];
+
 const insuranceProductAcademy = {
     'Danos materiales inmueble arrendado': {
         appliesTo: ['Inmueble'],
@@ -1718,6 +1801,48 @@ const insuranceProductTabsHtml = (products, active, target) => {
                 </button>
             `).join('')}
         </div>
+    `;
+};
+
+const insurancePolicyPdfFieldsForProducts = (products = []) => {
+    const normalizedProducts = new Set(products.map((product) => normalizeInsuranceText(normalizeInsuranceRamo(product))));
+    return insurancePolicyPdfFieldMatrix.filter((row) => row.ramos.some((ramo) => normalizedProducts.has(normalizeInsuranceText(normalizeInsuranceRamo(ramo)))));
+};
+
+const insurancePolicyPdfFieldMatrixHtml = (products = []) => {
+    const rows = insurancePolicyPdfFieldsForProducts(products);
+    if (rows.length === 0) {
+        return `
+            <div class="asset-insurance-policy-reading-empty">
+                Selecciona los ramos del activo para ver que campos debe leer el analista en la caratula y el clausulado.
+            </div>
+        `;
+    }
+    return `
+        <details class="asset-insurance-policy-reading" open>
+            <summary>
+                <strong>Campos que debe leer el analista en la poliza actual</strong>
+                <span>${rows.length} reglas segun ramo/cobertura</span>
+            </summary>
+            <div class="asset-insurance-policy-reading-table" role="table" aria-label="Matriz tecnica de lectura de poliza">
+                <div class="asset-insurance-policy-reading-head" role="row">
+                    <span>Cobertura</span>
+                    <span>Objeto asegurable</span>
+                    <span>Campos de la caratula</span>
+                    <span>Fuente</span>
+                    <span>Alerta del analista</span>
+                </div>
+                ${rows.map((row) => `
+                    <div class="asset-insurance-policy-reading-row" role="row">
+                        <strong>${assetEscape(row.cobertura)}</strong>
+                        <span>${assetEscape(row.objeto)}</span>
+                        <span>${assetEscape(row.campos)}</span>
+                        <span>${assetEscape(row.fuente)}</span>
+                        <span>${assetEscape(row.alerta)}</span>
+                    </div>
+                `).join('')}
+            </div>
+        </details>
     `;
 };
 
@@ -4245,6 +4370,7 @@ const renderAssetInsuranceCurrentPolicyRows = (form) => {
         container.innerHTML = '';
         return;
     }
+    const selectedProducts = selectedInsuranceProductsFromForm(form);
     const policies = assetFormRows(form, '[data-asset-insurance-policy-row]', assetInsurancePolicyFields)
         .filter((row) => row.adoptada === 'Si' || row.estado === 'Vigente' || row.estado === 'Vencida' || row.numero_poliza || row.alcance_poliza === 'Matriz/global');
     const coverages = insuranceRequestedCoverages(form);
@@ -4253,6 +4379,7 @@ const renderAssetInsuranceCurrentPolicyRows = (form) => {
             <strong>Comparativo: poliza actual vs renovacion solicitada</strong>
             <p>Primero registra lo contratado hoy. Al estructurar la renovacion, el sistema conserva esa linea base y permite pedir mejoras de valor, deducible, sublimite, indice variable, tasa o prima.</p>
         </div>
+        ${insurancePolicyPdfFieldMatrixHtml(selectedProducts)}
         ${policies.length ? `
             <div class="asset-insurance-current-policy-list">
                 ${policies.map((row) => `
