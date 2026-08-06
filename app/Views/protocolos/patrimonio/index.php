@@ -278,20 +278,19 @@ foreach (($documentoRows ?? []) as $documento) {
             </section>
             <nav class="asset-insurance-flow" data-asset-insurance-flow hidden aria-label="Flujo de seguros">
                 <button type="button" data-asset-insurance-tab="actual" class="is-active">2. Poliza actual</button>
-                <button type="button" data-asset-insurance-tab="coberturas">3. Coberturas requeridas</button>
-                <button type="button" data-asset-insurance-tab="bienes">4. Bienes/exposiciones</button>
-                <button type="button" data-asset-insurance-tab="modelo">5. Valores asegurados</button>
-                <button type="button" data-asset-insurance-tab="cotizaciones">6. Solicitud y cotizacion</button>
-                <button type="button" data-asset-insurance-tab="vigente">7. Poliza vigente</button>
-                <button type="button" data-asset-insurance-tab="matriz">8. Matriz/global</button>
-                <button type="button" data-asset-insurance-tab="movimientos">9. Cambios/endosos</button>
-                <button type="button" data-asset-insurance-tab="historial">10. Historial</button>
+                <button type="button" data-asset-insurance-tab="coberturas">3. Coberturas y bienes</button>
+                <button type="button" data-asset-insurance-tab="modelo">4. Valores asegurados</button>
+                <button type="button" data-asset-insurance-tab="cotizaciones">5. Solicitud y cotizacion</button>
+                <button type="button" data-asset-insurance-tab="vigente">6. Poliza vigente</button>
+                <button type="button" data-asset-insurance-tab="matriz">7. Matriz/global</button>
+                <button type="button" data-asset-insurance-tab="movimientos">8. Cambios/endosos</button>
+                <button type="button" data-asset-insurance-tab="historial">9. Historial</button>
             </nav>
             <section class="asset-insurance" data-asset-insurance-current-policy data-asset-insurance-panel="actual" hidden>
                 <div class="asset-participation-header">
                     <div>
                         <h2>2. Poliza actual / cobertura contratada <span class="asset-document-marker">*Control Documental*</span></h2>
-                        <p>Registra lo que existe hoy por ramo y cobertura: valor asegurado, limite por evento, sublimite, deducible, indice variable, tasa, prima, exclusiones y soporte. Esta sera la linea base para renovar o mejorar.</p>
+                        <p>Registra solo lo que existe hoy: coberturas contratadas, bienes o exposiciones cubiertas, valor actual, limite por evento, sublimite, deducible, indice variable, tasa, prima, exclusiones y soporte.</p>
                     </div>
                     <button type="button" data-add-asset-insurance-previous>Registrar poliza actual o anterior</button>
                 </div>
@@ -300,7 +299,7 @@ foreach (($documentoRows ?? []) as $documento) {
             <section class="asset-insurance" data-asset-insurance-matrix data-asset-insurance-panel="matriz" hidden>
                 <div class="asset-participation-header">
                     <div>
-                        <h2>8. Poliza matriz/global <span class="asset-document-marker">*Control Documental*</span></h2>
+                        <h2>7. Poliza matriz/global <span class="asset-document-marker">*Control Documental*</span></h2>
                         <p>Usa esta opcion solo si una misma poliza cubre varios inmuebles, unidades o todo un edificio. No reemplaza las cotizaciones; sirve para guardar una sola poliza y asignar a este activo su prima proporcional.</p>
                     </div>
                     <button type="button" data-add-asset-insurance-matrix>Registrar poliza matriz</button>
@@ -310,8 +309,8 @@ foreach (($documentoRows ?? []) as $documento) {
             <section class="asset-insurance" data-asset-insurance data-asset-insurance-panel="cotizaciones" hidden>
                 <div class="asset-participation-header">
                     <div>
-                        <h2>6. Solicitud de cotizacion y comparativo <span class="asset-document-marker">*Control Documental*</span></h2>
-                        <p>Genera una solicitud unica por oferente con los ramos y valores solicitados. Cuando respondan, diligencia prima, deducibles, sublimites, limites, indice variable y observaciones para decidir.</p>
+                        <h2>5. Solicitud de cotizacion y comparativo <span class="asset-document-marker">*Control Documental*</span></h2>
+                        <p>Se arma desde las coberturas y valores solicitados. Cuando respondan, diligencia prima, deducibles, sublimites, limites, indice variable y observaciones para decidir.</p>
                     </div>
                     <div class="asset-header-actions">
                         <button type="button" data-add-asset-insurance-previous>Registrar poliza anterior</button>
@@ -334,7 +333,7 @@ foreach (($documentoRows ?? []) as $documento) {
             <section class="asset-insurance" data-asset-insurance-current data-asset-insurance-panel="vigente" hidden>
                 <div class="asset-participation-header">
                     <div>
-                        <h2>7. Poliza vigente adoptada</h2>
+                        <h2>6. Poliza vigente adoptada</h2>
                         <p>Aqui no se diligencia manualmente. El resumen aparece cuando tomas una cotizacion. Si la poliza cubre varios activos, usa la pestana de poliza matriz/global.</p>
                     </div>
                 </div>
@@ -343,8 +342,8 @@ foreach (($documentoRows ?? []) as $documento) {
             <section class="asset-insurance" data-asset-insurance-coverage data-asset-insurance-panel="coberturas" hidden>
                 <div class="asset-participation-header">
                     <div>
-                        <h2>3. Coberturas requeridas por seguro <span class="asset-document-marker">*Control Documental*</span></h2>
-                        <p>Por cada seguro incorporado al activo, marca los amparos que deben cotizarse o contratarse. La matriz sale del catalogo tecnico de seguros.</p>
+                        <h2>3. Coberturas requeridas y bienes/exposiciones <span class="asset-document-marker">*Control Documental*</span></h2>
+                        <p>Por cada seguro incorporado, marca los amparos que se van a cotizar y la base que corresponde: bienes asegurables o exposiciones del riesgo.</p>
                     </div>
                 </div>
                 <div class="asset-insurance-rows" data-asset-insurance-coverage-rows></div>
@@ -361,8 +360,8 @@ foreach (($documentoRows ?? []) as $documento) {
             <section class="asset-insurance" data-asset-insurance-equipment data-asset-insurance-panel="modelo" hidden>
                 <div class="asset-participation-header">
                     <div>
-                        <h2>5. Valores asegurados y soporte <span class="asset-document-marker">*Control Documental*</span></h2>
-                        <p>Relaciona los bienes, limites o exposiciones que alimentan cada cobertura. El valor asegurado debe salir de avaluos, facturas, cotizaciones, inventarios o limites documentados.</p>
+                        <h2>4. Valores asegurados: actual vs solicitado <span class="asset-document-marker">*Control Documental*</span></h2>
+                        <p>Compara lo contratado con lo que se va a pedir. Luego relaciona los bienes, limites o exposiciones que soportan cada valor solicitado.</p>
                     </div>
                     <button type="button" data-add-asset-insurance-equipment>Agregar item</button>
                 </div>

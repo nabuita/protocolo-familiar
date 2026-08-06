@@ -1493,6 +1493,7 @@
 
 .asset-insurance-comparison-head span,
 .asset-insurance-comparison-row strong,
+.asset-insurance-comparison-row > span,
 .asset-insurance-comparison-row label {
     min-width: 0;
     padding: 9px 10px;
@@ -1502,6 +1503,7 @@
 }
 
 .asset-insurance-comparison-row:last-child strong,
+.asset-insurance-comparison-row:last-child > span,
 .asset-insurance-comparison-row:last-child label {
     border-bottom: 0;
 }
@@ -1511,6 +1513,21 @@
     display: grid;
     gap: 5px;
     align-content: start;
+}
+
+.asset-insurance-current-only-table .asset-insurance-comparison-head,
+.asset-insurance-current-only-table .asset-insurance-comparison-row {
+    grid-template-columns:
+        minmax(190px, 1fr)
+        minmax(140px, .75fr)
+        minmax(210px, 1.05fr)
+        minmax(155px, .8fr)
+        minmax(210px, 1.05fr)
+        minmax(155px, .8fr)
+        minmax(200px, 1fr)
+        minmax(145px, .75fr)
+        minmax(260px, 1.25fr);
+    min-width: 1680px;
 }
 
 .asset-insurance-comparison-row strong {
