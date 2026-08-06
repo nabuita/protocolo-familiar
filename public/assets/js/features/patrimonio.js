@@ -3556,6 +3556,24 @@ const updateAssetInsuranceSections = (form, type) => {
 const insuranceRequestedCoverages = (form) => insuranceRequestRowsForSelectedProducts(form)
     .filter((row) => row.ramo || row.cobertura || assetNumber(row.valor_asegurado) > 0);
 
+const insuranceCurrentComparisonCoverages = (form) => {
+    const requestedRows = insuranceRequestedCoverages(form);
+    const currentRows = historyRowsForType(form, '[data-asset-insurance-coverage-row]', assetInsuranceCoverageFields)
+        .filter((row) => row.ramo || row.cobertura)
+        .filter((row) => [
+            'contratado_actual',
+            'valor_actual',
+            'limite_evento_actual',
+            'sublimite_actual',
+            'deducible_actual',
+            'indice_variable_actual',
+            'tasa_actual',
+            'prima_actual',
+            'observaciones_actuales',
+        ].some((field) => String(row[field] ?? '').trim() !== '' || assetNumber(row[field]) > 0));
+    return mergeInsuranceCoverageRows([...currentRows, ...requestedRows]);
+};
+
 const insuranceRequestedItems = (form) => assetInsuranceEquipmentRows(form)
     .filter((row) => assetNumber(row.valor_asegurable_sugerido || row.valor_reposicion) > 0
         || String(row.item || row.descripcion || row.fuente_consulta || row.serial_referencia || '').trim() !== '');
@@ -4381,7 +4399,7 @@ const renderAssetInsuranceCurrentPolicyRows = (form) => {
     const selectedProducts = selectedInsuranceProductsFromForm(form);
     const policies = assetFormRows(form, '[data-asset-insurance-policy-row]', assetInsurancePolicyFields)
         .filter((row) => row.adoptada === 'Si' || row.estado === 'Vigente' || row.estado === 'Vencida' || row.numero_poliza || row.alcance_poliza === 'Matriz/global');
-    const coverages = insuranceRequestedCoverages(form);
+    const coverages = insuranceCurrentComparisonCoverages(form);
     container.innerHTML = `
         <div class="asset-insurance-guide">
             <strong>Comparativo: poliza actual vs renovacion solicitada</strong>
@@ -4415,7 +4433,7 @@ const renderAssetInsuranceCurrentPolicyRows = (form) => {
                 </div>
                 ${coverages.map((row) => `
                     <div class="asset-insurance-comparison-row" role="row">
-                        <strong>${assetEscape(row.ramo || 'Ramo')}<small>${assetEscape(row.cobertura || 'Cobertura')}</small></strong>
+                        <strong>${assetEscape(row.ramo || 'Ramo')}<small>${assetEscape(row.cobertura || 'Cobertura')}</small>${row.valor_asegurado || row.renovacion_solicitada ? '' : '<em>Solo poliza actual: decidir si se mantiene o elimina</em>'}</strong>
                         <label>
                             <span>Contratado</span>
                             <select data-insurance-request-field="contratado_actual" data-product="${assetEscape(row.ramo || '')}" data-coverage="${assetEscape(row.cobertura || '')}">

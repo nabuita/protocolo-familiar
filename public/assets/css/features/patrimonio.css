@@ -1524,6 +1524,19 @@
     font-weight: 800;
 }
 
+.asset-insurance-comparison-row strong em {
+    display: inline-flex;
+    width: fit-content;
+    margin-top: 3px;
+    padding: 3px 6px;
+    border-radius: 999px;
+    background: #fff7df;
+    color: #8a5b00;
+    font-size: 10px;
+    font-style: normal;
+    font-weight: 850;
+}
+
 .asset-insurance-comparison-row input,
 .asset-insurance-comparison-row select {
     width: 100%;
