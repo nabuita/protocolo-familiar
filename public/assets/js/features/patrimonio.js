@@ -1786,8 +1786,8 @@ const joinInsuranceSelection = (values = []) => [...new Set(values.filter(Boolea
 
 const assetInsurancePolicyFields = ['ano', 'tipo_documento', 'ramo', 'aseguradora', 'contacto_nombre', 'contacto_correo', 'contacto_celular', 'intermediario', 'agencia_expedidora', 'codigo_agencia', 'numero_poliza', 'numero_emision', 'numero_pago_electronico', 'modalidad_facturacion', 'coaseguro', 'tomador', 'asegurado', 'beneficiario', 'direccion_riesgo', 'ciudad_riesgo', 'actividad_riesgo', 'tipo_riesgo', 'fecha_inicio', 'fecha_fin', 'fecha_renovacion', 'prima_neta', 'iva', 'gastos_expedicion', 'prima_total', 'valor_asegurado_total', 'deducible_general', 'forma_pago', 'numero_cuotas', 'clausulado', 'anexos_endosos', 'exclusiones_relevantes', 'texto_aclaratorio', 'asistencias', 'estado', 'adoptada', 'fecha_adopcion', 'criterio_adopcion', 'cotizacion_matriz', 'alcance_poliza', 'grupo_poliza', 'metodo_distribucion', 'coeficiente_participacion', 'numero_unidades_cubiertas', 'prima_asignada', 'observaciones_distribucion', 'soporte', 'observaciones'];
 
-const assetInsuranceCoverageCurrentFields = ['contratado_actual', 'valor_actual', 'limite_evento_actual', 'sublimite_actual', 'deducible_actual', 'indice_variable_actual', 'tasa_actual', 'prima_actual', 'observaciones_actuales', 'renovacion_solicitada'];
-const assetInsuranceCoverageFields = ['ano', 'numero_poliza', 'ramo', 'cobertura', 'riesgo_cubierto', ...assetInsuranceCoverageCurrentFields, 'valor_asegurado', 'limite_evento', 'porcentaje_invar', 'indice_variable', 'sublimite', 'tasa', 'prima', 'deducible', 'fuente_valor_asegurado', 'fecha_inicio', 'fecha_fin', 'fecha_renovacion', 'observaciones'];
+const assetInsuranceCoverageCurrentFields = ['contratado_actual', 'valor_actual', 'limite_evento_actual', 'limite_vigencia_actual', 'sublimite_actual', 'deducible_actual', 'deducible_porcentaje_actual', 'deducible_minimo_actual', 'indice_variable_actual', 'tasa_actual', 'prima_actual', 'observaciones_actuales', 'renovacion_solicitada'];
+const assetInsuranceCoverageFields = ['ano', 'numero_poliza', 'ramo', 'cobertura', 'riesgo_cubierto', ...assetInsuranceCoverageCurrentFields, 'valor_asegurado', 'limite_evento', 'limite_vigencia', 'porcentaje_invar', 'indice_variable', 'sublimite', 'tasa', 'prima', 'deducible', 'deducible_porcentaje', 'deducible_minimo', 'fuente_valor_asegurado', 'fecha_inicio', 'fecha_fin', 'fecha_renovacion', 'observaciones'];
 
 const selectedInsuranceProductsFromForm = (form) => {
     const selected = [...form.querySelectorAll('[data-asset-insurance-type-toggle]:checked')]
@@ -3605,8 +3605,11 @@ const insuranceCurrentComparisonCoverages = (form) => {
             'contratado_actual',
             'valor_actual',
             'limite_evento_actual',
+            'limite_vigencia_actual',
             'sublimite_actual',
             'deducible_actual',
+            'deducible_porcentaje_actual',
+            'deducible_minimo_actual',
             'indice_variable_actual',
             'tasa_actual',
             'prima_actual',
@@ -3687,8 +3690,10 @@ const insuranceQuoteMatrixHtml = (form, policy = {}, index = 0) => {
                 <span>Cotiza</span>
                 <span>Valor asegurado</span>
                 <span>Limite evento</span>
+                <span>Limite vigencia</span>
                 <span>Sublimite</span>
-                <span>Deducible</span>
+                <span>Ded. % perdida</span>
+                <span>Ded. minimo</span>
                 <span>Indice</span>
                 <span>Tasa</span>
                 <span>Prima</span>
@@ -3705,9 +3710,11 @@ const insuranceQuoteMatrixHtml = (form, policy = {}, index = 0) => {
                             <input type="checkbox" data-quote-field="cotiza" ${quote.cotiza === 'Si' ? 'checked' : ''}>
                         </label>
                         <input data-quote-field="valor_asegurado" data-money-format inputmode="decimal" value="${assetEscape(assetMoneyPlain(quote.valor_asegurado) || quote.valor_asegurado || '')}" placeholder="$0">
-                        <input data-quote-field="limite_evento" value="${assetEscape(quote.limite_evento || '')}" placeholder="Por evento">
+                        <input data-quote-field="limite_evento" data-money-format inputmode="decimal" value="${assetEscape(assetMoneyPlain(quote.limite_evento) || quote.limite_evento || '')}" placeholder="Por evento">
+                        <input data-quote-field="limite_vigencia" data-money-format inputmode="decimal" value="${assetEscape(assetMoneyPlain(quote.limite_vigencia) || quote.limite_vigencia || '')}" placeholder="Por vigencia">
                         <input data-quote-field="sublimite" value="${assetEscape(quote.sublimite || '')}" placeholder="Si aplica">
-                        <input data-quote-field="deducible" value="${assetEscape(quote.deducible || '')}" placeholder="% o valor">
+                        <input data-quote-field="deducible_porcentaje" inputmode="decimal" value="${assetEscape(quote.deducible_porcentaje || '')}" placeholder="Ej. 10%">
+                        <input data-quote-field="deducible_minimo" value="${assetEscape(quote.deducible_minimo || '')}" placeholder="Ej. 1 SMMLV">
                         <input data-quote-field="indice" value="${assetEscape(quote.indice || '')}" placeholder="IVA / variable">
                         <input data-quote-field="tasa" inputmode="decimal" value="${assetEscape(quote.tasa || '')}" placeholder="% o por mil">
                         <input data-quote-field="prima" data-money-format inputmode="decimal" value="${assetEscape(assetMoneyPlain(quote.prima) || quote.prima || '')}" placeholder="$0">
@@ -3741,8 +3748,10 @@ const syncInsuranceQuoteMatrix = (card) => {
             cotiza: valueFor('cotiza'),
             valor_asegurado: valueFor('valor_asegurado'),
             limite_evento: valueFor('limite_evento'),
+            limite_vigencia: valueFor('limite_vigencia'),
             sublimite: valueFor('sublimite'),
-            deducible: valueFor('deducible'),
+            deducible_porcentaje: valueFor('deducible_porcentaje'),
+            deducible_minimo: valueFor('deducible_minimo'),
             indice: valueFor('indice'),
             tasa: valueFor('tasa'),
             prima: valueFor('prima'),
@@ -3843,8 +3852,10 @@ const syncAllInsuranceQuoteMatrices = (form) => {
                 cotiza: valueFor('cotiza'),
                 valor_asegurado: valueFor('valor_asegurado'),
                 limite_evento: valueFor('limite_evento'),
+                limite_vigencia: valueFor('limite_vigencia'),
                 sublimite: valueFor('sublimite'),
-                deducible: valueFor('deducible'),
+                deducible_porcentaje: valueFor('deducible_porcentaje'),
+                deducible_minimo: valueFor('deducible_minimo'),
                 indice: valueFor('indice'),
                 tasa: valueFor('tasa'),
                 prima: valueFor('prima'),
@@ -3906,9 +3917,11 @@ const insuranceOfferComparisonMatrixHtml = (form, policies = []) => {
                                     <div class="asset-insurance-offer-cell" data-asset-insurance-offer-quote-row data-policy-index="${index}" data-ramo="${assetEscape(coverage.ramo || '')}" data-cobertura="${assetEscape(coverage.cobertura || '')}">
                                         <label class="asset-insurance-offer-check"><input type="checkbox" data-quote-field="cotiza" ${quote.cotiza === 'Si' ? 'checked' : ''}> Cotiza</label>
                                         <input data-quote-field="valor_asegurado" data-money-format inputmode="decimal" value="${assetEscape(assetMoneyPlain(quote.valor_asegurado) || quote.valor_asegurado || '')}" placeholder="Valor asegurado">
-                                        <input data-quote-field="limite_evento" value="${assetEscape(quote.limite_evento || '')}" placeholder="Limite evento">
+                                        <input data-quote-field="limite_evento" data-money-format inputmode="decimal" value="${assetEscape(assetMoneyPlain(quote.limite_evento) || quote.limite_evento || '')}" placeholder="Limite evento">
+                                        <input data-quote-field="limite_vigencia" data-money-format inputmode="decimal" value="${assetEscape(assetMoneyPlain(quote.limite_vigencia) || quote.limite_vigencia || '')}" placeholder="Limite vigencia">
                                         <input data-quote-field="sublimite" value="${assetEscape(quote.sublimite || '')}" placeholder="Sublimite">
-                                        <input data-quote-field="deducible" value="${assetEscape(quote.deducible || '')}" placeholder="Deducible">
+                                        <input data-quote-field="deducible_porcentaje" inputmode="decimal" value="${assetEscape(quote.deducible_porcentaje || '')}" placeholder="% perdida">
+                                        <input data-quote-field="deducible_minimo" value="${assetEscape(quote.deducible_minimo || '')}" placeholder="Minimo">
                                         <input data-quote-field="indice" value="${assetEscape(quote.indice || '')}" placeholder="Indice">
                                         <input data-quote-field="tasa" inputmode="decimal" value="${assetEscape(quote.tasa || '')}" placeholder="Tasa">
                                         <input data-quote-field="prima" data-money-format inputmode="decimal" value="${assetEscape(assetMoneyPlain(quote.prima) || quote.prima || '')}" placeholder="Prima">
@@ -3939,7 +3952,7 @@ const insuranceQuoteRecommendationHtml = (form) => {
         const quoted = matrix.filter((row) => row.cotiza === 'Si');
         const premium = assetNumber(policy.prima_total) || matrix.reduce((sum, row) => sum + assetNumber(row.prima), 0);
         const missing = targetCount - quoted.length;
-        const missingDetails = quoted.filter((row) => !row.deducible || !row.tasa || !row.prima).length;
+        const missingDetails = quoted.filter((row) => !(row.deducible_porcentaje || row.deducible_minimo || row.deducible) || !row.tasa || !row.prima).length;
         return {
             index,
             insurer: policy.aseguradora || `Oferta ${index + 1}`,
@@ -3984,6 +3997,7 @@ const insuranceQuoteRecommendationHtml = (form) => {
                             <strong>Cotiza</strong>
                             <strong>Valor asegurado</strong>
                             <strong>Limite evento</strong>
+                            <strong>Limite vigencia</strong>
                             <strong>Sublimite</strong>
                             <strong>Deducible</strong>
                             <strong>Indice</strong>
@@ -3996,9 +4010,10 @@ const insuranceQuoteRecommendationHtml = (form) => {
                                 <span>${assetEscape([row.ramo, row.cobertura].filter(Boolean).join(' / '))}</span>
                                 <span>${row.cotiza === 'Si' ? 'Si' : 'No'}</span>
                                 <span>${assetEscape(assetMoney(assetNumber(row.valor_asegurado)) || row.valor_asegurado || '')}</span>
-                                <span>${assetEscape(row.limite_evento || '')}</span>
+                                <span>${assetEscape(assetMoney(assetNumber(row.limite_evento)) || row.limite_evento || '')}</span>
+                                <span>${assetEscape(assetMoney(assetNumber(row.limite_vigencia)) || row.limite_vigencia || '')}</span>
                                 <span>${assetEscape(row.sublimite || '')}</span>
-                                <span>${assetEscape(row.deducible || '')}</span>
+                                <span>${assetEscape([row.deducible_porcentaje, row.deducible_minimo, row.deducible].filter(Boolean).join(' / '))}</span>
                                 <span>${assetEscape(row.indice || '')}</span>
                                 <span>${assetEscape(row.tasa || '')}</span>
                                 <span>${assetEscape(assetMoney(assetNumber(row.prima)) || row.prima || '')}</span>
@@ -4456,8 +4471,11 @@ const insuranceCoverageRowsForCurrentPolicy = (form) => {
             'contratado_actual',
             'valor_actual',
             'limite_evento_actual',
+            'limite_vigencia_actual',
             'sublimite_actual',
             'deducible_actual',
+            'deducible_porcentaje_actual',
+            'deducible_minimo_actual',
             'indice_variable_actual',
             'tasa_actual',
             'prima_actual',
@@ -4473,7 +4491,7 @@ const insuranceCurrentPolicyOnlyTableHtml = (rows = []) => rows.length ? `
             <span>Contratada</span>
             <span>Bien / exposicion cubierta</span>
             <span>Valor actual</span>
-            <span>Limite / sublimite</span>
+            <span>Limites y sublimite</span>
             <span>Deducible</span>
             <span>Indice / tasa</span>
             <span>Prima</span>
@@ -4497,13 +4515,16 @@ const insuranceCurrentPolicyOnlyTableHtml = (rows = []) => rows.length ? `
                     <input data-money-format inputmode="decimal" data-insurance-request-field="valor_actual" data-product="${assetEscape(row.ramo || '')}" data-coverage="${assetEscape(row.cobertura || '')}" value="${assetEscape(assetMoneyPlain(row.valor_actual) || row.valor_actual || '')}" placeholder="$0">
                 </label>
                 <label>
-                    <span>Limite / sublimite</span>
-                    <input data-insurance-request-field="limite_evento_actual" data-product="${assetEscape(row.ramo || '')}" data-coverage="${assetEscape(row.cobertura || '')}" value="${assetEscape(row.limite_evento_actual || '')}" placeholder="Limite evento">
+                    <span>Limites y sublimite</span>
+                    <input data-money-format inputmode="decimal" data-insurance-request-field="limite_evento_actual" data-product="${assetEscape(row.ramo || '')}" data-coverage="${assetEscape(row.cobertura || '')}" value="${assetEscape(assetMoneyPlain(row.limite_evento_actual) || row.limite_evento_actual || '')}" placeholder="Limite evento">
+                    <input data-money-format inputmode="decimal" data-insurance-request-field="limite_vigencia_actual" data-product="${assetEscape(row.ramo || '')}" data-coverage="${assetEscape(row.cobertura || '')}" value="${assetEscape(assetMoneyPlain(row.limite_vigencia_actual) || row.limite_vigencia_actual || '')}" placeholder="Limite vigencia">
                     <input data-insurance-request-field="sublimite_actual" data-product="${assetEscape(row.ramo || '')}" data-coverage="${assetEscape(row.cobertura || '')}" value="${assetEscape(row.sublimite_actual || '')}" placeholder="Sublimite">
                 </label>
                 <label>
                     <span>Deducible</span>
-                    <input data-insurance-request-field="deducible_actual" data-product="${assetEscape(row.ramo || '')}" data-coverage="${assetEscape(row.cobertura || '')}" value="${assetEscape(row.deducible_actual || '')}" placeholder="% o valor">
+                    <input data-insurance-request-field="deducible_porcentaje_actual" inputmode="decimal" data-product="${assetEscape(row.ramo || '')}" data-coverage="${assetEscape(row.cobertura || '')}" value="${assetEscape(row.deducible_porcentaje_actual || '')}" placeholder="% perdida">
+                    <input data-insurance-request-field="deducible_minimo_actual" data-product="${assetEscape(row.ramo || '')}" data-coverage="${assetEscape(row.cobertura || '')}" value="${assetEscape(row.deducible_minimo_actual || '')}" placeholder="Minimo ej. 1 SMMLV">
+                    <input data-insurance-request-field="deducible_actual" data-product="${assetEscape(row.ramo || '')}" data-coverage="${assetEscape(row.cobertura || '')}" value="${assetEscape(row.deducible_actual || '')}" placeholder="Texto caratula">
                 </label>
                 <label>
                     <span>Indice / tasa</span>
@@ -4548,8 +4569,8 @@ const insuranceRenewalComparisonHtml = (form, activeProduct, selectedProducts = 
                         <strong>${assetEscape(row.ramo || 'Ramo')}<small>${assetEscape(row.cobertura || 'Cobertura')}</small>${row.valor_asegurado || row.renovacion_solicitada ? '' : '<em>Solo poliza actual: decidir si se mantiene o elimina</em>'}</strong>
                         <span>${assetEscape(row.contratado_actual || 'Por definir')}</span>
                         <span>${assetEscape(assetMoney(row.valor_actual || 0))}</span>
-                        <span>${assetEscape(row.deducible_actual || 'Por definir')}</span>
-                        <span>${assetEscape([row.limite_evento_actual, row.sublimite_actual].filter(Boolean).join(' / ') || 'Por definir')}</span>
+                        <span>${assetEscape([row.deducible_porcentaje_actual, row.deducible_minimo_actual, row.deducible_actual].filter(Boolean).join(' / ') || 'Por definir')}</span>
+                        <span>${assetEscape([row.limite_evento_actual, row.limite_vigencia_actual, row.sublimite_actual].filter(Boolean).join(' / ') || 'Por definir')}</span>
                         <span>${assetEscape([row.indice_variable_actual, row.tasa_actual].filter(Boolean).join(' / ') || 'Por definir')}</span>
                         <span>${assetEscape(assetMoney(row.prima_actual || 0))}</span>
                         <label>
@@ -5145,8 +5166,9 @@ const renderAssetCurrentPolicy = (form) => {
         `;
         return;
     }
-    const coverages = assetFormRows(form, '[data-asset-insurance-coverage-row]', ['numero_poliza', 'cobertura', 'valor_asegurado', 'prima', 'deducible'])
+    const coverages = assetFormRows(form, '[data-asset-insurance-coverage-row]', ['numero_poliza', 'cobertura', 'valor_asegurado', 'prima', 'deducible', 'deducible_porcentaje', 'deducible_minimo', 'deducible_actual', 'deducible_porcentaje_actual', 'deducible_minimo_actual'])
         .filter((row) => !current.numero_poliza || !row.numero_poliza || row.numero_poliza === current.numero_poliza);
+    const coverageDeductible = (row) => [row.deducible_porcentaje, row.deducible_minimo, row.deducible, row.deducible_porcentaje_actual, row.deducible_minimo_actual, row.deducible_actual].filter(Boolean).join(' / ') || 'Por definir';
     target.innerHTML = `
         <article class="asset-insurance-year">
             <strong>${assetEscape(current.alcance_poliza === 'Matriz/global' ? 'Poliza matriz/global vigente' : 'Poliza vigente')}</strong>
@@ -5161,7 +5183,7 @@ const renderAssetCurrentPolicy = (form) => {
             <span>Renovacion: ${assetEscape(assetDate(current.fecha_renovacion || current.fecha_fin) || 'Sin fecha')}</span>
         </article>
         <div class="asset-insurance-current-coverages">
-            ${coverages.map((row) => `<span>${assetEscape(row.cobertura || 'Cobertura')} / ${assetMoney(assetNumber(row.valor_asegurado))} / ded. ${assetEscape(row.deducible || 'Por definir')}</span>`).join('') || '<span>Coberturas pendientes de asociar.</span>'}
+            ${coverages.map((row) => `<span>${assetEscape(row.cobertura || 'Cobertura')} / ${assetMoney(assetNumber(row.valor_asegurado))} / ded. ${assetEscape(coverageDeductible(row))}</span>`).join('') || '<span>Coberturas pendientes de asociar.</span>'}
         </div>
         <p class="muted">${assetEscape(current.criterio_adopcion || 'Decision pendiente de documentar.')}</p>
     `;

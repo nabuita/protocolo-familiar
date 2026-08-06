@@ -762,8 +762,8 @@
 
 .asset-insurance-comparison-table > div {
     display: grid;
-    grid-template-columns: minmax(160px, .8fr) minmax(230px, 1.2fr) 70px repeat(7, minmax(120px, .7fr));
-    min-width: 1220px;
+    grid-template-columns: minmax(160px, .8fr) minmax(230px, 1.2fr) 70px repeat(8, minmax(120px, .7fr));
+    min-width: 1360px;
 }
 
 .asset-insurance-comparison-table > div:first-child {
@@ -790,8 +790,8 @@
 .asset-insurance-quote-matrix-head,
 .asset-insurance-quote-matrix-row {
     display: grid;
-    grid-template-columns: minmax(210px, 1.2fr) minmax(130px, .65fr) 72px repeat(7, minmax(130px, .7fr)) minmax(190px, 1fr);
-    min-width: 1450px;
+    grid-template-columns: minmax(210px, 1.2fr) minmax(130px, .65fr) 72px repeat(9, minmax(130px, .7fr)) minmax(190px, 1fr);
+    min-width: 1710px;
 }
 
 .asset-insurance-quote-matrix-head {
