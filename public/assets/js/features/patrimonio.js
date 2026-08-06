@@ -3574,6 +3574,24 @@ const insuranceCurrentComparisonCoverages = (form) => {
     return mergeInsuranceCoverageRows([...currentRows, ...requestedRows]);
 };
 
+const insuranceComparisonProducts = (form, coverages = []) => {
+    const products = selectedInsuranceProductsFromForm(form);
+    coverages.forEach((row) => {
+        if (row.ramo) {
+            products.push(row.ramo);
+        }
+    });
+    const seen = new Set();
+    return products.filter((product) => {
+        const key = normalizeInsuranceText(normalizeInsuranceRamo(product));
+        if (!key || seen.has(key)) {
+            return false;
+        }
+        seen.add(key);
+        return true;
+    });
+};
+
 const insuranceRequestedItems = (form) => assetInsuranceEquipmentRows(form)
     .filter((row) => assetNumber(row.valor_asegurable_sugerido || row.valor_reposicion) > 0
         || String(row.item || row.descripcion || row.fuente_consulta || row.serial_referencia || '').trim() !== '');
@@ -4400,15 +4418,27 @@ const renderAssetInsuranceCurrentPolicyRows = (form) => {
     const policies = assetFormRows(form, '[data-asset-insurance-policy-row]', assetInsurancePolicyFields)
         .filter((row) => row.adoptada === 'Si' || row.estado === 'Vigente' || row.estado === 'Vencida' || row.numero_poliza || row.alcance_poliza === 'Matriz/global');
     const coverages = insuranceCurrentComparisonCoverages(form);
+    const comparisonProducts = insuranceComparisonProducts(form, coverages);
+    const activeProduct = activeInsuranceProduct(form, comparisonProducts, 'assetCurrentActiveProduct');
+    const normalizedActiveProduct = normalizeInsuranceText(normalizeInsuranceRamo(activeProduct));
+    const visibleCoverages = coverages.filter((row) => normalizeInsuranceText(normalizeInsuranceRamo(row.ramo || '')) === normalizedActiveProduct);
+    const visiblePolicies = policies.filter((row) => {
+        if (!activeProduct || !row.ramo) {
+            return true;
+        }
+        return splitInsuranceSelection(row.ramo)
+            .some((item) => normalizeInsuranceText(normalizeInsuranceRamo(item)) === normalizedActiveProduct);
+    });
     container.innerHTML = `
         <div class="asset-insurance-guide">
             <strong>Comparativo: poliza actual vs renovacion solicitada</strong>
             <p>Primero registra lo contratado hoy. Al estructurar la renovacion, el sistema conserva esa linea base y permite pedir mejoras de valor, deducible, sublimite, indice variable, tasa o prima.</p>
         </div>
-        ${insurancePolicyPdfFieldMatrixHtml(selectedProducts)}
-        ${policies.length ? `
+        ${insuranceProductTabsHtml(comparisonProducts, activeProduct, 'current')}
+        ${insurancePolicyPdfFieldMatrixHtml(activeProduct ? [activeProduct] : selectedProducts)}
+        ${visiblePolicies.length ? `
             <div class="asset-insurance-current-policy-list">
-                ${policies.map((row) => `
+                ${visiblePolicies.map((row) => `
                     <article>
                         <strong>${assetEscape([row.aseguradora, row.numero_poliza].filter(Boolean).join(' / ') || 'Poliza registrada')}</strong>
                         <span>${assetEscape([row.ramo, row.estado, row.fecha_inicio && row.fecha_fin ? `${row.fecha_inicio} a ${row.fecha_fin}` : 'Sin vigencia'].filter(Boolean).join(' / '))}</span>
@@ -4417,7 +4447,7 @@ const renderAssetInsuranceCurrentPolicyRows = (form) => {
                 `).join('')}
             </div>
         ` : '<p class="muted">Registra una poliza actual o anterior para dejar evidencia de lo que se tiene contratado.</p>'}
-        ${coverages.length ? `
+        ${visibleCoverages.length ? `
             <div class="asset-insurance-comparison-table" role="table" aria-label="Comparativo poliza actual contra renovacion">
                 <div class="asset-insurance-comparison-head" role="row">
                     <span>Cobertura</span>
@@ -4431,7 +4461,7 @@ const renderAssetInsuranceCurrentPolicyRows = (form) => {
                     <span>Nuevo valor solicitado</span>
                     <span>Fuente / observacion</span>
                 </div>
-                ${coverages.map((row) => `
+                ${visibleCoverages.map((row) => `
                     <div class="asset-insurance-comparison-row" role="row">
                         <strong>${assetEscape(row.ramo || 'Ramo')}<small>${assetEscape(row.cobertura || 'Cobertura')}</small>${row.valor_asegurado || row.renovacion_solicitada ? '' : '<em>Solo poliza actual: decidir si se mantiene o elimina</em>'}</strong>
                         <label>
@@ -4478,7 +4508,7 @@ const renderAssetInsuranceCurrentPolicyRows = (form) => {
                     </div>
                 `).join('')}
             </div>
-        ` : '<p class="muted">Marca coberturas requeridas para completar la linea base por cobertura.</p>'}
+        ` : '<p class="muted">Este ramo aun no tiene coberturas comparables. Marca coberturas requeridas o registra la poliza actual para completar la linea base.</p>'}
     `;
 };
 
@@ -6011,6 +6041,16 @@ if (assetForm instanceof HTMLFormElement) {
         renderInsuranceQuoteAnalysis(assetForm);
         renderAssetCurrentPolicy(assetForm);
         renderAssetInsuranceHistory(assetForm);
+        saveAssetDraft(assetForm);
+    });
+    assetForm.querySelector('[data-asset-insurance-current-policy-rows]')?.addEventListener('click', (event) => {
+        const target = event.target;
+        const productTab = target instanceof Element ? target.closest('[data-asset-insurance-product-tab="current"]') : null;
+        if (!(productTab instanceof HTMLButtonElement)) {
+            return;
+        }
+        assetForm.dataset.assetCurrentActiveProduct = productTab.dataset.product || '';
+        renderAssetInsuranceCurrentPolicyRows(assetForm);
         saveAssetDraft(assetForm);
     });
 
