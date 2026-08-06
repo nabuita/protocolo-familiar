@@ -1809,26 +1809,33 @@ const insurancePolicyPdfFieldsForProducts = (products = []) => {
     return insurancePolicyPdfFieldMatrix.filter((row) => row.ramos.some((ramo) => normalizedProducts.has(normalizeInsuranceText(normalizeInsuranceRamo(ramo)))));
 };
 
-const insurancePolicyPdfFieldMatrixHtml = (products = []) => {
+const insurancePolicyPdfFieldMatrixHtml = (products = [], mode = 'actual') => {
     const rows = insurancePolicyPdfFieldsForProducts(products);
+    const isRequestMode = mode === 'request';
+    const title = isRequestMode
+        ? 'Guia para configurar la nueva cobertura'
+        : 'Campos que debe leer el analista en la poliza actual';
+    const emptyText = isRequestMode
+        ? 'Selecciona los ramos del activo para ver que campos debe pedir, mejorar o confirmar en la nueva cotizacion.'
+        : 'Selecciona los ramos del activo para ver que campos debe leer el analista en la caratula y el clausulado.';
     if (rows.length === 0) {
         return `
             <div class="asset-insurance-policy-reading-empty">
-                Selecciona los ramos del activo para ver que campos debe leer el analista en la caratula y el clausulado.
+                ${assetEscape(emptyText)}
             </div>
         `;
     }
     return `
         <details class="asset-insurance-policy-reading" open>
             <summary>
-                <strong>Campos que debe leer el analista en la poliza actual</strong>
+                <strong>${assetEscape(title)}</strong>
                 <span>${rows.length} reglas segun ramo/cobertura</span>
             </summary>
             <div class="asset-insurance-policy-reading-table" role="table" aria-label="Matriz tecnica de lectura de poliza">
                 <div class="asset-insurance-policy-reading-head" role="row">
                     <span>Cobertura</span>
                     <span>Objeto asegurable</span>
-                    <span>Campos de la caratula</span>
+                    <span>${isRequestMode ? 'Campos a solicitar/mejorar' : 'Campos de la caratula'}</span>
                     <span>Fuente</span>
                     <span>Alerta del analista</span>
                 </div>
@@ -4302,6 +4309,7 @@ const renderAssetInsuranceCoverageRows = (form, rows = []) => {
     const sourceRows = existingRows;
     container.innerHTML = `
         ${selectedInsuranceStripHtml(form)}
+        ${insurancePolicyPdfFieldMatrixHtml(selectedProducts, 'request')}
         <div class="asset-coverage-selector" data-asset-coverage-selector>
             <div>
                 <strong>Matriz ramo / amparo / bienes asegurables</strong>
