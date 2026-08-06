@@ -792,6 +792,205 @@ const insuranceCoverageAcademy = {
     'Por confirmar': { kind: 'Pendiente', assets: ['Pendiente'], basis: 'Pendiente de definir con clausulado/cotizacion.', review: 'No contratar sin confirmar alcance.' },
 };
 
+const insuranceCoveragePolicyTermDefaults = {
+    'responsabilidad civil extracontractual': {
+        limite_evento: '500000000',
+        limite_vigencia: '500000000',
+        deducible_porcentaje: '10%',
+        deducible_minimo: '1 SMMLV',
+        deducible_texto: '10% del valor de la perdida, minimo 1 SMMLV.',
+        source: 'Caratula: Responsabilidad Civil Extracontractual - limite contratado evento/vigencia y deducibles.',
+    },
+    'responsabilidad civil': {
+        limite_evento: '500000000',
+        limite_vigencia: '500000000',
+        deducible_porcentaje: '10%',
+        deducible_minimo: '1 SMMLV',
+        deducible_texto: '10% del valor de la perdida, minimo 1 SMMLV.',
+        source: 'Caratula: Responsabilidad Civil Extracontractual - limite contratado evento/vigencia y deducibles.',
+    },
+    'rc predios labores y operaciones': {
+        limite_evento: '500000000',
+        limite_vigencia: '500000000',
+        deducible_porcentaje: '10%',
+        deducible_minimo: '1 SMMLV',
+        deducible_texto: 'Amparo basico RCE: 10% del valor de la perdida, minimo 1 SMMLV.',
+        source: 'Clausulado RCE: predios, labores y operaciones.',
+    },
+    'danos materiales a terceros': {
+        limite_evento: '500000000',
+        limite_vigencia: '500000000',
+        deducible_porcentaje: '10%',
+        deducible_minimo: '1 SMMLV',
+        deducible_texto: '10% del valor de la perdida, minimo 1 SMMLV.',
+        source: 'Caratula RCE: limite contratado evento/vigencia.',
+    },
+    'lesiones o muerte de terceros': {
+        limite_evento: '500000000',
+        limite_vigencia: '500000000',
+        deducible_porcentaje: '10%',
+        deducible_minimo: '1 SMMLV',
+        deducible_texto: '10% del valor de la perdida, minimo 1 SMMLV.',
+        source: 'Caratula RCE: limite contratado evento/vigencia.',
+    },
+    'perjuicios patrimoniales consecuenciales': {
+        limite_evento: '500000000',
+        limite_vigencia: '500000000',
+        deducible_porcentaje: '10%',
+        deducible_minimo: '1 SMMLV',
+        deducible_texto: 'Confirmar si consume limite principal de RCE.',
+        source: 'Caratula y clausulado RCE: perjuicios patrimoniales consecuenciales.',
+    },
+    'gastos de defensa': {
+        limite_evento: '500000000',
+        limite_vigencia: '500000000',
+        deducible_porcentaje: '10%',
+        deducible_minimo: '1 SMMLV',
+        deducible_texto: 'Confirmar si opera como gasto suplementario o dentro del limite de RCE.',
+        source: 'Clausulado RCE: gastos de defensa / pagos suplementarios.',
+    },
+    'responsabilidad civil patronal': {
+        limite_evento: '500000000',
+        limite_vigencia: '500000000',
+        deducible_porcentaje: '10%',
+        deducible_minimo: '1 SMMLV',
+        deducible_texto: 'Confirmar sublimite patronal y si consume el limite principal.',
+        source: 'Clausulado RCE: amparo patronal.',
+    },
+    'responsabilidad cruzada': {
+        limite_evento: '500000000',
+        limite_vigencia: '500000000',
+        deducible_porcentaje: '10%',
+        deducible_minimo: '1 SMMLV',
+        deducible_texto: 'Confirmar sublimite de RC cruzada y condicion de asegurados entre si.',
+        source: 'Clausulado RCE: responsabilidad cruzada.',
+    },
+    incendio: {
+        deducible_porcentaje: '10%',
+        deducible_minimo: '1 SMMLV',
+        deducible_texto: 'Amparo basico: 10% del valor de la perdida, minimo 1 SMMLV.',
+        source: 'Caratula: deducibles de amparos basicos.',
+    },
+    rayo: {
+        deducible_porcentaje: '10%',
+        deducible_minimo: '1 SMMLV',
+        deducible_texto: 'Amparo basico: 10% del valor de la perdida, minimo 1 SMMLV.',
+        source: 'Caratula: deducibles de amparos basicos.',
+    },
+    explosion: {
+        deducible_porcentaje: '10%',
+        deducible_minimo: '1 SMMLV',
+        deducible_texto: 'Amparo basico: 10% del valor de la perdida, minimo 1 SMMLV.',
+        source: 'Caratula: deducibles de amparos basicos.',
+    },
+    humo: {
+        deducible_porcentaje: '10%',
+        deducible_minimo: '1 SMMLV',
+        deducible_texto: 'Amparo basico: 10% del valor de la perdida, minimo 1 SMMLV.',
+        source: 'Caratula: deducibles de amparos basicos.',
+    },
+    'danos por agua': {
+        deducible_porcentaje: '10%',
+        deducible_minimo: '1 SMMLV',
+        deducible_texto: 'Amparo basico: 10% del valor de la perdida, minimo 1 SMMLV.',
+        source: 'Caratula: deducibles de amparos basicos.',
+    },
+    anegacion: {
+        deducible_porcentaje: '15%',
+        deducible_minimo: '3 SMMLV',
+        deducible_texto: 'Demas eventos: 15% del valor de la perdida, minimo 3 SMMLV.',
+        source: 'Caratula: deducibles de demas eventos.',
+    },
+    inundacion: {
+        deducible_porcentaje: '15%',
+        deducible_minimo: '3 SMMLV',
+        deducible_texto: 'Demas eventos: 15% del valor de la perdida, minimo 3 SMMLV.',
+        source: 'Caratula: deducibles de demas eventos.',
+    },
+    'actos mal intencionados de terceros': {
+        deducible_porcentaje: '15%',
+        deducible_minimo: '3 SMMLV',
+        deducible_texto: 'Demas eventos: 15% del valor de la perdida, minimo 3 SMMLV.',
+        source: 'Caratula: deducibles de demas eventos.',
+    },
+    terrorismo: {
+        deducible_porcentaje: '15%',
+        deducible_minimo: '3 SMMLV',
+        deducible_texto: 'Demas eventos: 15% del valor de la perdida, minimo 3 SMMLV.',
+        source: 'Caratula: deducibles de demas eventos.',
+    },
+    terremoto: {
+        deducible_porcentaje: '3%',
+        deducible_minimo: '',
+        deducible_texto: 'Deducible catastrofico sobre el valor de la perdida; confirmar minimo y base por articulo afectado.',
+        source: 'Caratula: terremoto, temblor, erupcion volcanica y eventos de la naturaleza.',
+    },
+    'temblor / erupcion volcanica': {
+        deducible_porcentaje: '3%',
+        deducible_minimo: '',
+        deducible_texto: 'Deducible catastrofico sobre el valor de la perdida; confirmar minimo y base por articulo afectado.',
+        source: 'Caratula: terremoto, temblor, erupcion volcanica y eventos de la naturaleza.',
+    },
+    vidrios: {
+        deducible_porcentaje: '10%',
+        deducible_minimo: '1 SMMLV',
+        deducible_texto: 'Confirmar si el deducible aplica sobre vidrio, instalacion o evento.',
+        source: 'Caratula: vidrios y cuadro de amparos.',
+    },
+    'rotura de maquinaria': {
+        deducible_porcentaje: '10%',
+        deducible_minimo: '1 SMMLV',
+        deducible_texto: 'Confirmar deducible, exclusion por desgaste y demerito por antiguedad/estado.',
+        source: 'Caratula y clausulado: montaje y rotura de maquinaria.',
+        demerito: 'Revisar demerito por edad, mantenimiento, vida util remanente y condicion del equipo.',
+    },
+    'dano interno': {
+        deducible_porcentaje: '10%',
+        deducible_minimo: '1 SMMLV',
+        deducible_texto: 'Confirmar deducible, exclusion por desgaste y demerito por antiguedad/estado.',
+        source: 'Clausulado de rotura de maquinaria / equipo electronico.',
+        demerito: 'Revisar demerito por edad, mantenimiento, vida util remanente y condicion del equipo.',
+    },
+    'equipo electronico / corriente debil': {
+        deducible_porcentaje: '10%',
+        deducible_minimo: '1 SMMLV',
+        deducible_texto: 'Confirmar deducible, dano electrico, protecciones y demerito de equipos electronicos.',
+        source: 'Caratula y clausulado: equipo electronico / corriente debil.',
+        demerito: 'Revisar demerito por edad, obsolescencia tecnologica, soporte del proveedor y mantenimiento.',
+    },
+};
+
+const insurancePolicyTermsFor = (coverage, product = '') => {
+    const keys = [coverage, product]
+        .map((item) => normalizeInsuranceText(item || ''))
+        .filter(Boolean);
+    return keys.reduce((carry, key) => carry || insuranceCoveragePolicyTermDefaults[key], null) || {};
+};
+
+const applyInsurancePolicyTerms = (row = {}) => {
+    const terms = insurancePolicyTermsFor(row.cobertura || '', row.ramo || '');
+    if (!Object.keys(terms).length) {
+        return row;
+    }
+    return {
+        ...row,
+        limite_evento: row.limite_evento || terms.limite_evento || '',
+        limite_vigencia: row.limite_vigencia || terms.limite_vigencia || '',
+        sublimite: row.sublimite || terms.sublimite || '',
+        deducible_porcentaje: row.deducible_porcentaje || terms.deducible_porcentaje || '',
+        deducible_minimo: row.deducible_minimo || terms.deducible_minimo || '',
+        deducible: row.deducible || terms.deducible_texto || '',
+        limite_evento_actual: row.limite_evento_actual || terms.limite_evento || '',
+        limite_vigencia_actual: row.limite_vigencia_actual || terms.limite_vigencia || '',
+        sublimite_actual: row.sublimite_actual || terms.sublimite || '',
+        deducible_porcentaje_actual: row.deducible_porcentaje_actual || terms.deducible_porcentaje || '',
+        deducible_minimo_actual: row.deducible_minimo_actual || terms.deducible_minimo || '',
+        deducible_actual: row.deducible_actual || terms.deducible_texto || '',
+        fuente_valor_asegurado: row.fuente_valor_asegurado || terms.source || '',
+        observaciones: row.observaciones || [terms.deducible_texto, terms.demerito].filter(Boolean).join(' '),
+    };
+};
+
 const insurancePolicyPdfFieldMatrix = [
     {
         ramos: ['Incendio', 'Incendio y terremoto', 'Todo riesgo dano material', 'Danos materiales inmueble arrendado', 'Hogar', 'Copropiedad'],
@@ -1966,6 +2165,7 @@ const insuranceCoverageRequestTableHtml = (rows = []) => {
                 const limit = row.limite_evento || row.sublimite || '';
                 const requestedValue = insuredValue > 0 ? assetMoney(insuredValue) : (limit || 'Definir limite solicitado');
                 const guidance = insuranceValueGuidanceFor(row.cobertura || '');
+                const terms = insurancePolicyTermsFor(row.cobertura || '', row.ramo || '');
                 return `
                     <div class="asset-insurance-request-row" role="row">
                         <strong>${assetHelpButton(guidance.tooltip)}${assetEscape(row.cobertura || 'Cobertura por definir')}<small>${assetEscape(guidance.title)}</small></strong>
@@ -1984,7 +2184,7 @@ const insuranceCoverageRequestTableHtml = (rows = []) => {
                         <label>
                             <input
                                 value="${assetEscape(row.fuente_valor_asegurado ?? '')}"
-                                placeholder="${assetEscape(guidance.source)}"
+                                placeholder="${assetEscape(terms.source || guidance.source)}"
                                 data-insurance-request-field="fuente_valor_asegurado"
                                 data-product="${assetEscape(row.ramo || '')}"
                                 data-coverage="${assetEscape(row.cobertura || '')}"
@@ -1993,7 +2193,7 @@ const insuranceCoverageRequestTableHtml = (rows = []) => {
                         <label>
                             <input
                                 value="${assetEscape(row.observaciones ?? '')}"
-                                placeholder="${assetEscape(guidance.alert)}"
+                                placeholder="${assetEscape([guidance.alert, terms.deducible_texto, terms.demerito].filter(Boolean).join(' '))}"
                                 data-insurance-request-field="observaciones"
                                 data-product="${assetEscape(row.ramo || '')}"
                                 data-coverage="${assetEscape(row.cobertura || '')}"
@@ -2779,13 +2979,26 @@ const syncInsuranceRequestField = (form, input) => {
         });
     if (!coverageRow) {
         const rows = historyRowsForType(form, '[data-asset-insurance-coverage-row]', assetInsuranceCoverageFields);
+        const terms = insurancePolicyTermsFor(coverage, product);
         rows.push({
             ano: String(new Date().getFullYear()),
             ramo: product,
             cobertura: coverage,
             riesgo_cubierto: coverage,
+            limite_evento: terms.limite_evento || '',
+            limite_vigencia: terms.limite_vigencia || '',
+            sublimite: terms.sublimite || '',
+            deducible_porcentaje: terms.deducible_porcentaje || '',
+            deducible_minimo: terms.deducible_minimo || '',
+            deducible: terms.deducible_texto || '',
+            limite_evento_actual: terms.limite_evento || '',
+            limite_vigencia_actual: terms.limite_vigencia || '',
+            sublimite_actual: terms.sublimite || '',
+            deducible_porcentaje_actual: terms.deducible_porcentaje || '',
+            deducible_minimo_actual: terms.deducible_minimo || '',
+            deducible_actual: terms.deducible_texto || '',
             [field]: input.value,
-            observaciones: field === 'observaciones' ? input.value : 'Definir valor o limite con soporte antes de cotizar.',
+            observaciones: field === 'observaciones' ? input.value : ([terms.deducible_texto, terms.demerito].filter(Boolean).join(' ') || 'Definir valor o limite con soporte antes de cotizar.'),
         });
         renderAssetInsuranceCoverageRows(form, rows);
         coverageRow = [...form.querySelectorAll('[data-asset-insurance-coverage-row]')]
@@ -4497,9 +4710,18 @@ const insuranceCurrentPolicyOnlyTableHtml = (rows = []) => rows.length ? `
             <span>Prima</span>
             <span>Fuente / observacion</span>
         </div>
-        ${rows.map((row) => `
+        ${rows.map((row) => {
+            const terms = insurancePolicyTermsFor(row.cobertura || '', row.ramo || '');
+            const limiteEvento = row.limite_evento_actual || terms.limite_evento || '';
+            const limiteVigencia = row.limite_vigencia_actual || terms.limite_vigencia || '';
+            const sublimite = row.sublimite_actual || terms.sublimite || '';
+            const deduciblePorcentaje = row.deducible_porcentaje_actual || terms.deducible_porcentaje || '';
+            const deducibleMinimo = row.deducible_minimo_actual || terms.deducible_minimo || '';
+            const deducibleTexto = row.deducible_actual || terms.deducible_texto || '';
+            const observacionActual = row.observaciones_actuales || terms.source || terms.demerito || '';
+            return `
             <div class="asset-insurance-comparison-row" role="row">
-                <strong>${assetEscape(row.ramo || 'Ramo')}<small>${assetEscape(row.cobertura || 'Cobertura')}</small></strong>
+                <strong>${assetEscape(row.ramo || 'Ramo')}<small>${assetEscape(row.cobertura || 'Cobertura')}</small>${terms.demerito ? `<em>${assetEscape(terms.demerito)}</em>` : ''}</strong>
                 <label>
                     <span>Contratada</span>
                     <select data-insurance-request-field="contratado_actual" data-product="${assetEscape(row.ramo || '')}" data-coverage="${assetEscape(row.cobertura || '')}">
@@ -4516,15 +4738,15 @@ const insuranceCurrentPolicyOnlyTableHtml = (rows = []) => rows.length ? `
                 </label>
                 <label>
                     <span>Limites y sublimite</span>
-                    <input data-money-format inputmode="decimal" data-insurance-request-field="limite_evento_actual" data-product="${assetEscape(row.ramo || '')}" data-coverage="${assetEscape(row.cobertura || '')}" value="${assetEscape(assetMoneyPlain(row.limite_evento_actual) || row.limite_evento_actual || '')}" placeholder="Limite evento">
-                    <input data-money-format inputmode="decimal" data-insurance-request-field="limite_vigencia_actual" data-product="${assetEscape(row.ramo || '')}" data-coverage="${assetEscape(row.cobertura || '')}" value="${assetEscape(assetMoneyPlain(row.limite_vigencia_actual) || row.limite_vigencia_actual || '')}" placeholder="Limite vigencia">
-                    <input data-insurance-request-field="sublimite_actual" data-product="${assetEscape(row.ramo || '')}" data-coverage="${assetEscape(row.cobertura || '')}" value="${assetEscape(row.sublimite_actual || '')}" placeholder="Sublimite">
+                    <input data-money-format inputmode="decimal" data-insurance-request-field="limite_evento_actual" data-product="${assetEscape(row.ramo || '')}" data-coverage="${assetEscape(row.cobertura || '')}" value="${assetEscape(assetMoneyPlain(limiteEvento) || limiteEvento)}" placeholder="Limite evento">
+                    <input data-money-format inputmode="decimal" data-insurance-request-field="limite_vigencia_actual" data-product="${assetEscape(row.ramo || '')}" data-coverage="${assetEscape(row.cobertura || '')}" value="${assetEscape(assetMoneyPlain(limiteVigencia) || limiteVigencia)}" placeholder="Limite vigencia">
+                    <input data-insurance-request-field="sublimite_actual" data-product="${assetEscape(row.ramo || '')}" data-coverage="${assetEscape(row.cobertura || '')}" value="${assetEscape(sublimite)}" placeholder="Sublimite">
                 </label>
                 <label>
                     <span>Deducible</span>
-                    <input data-insurance-request-field="deducible_porcentaje_actual" inputmode="decimal" data-product="${assetEscape(row.ramo || '')}" data-coverage="${assetEscape(row.cobertura || '')}" value="${assetEscape(row.deducible_porcentaje_actual || '')}" placeholder="% perdida">
-                    <input data-insurance-request-field="deducible_minimo_actual" data-product="${assetEscape(row.ramo || '')}" data-coverage="${assetEscape(row.cobertura || '')}" value="${assetEscape(row.deducible_minimo_actual || '')}" placeholder="Minimo ej. 1 SMMLV">
-                    <input data-insurance-request-field="deducible_actual" data-product="${assetEscape(row.ramo || '')}" data-coverage="${assetEscape(row.cobertura || '')}" value="${assetEscape(row.deducible_actual || '')}" placeholder="Texto caratula">
+                    <input data-insurance-request-field="deducible_porcentaje_actual" inputmode="decimal" data-product="${assetEscape(row.ramo || '')}" data-coverage="${assetEscape(row.cobertura || '')}" value="${assetEscape(deduciblePorcentaje)}" placeholder="% perdida">
+                    <input data-insurance-request-field="deducible_minimo_actual" data-product="${assetEscape(row.ramo || '')}" data-coverage="${assetEscape(row.cobertura || '')}" value="${assetEscape(deducibleMinimo)}" placeholder="Minimo ej. 1 SMMLV">
+                    <input data-insurance-request-field="deducible_actual" data-product="${assetEscape(row.ramo || '')}" data-coverage="${assetEscape(row.cobertura || '')}" value="${assetEscape(deducibleTexto)}" placeholder="Texto caratula">
                 </label>
                 <label>
                     <span>Indice / tasa</span>
@@ -4537,10 +4759,11 @@ const insuranceCurrentPolicyOnlyTableHtml = (rows = []) => rows.length ? `
                 </label>
                 <label>
                     <span>Fuente / observacion</span>
-                    <input data-insurance-request-field="observaciones_actuales" data-product="${assetEscape(row.ramo || '')}" data-coverage="${assetEscape(row.cobertura || '')}" value="${assetEscape(row.observaciones_actuales || '')}" placeholder="Caratula, clausulado, exclusion">
+                    <input data-insurance-request-field="observaciones_actuales" data-product="${assetEscape(row.ramo || '')}" data-coverage="${assetEscape(row.cobertura || '')}" value="${assetEscape(observacionActual)}" placeholder="Caratula, clausulado, exclusion">
                 </label>
             </div>
-        `).join('')}
+        `;
+        }).join('')}
     </div>
 ` : '<p class="muted">Selecciona ramos y registra las coberturas de la poliza actual para construir la linea base.</p>';
 
@@ -4564,13 +4787,17 @@ const insuranceRenewalComparisonHtml = (form, activeProduct, selectedProducts = 
                     <span>Nuevo valor solicitado</span>
                     <span>Fuente / observacion</span>
                 </div>
-                ${visibleCoverages.map((row) => `
+                ${visibleCoverages.map((row) => {
+                    const terms = insurancePolicyTermsFor(row.cobertura || '', row.ramo || '');
+                    const deducibleActual = [row.deducible_porcentaje_actual || terms.deducible_porcentaje, row.deducible_minimo_actual || terms.deducible_minimo, row.deducible_actual || terms.deducible_texto].filter(Boolean).join(' / ') || 'Por definir';
+                    const limitesActuales = [row.limite_evento_actual || terms.limite_evento, row.limite_vigencia_actual || terms.limite_vigencia, row.sublimite_actual || terms.sublimite].filter(Boolean).join(' / ') || 'Por definir';
+                    return `
                     <div class="asset-insurance-comparison-row" role="row">
-                        <strong>${assetEscape(row.ramo || 'Ramo')}<small>${assetEscape(row.cobertura || 'Cobertura')}</small>${row.valor_asegurado || row.renovacion_solicitada ? '' : '<em>Solo poliza actual: decidir si se mantiene o elimina</em>'}</strong>
+                        <strong>${assetEscape(row.ramo || 'Ramo')}<small>${assetEscape(row.cobertura || 'Cobertura')}</small>${row.valor_asegurado || row.renovacion_solicitada ? '' : '<em>Solo poliza actual: decidir si se mantiene o elimina</em>'}${terms.demerito ? `<em>${assetEscape(terms.demerito)}</em>` : ''}</strong>
                         <span>${assetEscape(row.contratado_actual || 'Por definir')}</span>
                         <span>${assetEscape(assetMoney(row.valor_actual || 0))}</span>
-                        <span>${assetEscape([row.deducible_porcentaje_actual, row.deducible_minimo_actual, row.deducible_actual].filter(Boolean).join(' / ') || 'Por definir')}</span>
-                        <span>${assetEscape([row.limite_evento_actual, row.limite_vigencia_actual, row.sublimite_actual].filter(Boolean).join(' / ') || 'Por definir')}</span>
+                        <span>${assetEscape(deducibleActual)}</span>
+                        <span>${assetEscape(limitesActuales)}</span>
                         <span>${assetEscape([row.indice_variable_actual, row.tasa_actual].filter(Boolean).join(' / ') || 'Por definir')}</span>
                         <span>${assetEscape(assetMoney(row.prima_actual || 0))}</span>
                         <label>
@@ -4587,7 +4814,8 @@ const insuranceRenewalComparisonHtml = (form, activeProduct, selectedProducts = 
                             <input data-insurance-request-field="observaciones" data-product="${assetEscape(row.ramo || '')}" data-coverage="${assetEscape(row.cobertura || '')}" value="${assetEscape(row.observaciones || '')}" placeholder="Mejora, exclusion o condicion">
                         </label>
                     </div>
-                `).join('')}
+                `;
+                }).join('')}
             </div>
         ` : '<p class="muted">Marca coberturas requeridas para que aqui aparezca la comparacion y los valores que iran a cotizacion.</p>'}
     `;
@@ -4803,15 +5031,15 @@ const insuranceRequestRowsForProduct = (form, product, existingRows = []) => {
     ])];
     return coverageOptionsForPolicy(product, allCoverageNames, form).map((coverage) => {
         const suggestion = suggestCoverageValue(form, coverage);
-        return {
+        return applyInsurancePolicyTerms({
             ano: String(new Date().getFullYear()),
             ramo: product,
             cobertura: coverage,
             riesgo_cubierto: coverage,
             valor_asegurado: suggestion.value > 0 ? String(Math.round(suggestion.value)) : '',
             fuente_valor_asegurado: suggestion.source || '',
-            observaciones: suggestion.source ? `Valor sugerido segun relacion de bienes a reposicion. Fuente: ${suggestion.source}` : 'Definir valor o limite con soporte antes de cotizar.',
-        };
+            observaciones: suggestion.source ? `Valor sugerido segun relacion de bienes a reposicion. Fuente: ${suggestion.source}` : '',
+        });
     });
 };
 
@@ -4827,7 +5055,7 @@ const mergeInsuranceCoverageRows = (rows = []) => {
         assetInsuranceCoverageFields.forEach((field) => {
             const previousValue = previous[field] ?? '';
             const rowValue = row[field] ?? '';
-            if (['valor_asegurado', 'limite_evento', 'sublimite', 'prima', 'tasa', 'deducible'].includes(field)) {
+            if (['valor_asegurado', 'valor_actual', 'limite_evento', 'limite_vigencia', 'limite_evento_actual', 'limite_vigencia_actual', 'sublimite', 'sublimite_actual', 'prima', 'prima_actual', 'tasa', 'tasa_actual', 'deducible', 'deducible_actual'].includes(field)) {
                 const numericRow = assetNumber(rowValue);
                 if (numericRow > 0 || (!previousValue && rowValue)) {
                     next[field] = rowValue;
@@ -4840,7 +5068,7 @@ const mergeInsuranceCoverageRows = (rows = []) => {
                 next[field] = previousValue;
             }
         });
-        merged.set(key, next);
+        merged.set(key, applyInsurancePolicyTerms(next));
     });
     return [...merged.values()];
 };
@@ -6399,25 +6627,39 @@ if (assetForm instanceof HTMLFormElement) {
             const targetKey = normalizedCoverageRowKey({ ramo: product, cobertura: coverage });
             if (!rows.some((row) => product ? normalizedCoverageRowKey(row) === targetKey : normalizeInsuranceText(row.cobertura) === normalizeInsuranceText(coverage))) {
                 const suggestion = suggestCoverageValue(assetForm, coverage);
+                const terms = insurancePolicyTermsFor(coverage, product);
                 const policyIndex = Number(assetForm.querySelector('[data-asset-coverage-policy-source]')?.value || 0);
                 const policies = assetFormRows(assetForm, '[data-asset-insurance-policy-row]', ['numero_poliza', 'ramo', 'fecha_inicio', 'fecha_fin', 'fecha_renovacion']);
                 const policy = policies[Number.isFinite(policyIndex) ? policyIndex : 0] || {};
+                const source = suggestion.source || terms.source || '';
+                const observation = suggestion.source
+                    ? `Valor sugerido segun relacion de bienes a reposicion. Fuente: ${suggestion.source}`
+                    : ([terms.deducible_texto, terms.demerito].filter(Boolean).join(' ') || 'Definir valor o limite con soporte antes de cotizar.');
                 rows.push({
                     ano: String(new Date().getFullYear()),
                     cobertura: coverage,
                     riesgo_cubierto: coverage,
                     valor_asegurado: suggestion.value > 0 ? String(Math.round(suggestion.value)) : '',
-                    fuente_valor_asegurado: suggestion.source || '',
+                    fuente_valor_asegurado: source,
                     numero_poliza: policy.numero_poliza || '',
                     ramo: product || policy.ramo || '',
                     fecha_inicio: policy.fecha_inicio || '',
                     fecha_fin: policy.fecha_fin || '',
                     fecha_renovacion: policy.fecha_renovacion || '',
-                    limite_evento: '',
-                    sublimite: '',
+                    limite_evento: terms.limite_evento || '',
+                    limite_vigencia: terms.limite_vigencia || '',
+                    sublimite: terms.sublimite || '',
                     indice_variable: '',
-                    deducible: '',
-                    observaciones: suggestion.source ? `Valor sugerido segun relacion de bienes a reposicion. Fuente: ${suggestion.source}` : 'Definir valor o limite con soporte antes de cotizar.',
+                    deducible_porcentaje: terms.deducible_porcentaje || '',
+                    deducible_minimo: terms.deducible_minimo || '',
+                    deducible: terms.deducible_texto || '',
+                    limite_evento_actual: terms.limite_evento || '',
+                    limite_vigencia_actual: terms.limite_vigencia || '',
+                    sublimite_actual: terms.sublimite || '',
+                    deducible_porcentaje_actual: terms.deducible_porcentaje || '',
+                    deducible_minimo_actual: terms.deducible_minimo || '',
+                    deducible_actual: terms.deducible_texto || '',
+                    observaciones: observation,
                 });
             }
         } else {
